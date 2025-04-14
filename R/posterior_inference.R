@@ -569,6 +569,8 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
 
     sf_polygon <- sf::st_sfc(sf::st_polygon(list(as.matrix(map_data_loc[,c(1,2)]))), crs=4326)
 
+    sf_polygon <- sf::st_make_valid(sf_polygon)
+    if(!sf::st_is_valid(sf_polygon)){sf::sf_use_s2(FALSE)}
     ### Check if points fall inside of polygon ###
     inside = c()
     for (kk in 1:nrow(predloc)) {
@@ -599,7 +601,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
                   xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                   ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
       ggtitle(plot.title) + # FIX ME
-      theme(panel.background =element_rect(fill = 'blue')) +
+      theme(panel.background =element_rect(fill = rgb(0, .1, 1, .1))) +
       geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predm)) +
       scale_colour_gradientn(colours=color.gradient, name=legend.name,
                              limits = c(min_value, max_value)) +
@@ -623,7 +625,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
                     xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                     ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Lower Bound')) +
-        theme(panel.background =element_rect(fill = 'blue')) +
+        theme(panel.background =element_rect(fill = rgb(0, .1, 1, .1))) +
         geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predl)) +
         scale_colour_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +
@@ -644,7 +646,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
                     xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                     ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Upper Bound')) +
-        theme(panel.background =element_rect(fill = 'blue')) +
+        theme(panel.background =element_rect(fill = rgb(0, .1, 1, .1))) +
         geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predu)) +
         scale_colour_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +

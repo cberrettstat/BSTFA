@@ -15,13 +15,13 @@
 BSTFA <- function(ymat, dates, coords,
                  iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                  mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
-                 n.seasn.knots=min(7, ceiling(length(unique(yday(dates)))/4)),
+                 n.seasn.knots=min(7, ceiling(length(unique(yday(dates)))/3)),
                  spatial.style='fourier',
-                 n.spatial.bases=8,
+                 n.spatial.bases=min(8, ceiling(dim(coords)[1]/3)),
                  knot.levels=2, max.knot.dist=mean(dist(coords)), premade.knots=NULL, plot.knots=FALSE,
                  n.factors=min(4,ceiling(n.locs/20)), factors.fixed=NULL, plot.factors=FALSE,
                  load.style='fourier',
-                 n.load.bases=6,
+                 n.load.bases=min(6, ceiling(dim(coords)[1]/3)),
                  freq.lon=4*diff(range(coords[,1])),
                  freq.lat=4*diff(range(coords[,2])),
                  n.temp.bases=ifelse(floor(n.times*0.10)%%2==1, floor(n.times*0.10)-1, floor(n.times*0.10)),
@@ -680,7 +680,7 @@ BSTFA <- function(ymat, dates, coords,
     }
 
 
-    if (i %% floor(iters/min(100,iters)) == 0 & verbose) {
+    if (i %% floor(iters*.1) == 0 & verbose) {
       print(paste("Finished iteration ", i, ": taken ", round((proc.time()[3]-start.time[3])/60,2), " minutes.", sep=""))
     }
     if (i == delayFA & verbose) {
