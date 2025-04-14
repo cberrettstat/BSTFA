@@ -310,15 +310,22 @@ plot.grid = function(out, parameter, loadings=1, type='mean', ci.level=c(0.025, 
   }
   if (parameter == 'loading') {
     for (i in loadings) {
-      print(ggplot(mapping=aes(x=out$coords[,1], y=out$coords[,2], color=vals[,i])) +
-              geom_point() +
-              xlab('Longitude') +
-              ylab('Latitude') +
-              geom_point(aes(x=out$coords[out$factors.fixed[i],1]),
-                         y=out$coords[out$factors.fixed[i],2], color="red", size=4) +
-              ggtitle(paste("Loading ", i, ", Fixed Location ", out$factors.fixed[i], sep="")) +
-        scale_colour_gradientn(colors=color.gradient,
-                               name=paste('Loading',loadings), limits = c(min_value, max_value)))
+      mm <- ggplot(mapping = aes(x = out$coords[,1], y = out$coords[,2])) +
+        geom_point(aes(color = vals[,i])) +  # Main values
+        geom_point(aes(x = out$coords[out$factors.fixed[i], 1],
+                       y = out$coords[out$factors.fixed[i], 2],
+                       shape = "Fixed Location"),
+                   color = "black", size = 2, stroke = 1) +  # Fixed location as open dot
+        xlab('Longitude') +
+        ylab('Latitude') +
+        ggtitle(paste("Loading ", i, ", Fixed Location ", out$factors.fixed[i], sep = "")) +
+        scale_colour_gradientn(colors = color.gradient,
+                               name = paste('Loading', loadings),
+                               limits = c(min_value, max_value)) +
+        scale_shape_manual(name = "", values = c("Fixed Location" = 1)) +  # shape 1 = open circle
+        guides(color = guide_colorbar(order = 1),
+               shape = guide_legend(order = 2))
+      print(mm)
     }
   }
 }
@@ -575,7 +582,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
     inside = c()
     for (kk in 1:nrow(predloc)) {
       point = sf::st_sfc(sf::st_point(as.matrix(predloc[kk,c(1,2)])), crs=4326)
-      if (sf::st_intersects(point, sf_polygon, sparse=FALSE)) inside = append(inside, kk)
+      if (suppressMessages(sf::st_intersects(point, sf_polygon, sparse=FALSE))) inside = append(inside, kk)
     }
 
     predloc.inside = predloc[inside, ]
@@ -595,7 +602,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
       ## Second layer: Country map
       geom_polygon(data = map_data_loc,
                    aes(x=long, y=lat, group = group),
-                   color = 'red', fill='gray') +
+                   color = 'gray', fill='gray') +
       coord_map() +
       coord_fixed(1.3,
                   xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
@@ -619,7 +626,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
         ## Second layer: Country map
         geom_polygon(data = map_data_loc,
                      aes(x=long, y=lat, group = group),
-                     color = 'red', fill='gray') +
+                     color = 'gray', fill='gray') +
         coord_map() +
         coord_fixed(1.3,
                     xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
@@ -640,7 +647,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
         ## Second layer: Country map
         geom_polygon(data = map_data_loc,
                      aes(x=long, y=lat, group = group),
-                     color = 'red', fill='gray') +
+                     color = 'gray', fill='gray') +
         coord_map() +
         coord_fixed(1.3,
                     xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
