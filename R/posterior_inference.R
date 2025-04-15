@@ -653,7 +653,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
 #' @param out output from STFA or STFAfull
 #' @export plot.factor
 plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
-                       type='mean', ci.level=c(0.025, 0.975),
+                       type='mean', uncertainty=T, ci.level=c(0.025, 0.975),
                        xrange=NULL) {
 
   par(mfrow=c(1,1))
@@ -661,7 +661,11 @@ plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
   if (type=='mean') F.tilde = matrix(apply(out$F.tilde,2,mean),nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)
   if (type=='median') F.tilde = matrix(apply(out$F.tilde,2,median),nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)
   if (type=='lb') F.tilde = matrix(apply(out$F.tilde,2,quantile,prob=ci.level[1]),nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)
-  if (type=='ub') F.tilde = matrix(apply(out$F.tilde,2,quantile,prob=ci.level[1]),nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)
+  if (type=='ub') F.tilde = matrix(apply(out$F.tilde,2,quantile,prob=ci.level[2]),nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)
+  if(uncertainty){
+    F.tilde.lb <- matrix(apply(out$F.tilde,2,quantile,prob=ci.level[1]),nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)
+    F.tilde.ub <- matrix(apply(out$F.tilde,2,quantile,prob=ci.level[2]),nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)
+  }
 
   if (is.null(xrange)) xlims=1:out$n.times
   else xlims=which(out$dates > xrange[1] & out$dates < xrange[2])
@@ -687,8 +691,9 @@ plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
   }
   if (!together) {
     for (i in factor) {
-      plot(y=F.tilde[,i], x=out$dates, type='l', main=paste('Factor', i),
-           xlab = 'Time', ylab='Value')
+      plot(y=F.tilde[xlims,i], x=out$dates[xlims], type='l', main=paste('Factor', i),
+           xlab = 'Time', ylab='Value', lwd=2)
+      if(uncertainty){polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(F.tilde.lb[xlims,i], rev(F.tilde.ub[xlims,i])), col=rgb(.5, .5, .5,.4), border=NA)}
     }
   }
 

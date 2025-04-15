@@ -490,6 +490,7 @@ BSTFA <- function(ymat, dates, coords,
 
       ### Sample alpha.beta
       alpha.var <- solve((1/tau2.beta)*t(newS)%*%newS + A.prec)
+      alpha.var <- .5*alpha.var + .5*t(alpha.var)
       alpha.mean <- alpha.var%*%((1/tau2.beta)*t(newS)%*%beta)
       alpha.beta <- c(MASS::mvrnorm(1, alpha.mean, alpha.var))
       rm(list=c("tau2.shape", "tau2.rate", "alpha.var", "alpha.mean"))
