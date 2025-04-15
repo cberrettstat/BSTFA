@@ -104,9 +104,9 @@ computeLogLik <- function(out, verbose=FALSE, addthin=1) {
   log_lik = matrix(0,nrow=out$n.times*out$n.locs,
                           ncol=length(myseq))
   if (verbose) print('Starting Log-likelihood calculation')
-  for (d in myseq) {
+  for (d in 1:length(myseq)) {
     for (i in 1:(out$n.times*out$n.locs)) {
-      log_lik[i,d] = dnorm(y[i],mu[i,d],sd=out$sig2[d],log=TRUE)
+      log_lik[i,d] = dnorm(y[i],mu[i,myseq[d]],sd=out$sig2[myseq[d]],log=TRUE)
     }
     if (verbose) print(paste('Draw', d))
   }
