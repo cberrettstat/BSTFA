@@ -100,10 +100,11 @@ computeLogLik <- function(out, verbose=FALSE, addthin=1) {
   y = out$y
   mu = predictBSTFA(out=out,
                     type='all')
+  myseq <- seq(1,out$draws,by=addthin)
   log_lik = matrix(0,nrow=out$n.times*out$n.locs,
-                          ncol=floor(out$draws/addthin))
+                          ncol=length(myseq))
   if (verbose) print('Starting Log-likelihood calculation')
-  for (d in seq(1,out$draws,by=addthin)) {
+  for (d in myseq) {
     for (i in 1:(out$n.times*out$n.locs)) {
       log_lik[i,d] = dnorm(y[i],mu[i,d],sd=out$sig2[d],log=TRUE)
     }
