@@ -349,13 +349,6 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
 
   # FIX ME - do functions like bisquare2d work in this function?
 
-  # require(tidyverse)
-  # require(ggpubr)
-  # require(gridExtra)
-  # require(maps)
-  # require(sf)
-  # source('usefulFunctions.R')
-
   if (map) {
     if (!state) {
       map_data_loc <- ggplot2::map_data('world')[ggplot2::map_data('world')$region == location,]
@@ -377,23 +370,6 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
                                max(out$coords[,2]), length=fine))
   }
   names(predloc) <- c("Lon", "Lat")
-
-  # predS = matrix(0,nrow=nrow(predloc),ncol=dim(out$alpha.beta)[2])
-  # for (i in 1:nrow(predloc)) {
-  #   long=predloc[i,1]
-  #   lat=predloc[i,2]
-  #   region=defineRegion(out,predloc[i,])
-  #   knots.to.use=c(1:4)
-  #   if (out$knot.levels>=2) {
-  #     knots.to.use = append(knots.to.use, ((4*region[[2]])+1):((4*region[[2]])+4))
-  #   }
-  #   if (out$knot.levels>=3) {
-  #     knots.to.use = append(knots.to.use, ((4*region[[3]])+17):((4*region[[3]])+20))
-  #   }
-  #   predS[i,knots.to.use[1:4]] = bisquare2d(as.matrix(predloc[i,]), as.matrix(out$knots[[1]]))
-  #   if (out$knot.levels>=2) predS[i,knots.to.use[5:8]] = bisquare2d(as.matrix(predloc[i,]), as.matrix(out$knots[[2]][knots.to.use[5:8]-4,]))
-  #   if (out$knot.levels>=3) predS[i,knots.to.use[9:12]] = bisquare2d(as.matrix(predloc[i,]), as.matrix(out$knots[[3]][knots.to.use[9:12]-20,]))
-  # }
 
   if (parameter=='loading') {
     plot.title = paste('Loading', loading)
@@ -419,14 +395,6 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
       Slon <- cbind(m.fft.lon[1:nrow(predloc),], m.fft.lon[(nrow(predloc)+1):(2*nrow(predloc)),])
       Slat <- cbind(m.fft.lat[1:nrow(predloc),], m.fft.lat[(nrow(predloc)+1):(2*nrow(predloc)),])
       predS = matrix(Slat*Slon,ncol=out$n.load.bases)
-
-      ### Additive Fourier Method
-      # m.fft = sapply(1:(out$n.load.bases/2), function(k) {
-      #   sin_term = sin(2*pi*k*predloc[,1]/out$freq.lon + 2*pi*k*predloc[,2]/out$freq.lat )
-      #   cos_term = cos(2*pi*k*predloc[,1]/out$freq.lon + 2*pi*k*predloc[,2]/out$freq.lat )
-      #   cbind(sin_term, cos_term)
-      # })
-      # predS = cbind(m.fft[1:nrow(predloc),], m.fft[(nrow(predloc)+1):(2*nrow(predloc)),])
     }
     if (out$load.style=='tps') {
       predS = npreg::basis.tps(predloc,knots=out$knots.load,rk=TRUE)[,-(1:2)]
@@ -457,15 +425,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
       Slon <- cbind(m.fft.lon[1:nrow(predloc),], m.fft.lon[(nrow(predloc)+1):(2*nrow(predloc)),])
       Slat <- cbind(m.fft.lat[1:nrow(predloc),], m.fft.lat[(nrow(predloc)+1):(2*nrow(predloc)),])
       predS = matrix(Slat*Slon,ncol=out$n.spatial.bases)
-
-      ### Additive Fourier Method
-      # m.fft = sapply(1:(out$n.spatial.bases/2), function(k) {
-      #   sin_term = sin(2*pi*k*predloc[,1]/out$freq.lon + 2*pi*k*predloc[,2]/out$freq.lat )
-      #   cos_term = cos(2*pi*k*predloc[,1]/out$freq.lon + 2*pi*k*predloc[,2]/out$freq.lat )
-      #   cbind(sin_term, cos_term)
-      # })
-      # predS = cbind(m.fft[1:nrow(predloc),], m.fft[(nrow(predloc)+1):(2*nrow(predloc)),])
-    }
+   }
     if (out$spatial.style=='tps') {
       predS = npreg::basis.tps(predloc,knots=out$knots.spatial,rk=TRUE)[,-(1:2)]
     }
@@ -549,23 +509,24 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
   }
 
   if (!map) {
-    m <- ggplot2::ggplot(aes(x=Lon, y=Lat), data=predloc) +
-      geom_point(aes(x=Lon, y=Lat, color=predm)) +
-      scale_colour_gradientn(colours=color.gradient, name=legend.name,
+    m <- ggplot2::ggplot(aes(x=Lon, y=Lat, fill=predm), data=predloc) +
+      #geom_point(aes(x=Lon, y=Lat, color=predm)) +
+      geom_raster(interpolate=T) +
+      scale_fill_gradientn(colours=color.gradient, name=legend.name,
                              limits = c(min_value, max_value)) +
       ggtitle(plot.title) + xlab("Longitude") + ylab("Latitude")
-    # geom_point(data=out$knots[[1]], aes(x=x,y=y)) +
-    # geom_point(x=out$coords[out$factors.fixed[loading],1], y=out$coords[out$factors.fixed[loading],2], color='green')
     if (!with.uncertainty) print(m)
     if (with.uncertainty) {
-      l <- ggplot(data=predloc) +
-        geom_point(aes(x=Lon, y=Lat, color=predl)) +
-        scale_colour_gradientn(colours=color.gradient, name=legend.name,
+      l <- ggplot(data=predloc, aes(x=Lon, y=Lat, fill=predl)) +
+        #geom_point(aes(x=Lon, y=Lat, color=predl)) +
+        geom_raster(interpolate=T) +
+        scale_fill_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Lower Bound')) + xlab("Longitude") + ylab("Latitude")
-      u <- ggplot(data=predloc) +
-        geom_point(aes(x=Lon, y=Lat, color=predu)) +
-        scale_colour_gradientn(colours=color.gradient, name=legend.name,
+      u <- ggplot(data=predloc, aes(x=Lon, y=Lat, fill=predu)) +
+        #geom_point(aes(x=Lon, y=Lat, color=predu)) +
+        geom_raster(interpolate=T) +
+        scale_fill_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Upper Bound')) + xlab("Longitude") + ylab("Latitude")
       print(ggpubr::ggarrange(l, m, u, nrow=1, common.legend=T, legend="right"))
@@ -577,7 +538,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
     sf_polygon <- sf::st_sfc(sf::st_polygon(list(as.matrix(map_data_loc[,c(1,2)]))), crs=4326)
 
     sf_polygon <- sf::st_make_valid(sf_polygon)
-    if(!sf::st_is_valid(sf_polygon)){sf::sf_use_s2(FALSE)}
+    if(!sf::st_is_valid(sf_polygon)){suppressMessages(sf::sf_use_s2(FALSE))}
     ### Check if points fall inside of polygon ###
     inside = c()
     for (kk in 1:nrow(predloc)) {
@@ -602,15 +563,16 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
       ## Second layer: Country map
       geom_polygon(data = map_data_loc,
                    aes(x=long, y=lat, group = group),
-                   color = 'gray', fill='gray') +
+                   color = '#9c9c9c', fill='#f3f3f3') +
       coord_map() +
       coord_fixed(1.3,
                   xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                   ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
       ggtitle(plot.title) + # FIX ME
-      theme(panel.background =element_rect(fill = rgb(0, .1, 1, .1))) +
-      geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predm)) +
-      scale_colour_gradientn(colours=color.gradient, name=legend.name,
+      theme(panel.background =element_rect(fill = rgb(0.67, .84, .89, .35))) +
+      #geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predm)) +
+      geom_raster(data=predloc.inside, aes(x=Lon, y=Lat, fill=predm)) +
+      scale_fill_gradientn(colours=color.gradient, name=legend.name,
                              limits = c(min_value, max_value)) +
                              # limits = c(-0.7, 0.7)) + # FIX ME
       xlab('Longitude') +
@@ -632,9 +594,10 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
                     xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                     ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Lower Bound')) +
-        theme(panel.background =element_rect(fill = rgb(0, .1, 1, .1))) +
-        geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predl)) +
-        scale_colour_gradientn(colours=color.gradient, name=legend.name,
+        theme(panel.background =element_rect(fill = rgb(0.67, .84, .89, .35))) +
+        #geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predl)) +
+        geom_raster(data=predloc.inside, aes(x=Lon, y=Lat, fill=predl), interpolate=T) +
+        scale_fill_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +
         xlab('Longitude') +
         ylab('Latitude')
@@ -653,9 +616,10 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
                     xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                     ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Upper Bound')) +
-        theme(panel.background =element_rect(fill = rgb(0, .1, 1, .1))) +
-        geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predu)) +
-        scale_colour_gradientn(colours=color.gradient, name=legend.name,
+        theme(panel.background =element_rect(fill = rgb(0.67, .84, .89, .35))) +
+        #geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predu)) +
+        geom_raster(data=predloc.inside, aes(x=Lon, y=Lat, fill=predu), interpolate=T) +
+        scale_fill_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +
         xlab('Longitude') +
         ylab('Latitude')
