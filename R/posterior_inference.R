@@ -679,6 +679,7 @@ plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
     if(uncertainty){
       for(i in 1:out$n.factors){
       polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(F.tilde.lb[xlims,i], rev(F.tilde.ub[xlims,i])), col=mycolssee[i], border=NA)
+      }
     }
     for (i in 1:out$n.factors) {
       lines(y=F.tilde[,i], x=out$dates, type='l', col=mycols[i])
