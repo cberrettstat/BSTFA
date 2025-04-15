@@ -254,11 +254,11 @@ plot.location = function(out, location, new_x=NULL,
          ylim=ylim,
          lwd=2)
     if (uncertainty) {
-      polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(ymat.preds.lb[xlims,i], rev(ymat.preds.ub[xlims,i])), border=NA, col=rgb(.1, .1, .1, .2))
+      polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(ymat.preds.lb[xlims,i], rev(ymat.preds.ub[xlims,i])), border=NA, col=rgb(.5, .5, .5, .4))
       #lines(ymat.preds.ub[xlims,i], x=out$dates[xlims], col='green', lty=2)
     }
     if (truth & is.null(dim(location))) points(y=out$ymat[xlims,location[i]],
-                                              x=out$dates[xlims], col=rgb(.5, .5, .5,.25))
+                                              x=out$dates[xlims], col=rgb(.5, .5, .5,1))
   }
 
 }
