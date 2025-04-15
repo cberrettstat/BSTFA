@@ -670,18 +670,24 @@ plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
   if (is.null(xrange)) xlims=1:out$n.times
   else xlims=which(out$dates > xrange[1] & out$dates < xrange[2])
   if (together) {
+    mycols <- RColorBrewer::brewer.pal(out$n.factors, 'Dark2')
+    mycolssee <- paste0(mycols, "20")
     plot(y=F.tilde[xlims,1], x=out$dates[xlims], type='l', main = ('All Factors'),
-         xlab = 'Time', ylab='Value', col=1,
+         xlab = 'Time', ylab='Value', col=mycols[1],
          ylim=range(F.tilde))
          # ylim=c(-7,7)) # FIX ME
-    for (i in 2:out$n.factors) {
-      lines(y=F.tilde[,i], x=out$dates, type='l', col=i)
+    if(uncertainty){
+      for(i in 1:out$n.factors){
+      polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(F.tilde.lb[xlims,i], rev(F.tilde.ub[xlims,i])), col=mycolssee[i], border=NA)
+    }
+    for (i in 1:out$n.factors) {
+      lines(y=F.tilde[,i], x=out$dates, type='l', col=mycols[i])
     }
     if (include.legend) {
       legend("topleft",
              legend=paste("Factor", seq(1,out$n.factors)),
              # legend=c("Wendover","Moab","St. George","Logan/USU"),
-             col = seq(1,out$n.factors),
+             col = mycols,
              lty=1,
              lwd=2,
              xpd=TRUE)
@@ -691,8 +697,11 @@ plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
   }
   if (!together) {
     for (i in factor) {
+      if(uncertainty){
+        ylims <- range(c(c(F.tilde.lb, F.tilde.ub)))
+      }else{ylims <- range(F.tilde)}
       plot(y=F.tilde[xlims,i], x=out$dates[xlims], type='l', main=paste('Factor', i),
-           xlab = 'Time', ylab='Value', lwd=2)
+           xlab = 'Time', ylab='Value', lwd=2, ylim=ylims)
       if(uncertainty){polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(F.tilde.lb[xlims,i], rev(F.tilde.ub[xlims,i])), col=rgb(.5, .5, .5,.4), border=NA)}
     }
   }
