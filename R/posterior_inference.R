@@ -253,13 +253,31 @@ plot.location = function(out, location, new_x=NULL,
          ylab = "Value",
          ylim=ylim,
          lwd=2)
+    mylegend <- c("Posterior Mean")
+    mylines <- c(1)
+    mydots <- c(NA)
+    mylegcols <- c("black")
+    mylwd <- c(1)
     if (uncertainty) {
       polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(ymat.preds.lb[xlims,i], rev(ymat.preds.ub[xlims,i])), border=NA, col=rgb(.5, .5, .5, .4))
       #lines(ymat.preds.ub[xlims,i], x=out$dates[xlims], col='green', lty=2)
+      mylegend <- c(mylegend, paste(100*(ci.level[2]-ci.level[1]), "% Uncertainty", sep=""))
+      mylines <- c(mylines, 1)
+      mydots <- c(mydots, NA)
+      mylegcols <- c(mylegcols, rgb(.5, .5, .5, .4))
+      mylwd <- c(mylwd, 3)
     }
-    if (truth & is.null(dim(location))) points(y=out$ymat[xlims,location[i]],
-                                              x=out$dates[xlims], col=rgb(.5, .5, .5,1))
+    if (truth & is.null(dim(location))) {
+      points(y=out$ymat[xlims,location[i]],x=out$dates[xlims], col=rgb(.5, .5, .5,1))
+      mylegend <- c(mylegend, paste("Observations"))
+      mylines <- c(mylines, NA)
+      mydots <- c(mydots, 21)
+      mylegcols <- c(mylegcols, rgb(.5, .5, .5, 1))
+      mylwd <- c(mylwd, NA)
+    }
+    legend("topright", legend=mylegend, lty=mylines, lwd=mylwd, col=mylegcols, pch=mydots)
   }
+
 
 }
 
