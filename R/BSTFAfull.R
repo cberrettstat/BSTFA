@@ -648,11 +648,11 @@ BSTFAfull <- function(ymat, dates, n.times=nrow(ymat), n.locs=ncol(ymat), coords
                 "xi" = as.mcmc(t(xi.save)),
                 "alpha.xi" = as.mcmc(t(alpha.xi.save)),
                 "tau2.xi" = as.mcmc(t(tau2.xi.save)),
-                "PFmat" = as.mcmc(t(PFmat.save)),
+                "F.tilde" = as.mcmc(t(PFmat.save)),
                 "Omega" = as.mcmc(t(Omega.save)),
                 "Omega.accept" = Omega.accept,
                 "Sigma.F.inv" = as.mcmc(t(Sigma.F.inv.save)),
-                "Lambda" = as.mcmc(t(Lambda.save)),
+                "Lambda.tilde" = as.mcmc(t(Lambda.save)),
                 "tau2.lambda" = as.mcmc(t(tau2.lambda.save)),
                 "phi.lambda" = as.mcmc(t(phi.lambda.save)),
                 "phi.lambda.accept" = phi.lambda.accept,
@@ -680,7 +680,8 @@ BSTFAfull <- function(ymat, dates, n.times=nrow(ymat), n.locs=ncol(ymat), coords
                 "n.spatial.bases" = n.spatial.bases,
                 "n.seasn.knots" = n.seasn.knots,
                 "n.spatial.bases" = n.spatial.bases,
-                "draws" = dim(as.mcmc(t(beta.save)))[1])
+                "draws" = dim(as.mcmc(t(beta.save)))[1],
+                "full" = TRUE)
 
   save(output, file=filename)
 
