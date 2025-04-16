@@ -14,10 +14,10 @@
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, n.times=nrow(ymat), n.locs=ncol(ymat), coords, iters=10000, x=NULL,
                      mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
-                     n.seasn.knots=7, n.spatial.bases=ceiling(n.locs/2), n.factors=min(4,ceiling(n.locs/20)), factors.fixed=NULL, plot.factors=TRUE,
+                     n.seasn.knots=min(7, ceiling(length(unique(yday(dates)))/3)), n.spatial.bases=ceiling(n.locs/2), n.factors=min(4,ceiling(n.locs/20)), factors.fixed=NULL, plot.factors=FALSE,
                      knot.levels=2, max.knot.dist=n.locs*0.05, premade.knots=NULL, plot.knots=TRUE, spatial.style='grid',
-                     freq.lon=(max(coords[,1])-min(coords[,1]))^2,
-                     freq.lat=(max(coords[,2])-min(coords[,2]))^2,
+                     freq.lon=4*diff(range(coords[,1])),
+                     freq.lat=4*diff(range(coords[,2])),
                      alpha.prec=1/100000, tau2.gamma=2, tau2.phi=0.0000001, sig2.gamma=2, sig2.phi=1e-5,
                      omega.ii.mean=1, omega.ii.var=1, omega.ij.mean=0, omega.ij.var=2,
                      S.F=diag(1,n.factors), nu.F=n.factors, phi.gamma=3, phi.phi=0.5,
@@ -624,7 +624,7 @@ BSTFAfull <- function(ymat, dates, n.times=nrow(ymat), n.locs=ncol(ymat), coords
       }#end if factor==T
     }#end if adapt.epsilon>0
 
-    if (i %% floor(iters/min(100,iters)) == 0 & verbose) {
+    if (i %% floor(iters*.1) == 0 & verbose) {
       print(paste("Finished iteration ", i, ": taken ", round((proc.time()[3]-start.time[3])/60,2), " minutes.", sep=""))
     }
     if (i == delayFA & verbose) {
