@@ -417,7 +417,9 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
     if (out$load.style=='tps') {
       predS = npreg::basis.tps(predloc,knots=out$knots.load,rk=TRUE)[,-(1:2)]
     }
-
+    if(out$load.style=='full'){
+      predS = diag(1, dim(predloc)[1])
+    }
   }
   else {
     if (out$spatial.style=='grid') {
