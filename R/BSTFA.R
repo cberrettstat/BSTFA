@@ -737,8 +737,7 @@ BSTFA <- function(ymat, dates, coords,
                 "n.spatial.bases" = n.spatial.bases,
                 "n.temp.bases" = n.temp.bases,
                 "n.load.bases" = n.load.bases,
-                "draws" = dim(coda::as.mcmc(t(beta.save)))[1],
-                "full"=FALSE)
+                "draws" = dim(coda::as.mcmc(t(beta.save)))[1])
 
   if (save.output == TRUE) save(output, file=filename)
 

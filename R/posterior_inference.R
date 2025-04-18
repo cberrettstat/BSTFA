@@ -479,7 +479,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
 
   if (parameter=='loading') {
     legend.name = paste('Loading', loading)
-    if(out$full){
+    if(out$load.style=="full"){
         names(out$coords) <- c("Lon", "Lat")
         npred <- dim(predloc)[1]
         predloc2 <- rbind(out$coords, predloc)

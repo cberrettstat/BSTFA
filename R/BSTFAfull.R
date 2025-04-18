@@ -681,7 +681,7 @@ BSTFAfull <- function(ymat, dates, n.times=nrow(ymat), n.locs=ncol(ymat), coords
                 "n.seasn.knots" = n.seasn.knots,
                 "n.spatial.bases" = n.spatial.bases,
                 "draws" = dim(as.mcmc(t(beta.save)))[1],
-                "full" = TRUE)
+                "load.style" = "full")
 
   save(output, file=filename)
 
