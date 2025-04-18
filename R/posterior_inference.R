@@ -363,7 +363,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
                     type='mean', ci.level=c(0.025, 0.975), fine=100,
                     color.gradient=colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(fine),
                     with.uncertainty=FALSE, map=FALSE, state=FALSE, location=NULL,
-                    loading=1) {
+                    loading=1, addthin=1) {
 
   # FIX ME - do functions like bisquare2d work in this function?
 
@@ -457,10 +457,10 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
 
   if (parameter=='slope') {
     legend.name = 'Slope'
-    betamean <- predS%*%t(out$alpha.beta)
-    betaresid <- matrix(rnorm(fine^2*out$draws,
-                             mean=rep(0,fine^2*out$draws),
-                             sd=sqrt(rep(c(out$tau2.beta),each=fine^2))),ncol=out$draws,byrow=TRUE)
+    betamean <- predS%*%t(out$alpha.beta[seq(1, out$draws, by=addthin),])
+    betaresid <- matrix(rnorm(fine^2*(floor(out$draws/addthin)),
+                             mean=rep(0,fine^2*(floor(out$draws/addthin))),
+                             sd=sqrt(rep(c(out$tau2.beta[seq(1, out$draws, by=addthin),]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
     # betapred <- betamean + betaresid
     betapred <- betamean
     if (yearscale) {
@@ -471,10 +471,10 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
   }
   if (parameter=='mean') {
     legend.name = 'Mean'
-    mumean <- predS%*%t(out$alpha.mu)
-    muresid <- matrix(rnorm(fine^2*out$draws,
-                              mean=rep(0,fine^2*out$draws),
-                              sd=sqrt(rep(c(out$tau2.mu),each=fine^2))),ncol=out$draws,byrow=TRUE)
+    mumean <- predS%*%t(out$alpha.mu[seq(1, out$draws, by=addthin),])
+    muresid <- matrix(rnorm(fine^2*floor(out$draws/addthin)),
+                              mean=rep(0,fine^2*floor(out$draws/addthin)),
+                              sd=sqrt(rep(c(out$tau2.mu[seq(1, out$draws, by=addthin),]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
     # pred <- mumean + muresid
     pred <- mumean
   }
@@ -486,13 +486,13 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
         npred <- dim(predloc)[1]
         predloc2 <- rbind(out$coords, predloc)
         preddist <- as.matrix(dist(predloc2))
-        condinds <- 1:out$n.locs #rep(1:out$n.locs, out$n.factors) + rep(seq(0,out$n.factors*(dim(predloc2)[1]-1), by=dim(predloc2)[1]), each=out$n.locs)
-        lammean <- matrix(0, nrow=out$draws, ncol=npred)
-        for(d in 1:out$draws){
-            #blocks <- lapply(1:out$n.factors, function(iii){
+        condinds <- 1:out$n.locs
+        lammean <- matrix(0, nrow=floor(out$draws/addthin), ncol=npred)
+        lamresid <- matrix(0, nrow=floor(out$draws/addthin), ncol=npred)
+        mycount <- 0
+        for(d in seq(1, out$draws, by=addthin)){
+            mycount <- mycount + 1
             bigmat <- out$tau2.lambda[d,loading]*exp(-preddist/out$phi.lambda[d,loading])
-            #})
-            #bigmat <- Matrix::bdiag(blocks)
             A <- bigmat[condinds, condinds]
             B <- bigmat[condinds, -condinds]
             C <- bigmat[-condinds, -condinds]
@@ -501,20 +501,17 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
             LB <- forwardsolve(t(L), B)
             part1 <- t(backsolve(L, LB))
 
-            #LinvB <- backsolve(L, transpose=TRUE)
-            #part1 <- t(backsolve(L, LinvB)) #B%*%solve(A)
-
             condvar <- C - part1%*%B
-            lammean[d,] <- part1%*%out$Lambda.tilde[d,((loading-1)*out$n.locs) + (1:out$n.locs)]
+            lammean[mycount,] <- part1%*%out$Lambda.tilde[d,((loading-1)*out$n.locs) + (1:out$n.locs)]
             cholC <- chol(condvar)
-            lamresid[d,] <- as.numeric(cholC%*%rnorm(npred))
+            lamresid[mycount,] <- as.numeric(cholC%*%rnorm(npred))
         }
         pred <- lammean
     }else{
-      lammean <- predS%*%t(out$alphaS)[seq(loading,out$n.load.bases*out$n.factors,by=out$n.factors),]
-      lamresid <- matrix(rnorm(fine^2*out$draws,
-                             mean=rep(0,fine^2*out$draws),
-                             sd=sqrt(rep(c(out$tau2.lambda),each=fine^2))),ncol=out$draws,byrow=TRUE)
+      lammean <- predS%*%t(out$alphaS)[seq(loading,out$n.load.bases*out$n.factors,by=out$n.factors),seq(1, out$draws, by=addthin)]
+      lamresid <- matrix(rnorm(fine^2*floor(out$draws/addthin),
+                             mean=rep(0,fine^2*floor(out$draws/addthin)),
+                             sd=sqrt(rep(c(out$tau2.lambda[seq(1, out$draws, by=addthin),]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
       pred <- lammean
     }
   }
