@@ -479,24 +479,42 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
 
   if (parameter=='loading') {
     legend.name = paste('Loading', loading)
-    lammean <- predS%*%t(out$alphaS)[seq(loading,out$n.load.bases*out$n.factors,by=out$n.factors),]
-    lamresid <- matrix(rnorm(fine^2*out$draws,
+    if(out$full){
+        names(out$coords) <- c("Lon", "Lat")
+        npred <- dim(predloc)[1]
+        predloc2 <- rbind(out$coords, predloc)
+        preddist <- as.matrix(dist(predloc2))
+        condinds <- 1:out$n.locs #rep(1:out$n.locs, out$n.factors) + rep(seq(0,out$n.factors*(dim(predloc2)[1]-1), by=dim(predloc2)[1]), each=out$n.locs)
+        lammean <- matrix(0, nrow=out$draws, ncol=npred)
+        for(d in 1:out$draws){
+            #blocks <- lapply(1:out$n.factors, function(iii){
+            bigmat <- out$tau2.lambda[d,loading]*exp(-preddist/out$phi.lambda[d,loading])
+            #})
+            #bigmat <- Matrix::bdiag(blocks)
+            A <- bigmat[condinds, condinds]
+            B <- bigmat[condinds, -condinds]
+            C <- bigmat[-condinds, -condinds]
+
+            L <- chol(A)
+            LB <- forwardsolve(t(L), B)
+            part1 <- t(backsolve(L, LB))
+
+            #LinvB <- backsolve(L, transpose=TRUE)
+            #part1 <- t(backsolve(L, LinvB)) #B%*%solve(A)
+
+            condvar <- C - part1%*%B
+            lammean[d,] <- part1%*%out$Lambda.tilde[d,((loading-1)*out$n.locs) + (1:out$n.locs)]
+            cholC <- chol(condvar)
+            lamresid[d,] <- as.numeric(cholC%*%rnorm(npred))
+        }
+        pred <- lammean
+    }else{
+      lammean <- predS%*%t(out$alphaS)[seq(loading,out$n.load.bases*out$n.factors,by=out$n.factors),]
+      lamresid <- matrix(rnorm(fine^2*out$draws,
                              mean=rep(0,fine^2*out$draws),
                              sd=sqrt(rep(c(out$tau2.lambda),each=fine^2))),ncol=out$draws,byrow=TRUE)
-    # pred <- lammean + lamresid
-    pred <- lammean
-
-    ### Spatial Gaussian
-    # if (spatial=='gaussian') {
-    #   gaussian_basis <- function(x, y, mu_x, mu_y, sigma) {
-    #     return(exp(-((x - mu_x)^2 + (y - mu_y)^2) / (2 * sigma^2)))
-    #   }
-    #   predQS = matrix(0,nrow=nrow(predloc),ncol=nrow(out$bumps))
-    #   # Sum the Gaussian basis functions
-    #   for (i in 1:nrow(bumps)) {
-    #     predQS[,i] = gaussian_basis(predloc[,1], predloc[,2], out$bumps[i,1], out$bumps[i,2], out$sigma)
-    #   }
-
+      pred <- lammean
+    }
   }
 
   if (type=='mean') {
