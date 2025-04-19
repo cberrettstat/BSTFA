@@ -458,8 +458,8 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
   if (parameter=='slope') {
     legend.name = 'Slope'
     betamean <- predS%*%t(out$alpha.beta[seq(1, out$draws, by=addthin),])
-    betaresid <- matrix(rnorm(fine^2*(floor(out$draws/addthin)),
-                             mean=rep(0,fine^2*(floor(out$draws/addthin))),
+    betaresid <- matrix(rnorm(fine^2*floor(out$draws/addthin),
+                             mean=rep(0,fine^2*floor(out$draws/addthin)),
                              sd=sqrt(rep(c(out$tau2.beta[seq(1, out$draws, by=addthin),]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
     # betapred <- betamean + betaresid
     betapred <- betamean
@@ -472,7 +472,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
   if (parameter=='mean') {
     legend.name = 'Mean'
     mumean <- predS%*%t(out$alpha.mu[seq(1, out$draws, by=addthin),])
-    muresid <- matrix(rnorm(fine^2*floor(out$draws/addthin)),
+    muresid <- matrix(rnorm(fine^2*floor(out$draws/addthin),
                               mean=rep(0,fine^2*floor(out$draws/addthin)),
                               sd=sqrt(rep(c(out$tau2.mu[seq(1, out$draws, by=addthin),]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
     # pred <- mumean + muresid
@@ -511,7 +511,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
       lammean <- predS%*%t(out$alphaS)[seq(loading,out$n.load.bases*out$n.factors,by=out$n.factors),seq(1, out$draws, by=addthin)]
       lamresid <- matrix(rnorm(fine^2*floor(out$draws/addthin),
                              mean=rep(0,fine^2*floor(out$draws/addthin)),
-                             sd=sqrt(rep(c(out$tau2.lambda[seq(1, out$draws, by=addthin),]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
+                             sd=sqrt(rep(c(out$tau2.lambda[seq(1, out$draws, by=addthin),loading]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
       pred <- lammean
     }
   }
