@@ -506,7 +506,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
             cholC <- chol(condvar)
             lamresid[mycount,] <- as.numeric(cholC%*%rnorm(npred))
         }
-        pred <- lammean
+        pred <- t(lammean)
     }else{
       lammean <- predS%*%t(out$alphaS)[seq(loading,out$n.load.bases*out$n.factors,by=out$n.factors),seq(1, out$draws, by=addthin)]
       lamresid <- matrix(rnorm(fine^2*floor(out$draws/addthin),
