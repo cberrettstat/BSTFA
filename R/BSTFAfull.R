@@ -46,7 +46,7 @@ BSTFAfull <- function(ymat, dates, n.times=nrow(ymat), n.locs=ncol(ymat), coords
   # require(RcppArmadillo)
   # sourceCpp('SampleFactorsOriginal.cpp')
 
-  par(mfrow=c(1,1))
+
 
   ### Prepare to deal with missing data
   # Make missing values 0 for now, but they will be estimated differently
@@ -70,6 +70,7 @@ BSTFAfull <- function(ymat, dates, n.times=nrow(ymat), n.locs=ncol(ymat), coords
   ### Create newS
   if (spatial.style=='grid') {
     ### using function makeNewS - uses bisquare distance
+    if(plot.knots==TRUE){par(mfrow=c(1,1))}
     newS.output = makeNewS(coords=coords,n.locations=n.locs,knot.levels=knot.levels,
                            max.knot.dist=max.knot.dist, x=x,
                            plot.knots=plot.knots,
@@ -493,7 +494,8 @@ BSTFAfull <- function(ymat, dates, n.times=nrow(ymat), n.locs=ncol(ymat), coords
         phi.lambda.star <- rnorm(1, phi.lambda[jj], c.phi.lambda[jj])
         if(phi.lambda.star>0){
           Sigma.lambda.star <- exp(-distmat/phi.lambda.star)
-          Sigma.lambda.inv.star <- solve(Sigma.lambda.star)
+          Sigma.lambda.star <- .5*Sigma.lambda.star + .5*t(Sigma.lambda.star)
+          Sigma.lambda.inv.star <- chol2inv(chol(Sigma.lambda.star))
           num <- 0.5*determinant(Sigma.lambda.inv.star, logarithm=T)$modulus[1] - 0.5*(1/tau2.lambda[jj])*t(Lambda[,jj])%*%Sigma.lambda.inv.star%*%Lambda[,jj]
           denom <- 0.5*determinant(Sigma.lambda.inv[[jj]], logarithm=T)$modulus[1] - 0.5*(1/tau2.lambda[jj])*t(Lambda[,jj])%*%Sigma.lambda.inv[[jj]]%*%Lambda[,jj]
           logu <- log(runif(1))

@@ -612,7 +612,8 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
                              # limits = c(-0.7, 0.7)) + # FIX ME
       xlab('Longitude') +
       ylab('Latitude')
-    print(m)
+    if(!with.uncertainty){print(m)}
+
 
     if (with.uncertainty) {
       l = ggplot() +
