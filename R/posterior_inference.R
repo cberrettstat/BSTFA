@@ -502,7 +502,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
             part1 <- t(backsolve(L, LB))
 
             condvar <- C - part1%*%B
-            lammean[mycount,] <- part1%*%out$Lambda.tilde[d,((loading-1)*out$n.locs) + (1:out$n.locs)]
+            lammean[mycount,] <- part1%*%out$Lambda.tilde[d, seq(loading, out$n.factors*out$n.locs, by=out$n.factors)] #((loading-1)*out$n.locs) + (1:out$n.locs)]
             cholC <- chol(condvar)
             lamresid[mycount,] <- as.numeric(cholC%*%rnorm(npred))
         }
