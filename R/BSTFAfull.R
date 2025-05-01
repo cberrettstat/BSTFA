@@ -671,7 +671,7 @@ BSTFAfull <- function(ymat, dates, n.times=nrow(ymat), n.locs=ncol(ymat), coords
                 "coords" = coords,
                 "doy" = doy,
                 "dates" = dates,
-                "knots" = knots.vec.save,
+                "knots.spatial" = knots.vec.save,
                 "knot.levels" = knot.levels,
                 "spatial.style" = spatial.style,
                 "freq.lon" = freq.lon,
