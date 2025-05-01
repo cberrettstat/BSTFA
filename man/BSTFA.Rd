@@ -16,9 +16,9 @@ BSTFA(
   linear = TRUE,
   seasonal = TRUE,
   factors = TRUE,
-  n.seasn.knots = 7,
+  n.seasn.knots = min(7, ceiling(length(unique(yday(dates)))/3)),
   spatial.style = "fourier",
-  n.spatial.bases = 8,
+  n.spatial.bases = min(8, ceiling(n.locs/3)),
   knot.levels = 2,
   max.knot.dist = mean(dist(coords)),
   premade.knots = NULL,
@@ -27,9 +27,9 @@ BSTFA(
   factors.fixed = NULL,
   plot.factors = FALSE,
   load.style = "fourier",
-  n.load.bases = 6,
-  freq.lon = diff(range(coords[, 1]))^2,
-  freq.lat = diff(range(coords[, 2]))^2,
+  n.load.bases = min(6, ceiling(dim(coords)[1]/3)),
+  freq.lon = 4 * diff(range(coords[, 1])),
+  freq.lat = 4 * diff(range(coords[, 2])),
   n.temp.bases = ifelse(floor(n.times * 0.1)\%\%2 == 1, floor(n.times * 0.1) - 1,
     floor(n.times * 0.1)),
   freq.temp = n.times,
@@ -52,8 +52,131 @@ BSTFA(
 )
 }
 \arguments{
-\item{ymat}{data}
+\item{ymat}{Data matrix of size \code{n.times} by \code{n.locs}. Any missing data should be marked by \code{NA}.  The model works best if the data are zero-centered for each location.}
+
+\item{dates}{\code{n.times} length vector of class \code{"Date"} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).}
+
+\item{coords}{\code{n.locs} by \code{2} matrix or data frame of coordinates for the locations of the observed data. If using longitude and latitude, longitude is assumed to be the first coordinate.}
+
+\item{iters}{Number of MCMC iterations to draw.  Default value is \code{10000}.  Function only saves \code{(iters-burn)/thin} drawn values.}
+
+\item{n.times}{Number of observations for each location. Default is \code{nrow(ymat)}.}
+
+\item{n.locs}{Number of observed locations.  Default is \code{ncol(ymat)}.}
+
+\item{x}{Optional \code{n.locs} by \code{p} matrix of covariates for each location.  If there are no covariates, set to \code{NULL} (default).}
+
+\item{mean}{Logical scalar.  If \code{TRUE}, the model will fit a spatially-dependent mean for each location.  Otherwise, the model will assume the means are zero at each location (default).}
+
+\item{linear}{Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or "slope") in time. Otherwise, the model will assume a zero change in slope across time.}
+
+\item{seasonal}{Logical scalar. If \code{TRUE} (default), the model will use circular b-splines to model a spatially-dependent annual process.  Otherwise, the model will assume there is no seasonal (annual) process.}
+
+\item{factors}{Logical scalar. If \code{TRUE} (default), the model will fit a spatio-temporal factor analysis model with temporally-dependent factors and spatially-dependent loadings.}
+
+\item{n.seasn.knots}{Numeric scalar indicating the number of knots to use for the seasonal basis components. The default value is \code{min(7, ceiling(length(unique(yday(dates)))/3))}, where 7 will capture approximately 2 peaks during the year.}
+
+\item{spatial.style}{Character scalar indicating the style of bases to use for the linear and seasonal components.  Style options are \code{'fourier'} (default), \code{'tps'} for thin plate splines, and \code{'grid'} for multiresolution bisquare bases using knots from a grid across the space.}
+
+\item{n.spatial.bases}{Numeric scalar indicating the number of spatial bases to use when \code{spatial.style} is either \code{'fourier'} or \code{'tps'}. Default value is \code{min(8, ceiling(n.locs/3))}.}
+
+\item{knot.levels}{Numeric scalar indicating the number of resolutions to use for when \code{spatial.style='grid'} and/or \code{load.style='grid'}.  Default is 2.}
+
+\item{max.knot.dist}{Numeric scalar indicating the maximum distance at which a basis value is greater than zero when \code{spatial.style='grid'} and/or \code{load.style='grid'}.  Default value is \code{mean(dist(coords))}.}
+
+\item{premade.knots}{Optional list of length \code{knot.levels} with each list element containing a matrix of longitude-latitude coordinates of the knots to use for each resolution when \code{spatial.style='grid'} and/or \code{load.style='grid'}.  Otherwise, when \code{premade.knots = NULL} (default), the knots are determined by using the standard multiresolution grids across the space.}
+
+\item{plot.knots}{Logical scalar indicating whether to plot the knots used when \code{spatial.style='grid'} and/or \code{load.style='grid'}. Default is \code{FALSE}.}
+
+\item{n.factors}{Numeric scalar indicating how many factors to use in the model.  Default is \code{min(4,ceiling(n.locs/20))}.}
+
+\item{factors.fixed}{Numeric vector of length \code{n.factors} indicating the locations to use for the fixed loadings.  This is needed for model identifiability.  If \code{factors.fixed=NULL} (default), the code will select locations with less than 20\% missing data and that are far apart in the space.}
+
+\item{plot.factors}{Logical scalar indicating whether to plot the fixed factor locations.  Default is \code{FALSE}.}
+
+\item{load.style}{Character scalar indicating the style of spatial bases to use for the spatially-dependent loadings. Options are \code{'fourier'} (default) for the Fourier bases, \code{'tps'} for thin plate splines, and \code{'grid'} for multiresolution bases.  This can be the same as or different than \code{spatial.style}.}
+
+\item{n.load.bases}{Numeric scalar indicating the number of bases to use for the spatially-dependent loadings when \code{load.style} is either \code{'fouier'} or \code{'tps'}.  This can be the same as or different than  \code{n.spatial.bases}.  Default is \code{min(6, ceiling(dim(coords)[1]/3))}.}
+
+\item{freq.lon}{Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{4*diff(range(coords[,1]))}.}
+
+\item{freq.lat}{Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{4*diff(range(coords[,2]))}.}
+
+\item{n.temp.bases}{Numeric scalar indicating the number of Fourier bases to use for the temporally-dependent factors. The default value is 10\% of \code{n.times}.}
+
+\item{freq.temp}{Numeric scalar indicating the frequency to use for the Fourier bases of the temporally-dependent factors.  The default value is \code{n.times}.}
+
+\item{alpha.prec}{Numeric scalar indicating the prior precision for all model process coefficients. Default value is \code{1/100000}.}
+
+\item{tau2.gamma}{Numeric scalar indicating the prior shape for the precision of the model coefficients.  Default value is \code{2}.}
+
+\item{tau2.phi}{Numeric scalar indicating the prior rate for the precision of the model coefficients.  Default value is \code{1e-07}.}
+
+\item{sig2.gamma}{Numeric scalar indicating the prior shape for the residual precision.  Default value is {2}.}
+
+\item{sig2.phi}{Numeric scalar indicating the prior rate for the residual precision. Default value is {1e-05}.}
+
+\item{sig2}{Numeric scalar indicating the starting value for the residual variance. If \code{NULL} (default), the function will select a reasonable starting value.}
+
+\item{beta}{Numeric vector of length \code{n.locs + p} indicating starting values for the slopes.  If \code{NULL} (default), the function will select reasonable starting values.}
+
+\item{xi}{Numeric vector of length \code{(n.locs + p)*n.seasn.knots} indicating starting values for the coefficients of the seasonal component. If \code{NULL} (default), the function will select reasonable starting values.}
+
+\item{Fmat}{Numeric matrix of size \code{n.times} by \code{n.factors} indicating starting values for the factors.  Default value is to start all factor values at 0.}
+
+\item{Lambda}{Numeric matrix of size \code{n.locs} by \code{n.factors} indicating starting values for the loadings.  Default value is to start all loadings at 0.}
+
+\item{thin}{Numeric scalar indicating how many MCMC iterations to thin by.  Default value is 1, indicating no thinning.}
+
+\item{burn}{Numeric scalar indicating how many MCMC iterations to burn before saving.  Default value is one-half of \code{iters}.}
+
+\item{verbose}{Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10\% of the MCMC process is completed.}
+
+\item{filename}{Character scalar indicating the filename to use to save the MCMC output.  Default value is \code{'BSTFA.Rdata'}.}
+
+\item{save.missing}{Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.}
+
+\item{save.output}{Logical scalar indicating whether to save the output object to filename.  Default value is \code{FALSE}.}
+}
+\value{
+A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):
+\describe{
+\item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the values will all be zero.}
+\item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
+\item{tau2.mu}{An mcmc object of size \code{draws} by \code{1} containing the posterior draws for the variance of the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
+\item{beta}{An mcmc object of size \code{draws} by \code{n.locs} containing the posterior draws for the increase/decrease (slope) across time for each location.}
+\item{alpha.beta}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the slope.}
+\item{tau2.beta}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the slopes.}
+\item{xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots*n.locs} containing posterior draws for the coefficients of the seasonal process.}
+\item{alpha.xi}{An mcmc object of size \code{draws} by \code{(n.spatial.bases + p)*n.seasn.knots} containing posterior draws for the coefficients modeling each coefficient of the seasonal process.}
+\item{tau2.xi}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the coefficients of the seasonal process.}
+\item{F.tilde}{An mcmc object of size \code{draws} by \code{n.times*n.factors} containing posterior draws of the residual factors.}
+\item{alphaT}{An mcmc object of size \code{draws} by \code{n.factors*n.temp.bases} containing posterior draws of the coefficients for the factor temporally-dependent process.}
+\item{Lambda.tilde}{An mcmc object of size \code{draws} by \code{n.factors*n.locs} containing posterior draws of the loadings for each location.}
+\item{alphaS}{An mcmc object of size \code{draws} by \code{n.factors*n.load.bases} containing posterior draws of the coefficients for the loadings spatial process.}
+\item{tau2.lambda}{An mcmc object of size \code{draws} by \code{1} indicating the residual variance of the loadings spatial process.}
+\item{sig2}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the residual variance of the data.}
+\item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NULL}. }
+\item{time.data}{A data frame of size \code{iters} by {6} containing the time it took to sample each parameter for every iteration.}
+\item{setup.time}{An object containing the time the model setup took.}
+\item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
+\item{factors.fixed}{A vector of length \code{n.factors} giving the location indices of the fixed loadings.}
+\item{iters}{A scalar returning the number of MCMC iterations.}
+\item{y}{An \code{n.times*n.locs} vector of the observations.}
+\item{missing}{A logical vector indicating whether that element's observation was missing or not.}
+\item{doy}{A numeric vector of length \code{n.times} containing the day of year for each element in the original \code{dates}.}
+\item{knots.spatial}{For \code{spatial.style='grid'}, a list of length \code{knot.levels} containing the coordinates for all knots at each resolution.}
+\item{knots.load}{For \code{load.style='grid'}, a list of length \code{knot.levels} containing the coordinates for all knots at each resolution.}
+\item{draws}{The number of saved MCMC iterations after removing the burn-in and thinning.}
+}
 }
 \description{
-Main model-fitting BSTFA function.
+This function uses MCMC to draw from posterior distributions of a Bayesian spatio-temporal factor analysis model.  All spatial processes use one of Fourier, thin plate spline, or multiresolution basis functions.  The temporally-dependent factors use Fourier bases.  The default values are chosen to work well for many data sets.  Thus, it is possible to use this function using only three arguments: \code{ymat}, \code{dates}, and \code{coords}.  The default number of MCMC iterations is 10000 (saving 5000); however, depending on the number of observations and processes modeled, it may need more draws than this to ensure the posterior draws are representative of the entire posterior distribution space.
+}
+\examples{
+data(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
+}
+\author{
+Adam Simpson and Candace Berrett
 }

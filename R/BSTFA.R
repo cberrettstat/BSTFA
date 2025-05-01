@@ -1,6 +1,8 @@
 ##### BSTFA FUNCTION - FA Reduction built in #####
 
 #' Reduced BSTFA function
+#'
+#' This function uses MCMC to draw from posterior distributions of a Bayesian spatio-temporal factor analysis model.  All spatial processes use one of Fourier, thin plate spline, or multiresolution basis functions.  The temporally-dependent factors use Fourier bases.  The default values are chosen to work well for many data sets.  Thus, it is possible to use this function using only three arguments: \code{ymat}, \code{dates}, and \code{coords}.  The default number of MCMC iterations is 10000 (saving 5000); however, depending on the number of observations and processes modeled, it may need more draws than this to ensure the posterior draws are representative of the entire posterior distribution space.
 #' @param ymat Data matrix of size \code{n.times} by \code{n.locs}. Any missing data should be marked by \code{NA}.  The model works best if the data are zero-centered for each location.
 #' @param dates \code{n.times} length vector of class \code{"Date"} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).
 #' @param coords \code{n.locs} by \code{2} matrix or data frame of coordinates for the locations of the observed data. If using longitude and latitude, longitude is assumed to be the first coordinate.
@@ -53,6 +55,40 @@
 #' @import matrixcalc
 #' @import Matrix
 #' @import npreg
+#' @returns A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):
+#' \describe{
+#'   \item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the values will all be zero.}
+#'   \item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
+#'   \item{tau2.mu}{An mcmc object of size \code{draws} by \code{1} containing the posterior draws for the variance of the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
+#'   \item{beta}{An mcmc object of size \code{draws} by \code{n.locs} containing the posterior draws for the increase/decrease (slope) across time for each location.}
+#'   \item{alpha.beta}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the slope.}
+#'   \item{tau2.beta}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the slopes.}
+#'   \item{xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots*n.locs} containing posterior draws for the coefficients of the seasonal process.}
+#'   \item{alpha.xi}{An mcmc object of size \code{draws} by \code{(n.spatial.bases + p)*n.seasn.knots} containing posterior draws for the coefficients modeling each coefficient of the seasonal process.}
+#'   \item{tau2.xi}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the coefficients of the seasonal process.}
+#'   \item{F.tilde}{An mcmc object of size \code{draws} by \code{n.times*n.factors} containing posterior draws of the residual factors.}
+#'   \item{alphaT}{An mcmc object of size \code{draws} by \code{n.factors*n.temp.bases} containing posterior draws of the coefficients for the factor temporally-dependent process.}
+#'   \item{Lambda.tilde}{An mcmc object of size \code{draws} by \code{n.factors*n.locs} containing posterior draws of the loadings for each location.}
+#'   \item{alphaS}{An mcmc object of size \code{draws} by \code{n.factors*n.load.bases} containing posterior draws of the coefficients for the loadings spatial process.}
+#'   \item{tau2.lambda}{An mcmc object of size \code{draws} by \code{1} indicating the residual variance of the loadings spatial process.}
+#'   \item{sig2}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the residual variance of the data.}
+#'   \item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NULL}. }
+#'   \item{time.data}{A data frame of size \code{iters} by {6} containing the time it took to sample each parameter for every iteration.}
+#'   \item{setup.time}{An object containing the time the model setup took.}
+#'   \item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
+#'   \item{factors.fixed}{A vector of length \code{n.factors} giving the location indices of the fixed loadings.}
+#'   \item{iters}{A scalar returning the number of MCMC iterations.}
+#'   \item{y}{An \code{n.times*n.locs} vector of the observations.}
+#'   \item{missing}{A logical vector indicating whether that element's observation was missing or not.}
+#'   \item{doy}{A numeric vector of length \code{n.times} containing the day of year for each element in the original \code{dates}.}
+#'   \item{knots.spatial}{For \code{spatial.style='grid'}, a list of length \code{knot.levels} containing the coordinates for all knots at each resolution.}
+#'   \item{knots.load}{For \code{load.style='grid'}, a list of length \code{knot.levels} containing the coordinates for all knots at each resolution.}
+#'   \item{draws}{The number of saved MCMC iterations after removing the burn-in and thinning.}
+#' }
+#' @author Adam Simpson and Candace Berrett
+#' @examples
+#' data(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
 #' @export BSTFA
 BSTFA <- function(ymat, dates, coords,
                  iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
@@ -197,6 +233,7 @@ BSTFA <- function(ymat, dates, coords,
   alpha.mu.save <- matrix(0, nrow=dim(newS)[2], ncol=floor((iters-burn)/thin))
   tau2.mu.save <- matrix(0,nrow=1,ncol=floor((iters-burn)/thin))
 
+
   ### Set up linear component
   if (linear == TRUE) {
     Tsub <- -(n.times/2-0.5):(n.times/2-0.5)
@@ -215,7 +252,7 @@ BSTFA <- function(ymat, dates, coords,
     model.matrices$linear.Tsub <- Tsub
     alpha.beta <- rep(0, dim(newS)[2])
     tau2.beta <- 1
-  } else {
+ } else {
     beta <- rep(0, n.locs)
     Tfullbeta.long <- rep(0, n.times*n.locs)
   }
@@ -747,8 +784,8 @@ BSTFA <- function(ymat, dates, coords,
                 "xi" = coda::as.mcmc(t(xi.save)),
                 "alpha.xi" = coda::as.mcmc(t(alpha.xi.save)),
                 "tau2.xi" = coda::as.mcmc(t(tau2.xi.save)),
-                "alphaT" = coda::as.mcmc(t(alphaT.save)),
                 "F.tilde" = coda::as.mcmc(t(F.tilde.save)),
+                "alphaT" = coda::as.mcmc(t(alphaT.save)),
                 "Lambda.tilde" = coda::as.mcmc(t(Lambda.tilde.save)),
                 "alphaS" = coda::as.mcmc(t(alphaS.save)),
                 "tau2.lambda" = coda::as.mcmc(t(tau2.lambda.save)),

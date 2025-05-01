@@ -18,7 +18,8 @@
   map = FALSE,
   state = FALSE,
   location = NULL,
-  loading = 1
+  loading = 1,
+  addthin = 1
 )
 }
 \arguments{

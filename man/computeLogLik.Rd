@@ -4,7 +4,7 @@
 \alias{computeLogLik}
 \title{Compute log-likelihood}
 \usage{
-computeLogLik(out, verbose = FALSE)
+computeLogLik(out, verbose = FALSE, addthin = 1)
 }
 \arguments{
 \item{out}{output from BSTFA or BSTFAfull}

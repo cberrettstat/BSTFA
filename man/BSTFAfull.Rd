@@ -16,18 +16,18 @@ BSTFAfull(
   linear = TRUE,
   seasonal = TRUE,
   factors = TRUE,
-  n.seasn.knots = 7,
+  n.seasn.knots = min(7, ceiling(length(unique(yday(dates)))/3)),
   n.spatial.bases = ceiling(n.locs/2),
   n.factors = min(4, ceiling(n.locs/20)),
   factors.fixed = NULL,
-  plot.factors = TRUE,
+  plot.factors = FALSE,
   knot.levels = 2,
   max.knot.dist = n.locs * 0.05,
   premade.knots = NULL,
-  plot.knots = TRUE,
+  plot.knots = FALSE,
   spatial.style = "grid",
-  freq.lon = (max(coords[, 1]) - min(coords[, 1]))^2,
-  freq.lat = (max(coords[, 2]) - min(coords[, 2]))^2,
+  freq.lon = 4 * diff(range(coords[, 1])),
+  freq.lat = 4 * diff(range(coords[, 2])),
   alpha.prec = 1/1e+05,
   tau2.gamma = 2,
   tau2.phi = 1e-07,
@@ -59,6 +59,9 @@ BSTFAfull(
   verbose = TRUE,
   save.missing = TRUE
 )
+}
+\arguments{
+\item{ymat}{data}
 }
 \description{
 Full STFA function

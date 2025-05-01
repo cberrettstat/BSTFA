@@ -10,6 +10,7 @@
   together = FALSE,
   include.legend = TRUE,
   type = "mean",
+  uncertainty = T,
   ci.level = c(0.025, 0.975),
   xrange = NULL
 )

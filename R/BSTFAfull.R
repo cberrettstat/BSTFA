@@ -1,7 +1,7 @@
 ##### STFA.full FUNCTION - Original FA #####
 
 #' Full STFA function
-#' @param ymat
+#' @param ymat data
 #' @importFrom matrixcalc vec
 #' @importFrom mgcv cSplineDes
 #' @importFrom MCMCpack rwish

@@ -13,9 +13,6 @@ License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-Suggests: 
-    knitr,
-    rmarkdown
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
@@ -24,4 +21,4 @@ LazyData: true
 Imports: 
     Matrix, MASS, RColorBrewer, ggplot2, ggpubr, mgcv, MCMCpack, coda, npreg
 Suggests: 
-    scatter3d, sf, matrixcalc
+    scatter3d, sf, matrixcalc, knitr, rmarkdown
