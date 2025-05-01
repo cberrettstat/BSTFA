@@ -1,7 +1,49 @@
 ##### BSTFA FUNCTION - FA Reduction built in #####
 
 #' Reduced BSTFA function
-#' @param ymat data
+#' @param ymat Data matrix of size \code{n.times} by \code{n.locs}. Any missing data should be marked by \code{NA}.  The model works best if the data are zero-centered for each location.
+#' @param dates \code{n.times} length vector of class \code{"Date"} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).
+#' @param coords \code{n.locs} by \code{2} matrix or data frame of coordinates for the locations of the observed data. If using longitude and latitude, longitude is assumed to be the first coordinate.
+#' @param iters Number of MCMC iterations to draw.  Default value is \code{10000}.  Function only saves \code{(iters-burn)/thin} drawn values.
+#' @param n.times Number of observations for each location. Default is \code{nrow(ymat)}.
+#' @param n.locs Number of observed locations.  Default is \code{ncol(ymat)}.
+#' @param x Optional \code{n.locs} by \code{p} matrix of covariates for each location.  If there are no covariates, set to \code{NULL} (default).
+#' @param mean Logical scalar.  If \code{TRUE}, the model will fit a spatially-dependent mean for each location.  Otherwise, the model will assume the means are zero at each location (default).
+#' @param linear Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or "slope") in time. Otherwise, the model will assume a zero change in slope across time.
+#' @param seasonal Logical scalar. If \code{TRUE} (default), the model will use circular b-splines to model a spatially-dependent annual process.  Otherwise, the model will assume there is no seasonal (annual) process.
+#' @param factors Logical scalar. If \code{TRUE} (default), the model will fit a spatio-temporal factor analysis model with temporally-dependent factors and spatially-dependent loadings.
+#' @param n.seasn.knots Numeric scalar indicating the number of knots to use for the seasonal basis components. The default value is \code{min(7, ceiling(length(unique(yday(dates)))/3))}, where 7 will capture approximately 2 peaks during the year.
+#' @param spatial.style Character scalar indicating the style of bases to use for the linear and seasonal components.  Style options are \code{'fourier'} (default), \code{'tps'} for thin plate splines, and \code{'grid'} for multiresolution bisquare bases using knots from a grid across the space.
+#' @param n.spatial.bases Numeric scalar indicating the number of spatial bases to use when \code{spatial.style} is either \code{'fourier'} or \code{'tps'}. Default value is \code{min(8, ceiling(n.locs/3))}.
+#' @param knot.levels Numeric scalar indicating the number of resolutions to use for when \code{spatial.style='grid'} and/or \code{load.style='grid'}.  Default is 2.
+#' @param max.knot.dist Numeric scalar indicating the maximum distance at which a basis value is greater than zero when \code{spatial.style='grid'} and/or \code{load.style='grid'}.  Default value is \code{mean(dist(coords))}.
+#' @param premade.knots Optional list of length \code{knot.levels} with each list element containing a matrix of longitude-latitude coordinates of the knots to use for each resolution when \code{spatial.style='grid'} and/or \code{load.style='grid'}.  Otherwise, when \code{premade.knots = NULL} (default), the knots are determined by using the standard multiresolution grids across the space.
+#' @param plot.knots Logical scalar indicating whether to plot the knots used when \code{spatial.style='grid'} and/or \code{load.style='grid'}. Default is \code{FALSE}.
+#' @param n.factors Numeric scalar indicating how many factors to use in the model.  Default is \code{min(4,ceiling(n.locs/20))}.
+#' @param factors.fixed Numeric vector of length \code{n.factors} indicating the locations to use for the fixed loadings.  This is needed for model identifiability.  If \code{factors.fixed=NULL} (default), the code will select locations with less than 20% missing data and that are far apart in the space.
+#' @param plot.factors Logical scalar indicating whether to plot the fixed factor locations.  Default is \code{FALSE}.
+#' @param load.style Character scalar indicating the style of spatial bases to use for the spatially-dependent loadings. Options are \code{'fourier'} (default) for the Fourier bases, \code{'tps'} for thin plate splines, and \code{'grid'} for multiresolution bases.  This can be the same as or different than \code{spatial.style}.
+#' @param n.load.bases Numeric scalar indicating the number of bases to use for the spatially-dependent loadings when \code{load.style} is either \code{'fouier'} or \code{'tps'}.  This can be the same as or different than  \code{n.spatial.bases}.  Default is \code{min(6, ceiling(dim(coords)[1]/3))}.
+#' @param freq.lon Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{4*diff(range(coords[,1]))}.
+#' @param freq.lat Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{4*diff(range(coords[,2]))}.
+#' @param n.temp.bases Numeric scalar indicating the number of Fourier bases to use for the temporally-dependent factors. The default value is 10% of \code{n.times}.
+#' @param freq.temp Numeric scalar indicating the frequency to use for the Fourier bases of the temporally-dependent factors.  The default value is \code{n.times}.
+#' @param alpha.prec Numeric scalar indicating the prior precision for all model process coefficients. Default value is \code{1/100000}.
+#' @param tau2.gamma Numeric scalar indicating the prior shape for the precision of the model coefficients.  Default value is \code{2}.
+#' @param tau2.phi Numeric scalar indicating the prior rate for the precision of the model coefficients.  Default value is \code{1e-07}.
+#' @param sig2.gamma Numeric scalar indicating the prior shape for the residual precision.  Default value is {2}.
+#' @param sig2.phi Numeric scalar indicating the prior rate for the residual precision. Default value is {1e-05}.
+#' @param sig2 Numeric scalar indicating the starting value for the residual variance. If \code{NULL} (default), the function will select a reasonable starting value.
+#' @param beta Numeric vector of length \code{n.locs + p} indicating starting values for the slopes.  If \code{NULL} (default), the function will select reasonable starting values.
+#' @param xi Numeric vector of length \code{(n.locs + p)*n.seasn.knots} indicating starting values for the coefficients of the seasonal component. If \code{NULL} (default), the function will select reasonable starting values.
+#' @param Fmat Numeric matrix of size \code{n.times} by \code{n.factors} indicating starting values for the factors.  Default value is to start all factor values at 0.
+#' @param Lambda Numeric matrix of size \code{n.locs} by \code{n.factors} indicating starting values for the loadings.  Default value is to start all loadings at 0.
+#' @param thin Numeric scalar indicating how many MCMC iterations to thin by.  Default value is 1, indicating no thinning.
+#' @param burn Numeric scalar indicating how many MCMC iterations to burn before saving.  Default value is one-half of \code{iters}.
+#' @param verbose Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10% of the MCMC process is completed.
+#' @param filename Character scalar indicating the filename to use to save the MCMC output.  Default value is \code{'BSTFA.Rdata'}.
+#' @param save.missing Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.
+#' @param save.output Logical scalar indicating whether to save the output object to filename.  Default value is \code{FALSE}.
 #' @importFrom matrixcalc vec
 #' @importFrom mgcv cSplineDes
 #' @importFrom coda as.mcmc
@@ -17,7 +59,7 @@ BSTFA <- function(ymat, dates, coords,
                  mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
                  n.seasn.knots=min(7, ceiling(length(unique(yday(dates)))/3)),
                  spatial.style='fourier',
-                 n.spatial.bases=min(8, ceiling(dim(coords)[1]/3)),
+                 n.spatial.bases=min(8, ceiling(n.locs/3)),
                  knot.levels=2, max.knot.dist=mean(dist(coords)), premade.knots=NULL, plot.knots=FALSE,
                  n.factors=min(4,ceiling(n.locs/20)), factors.fixed=NULL, plot.factors=FALSE,
                  load.style='fourier',

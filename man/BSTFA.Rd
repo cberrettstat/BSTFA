@@ -55,5 +55,5 @@ BSTFA(
 \item{ymat}{data}
 }
 \description{
-Reduced BSTFA function
+Main model-fitting BSTFA function.
 }

@@ -1,11 +1,13 @@
 Package: BSTFA
 Title: Fast Computation for Bayesian Spatio-temporal Factor Analysis Model
-Description: This will eventually contain the description,
-    With each extra line being indented down below like this.
-Version: 4.4.0
+Description: This package fits a spatio-temporal factor analysis model to a spatio-temporal data 
+    set and provides plotting functionality for inference and prediction.
+Version: 0.1.0
 Authors@R: 
-    person("Adam", "Simpson", , "adamiser810@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+    c(
+    	person("Adam", "Simpson", , "adamiser810@gmail.com", role = c("aut")),
+	person("Candace", "Berrett", email="cberrett@stat.byu.edu", role=c("aut","cre"), comment=c(ORCID="0000-0003-4721-3065"))
+     )
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
@@ -20,6 +22,6 @@ Depends:
 LinkingTo: Rcpp, RcppArmadillo
 LazyData: true
 Imports: 
-    Matrix, MASS, RColorBrewer, ggplot2, ggpubr
+    Matrix, MASS, RColorBrewer, ggplot2, ggpubr, mgcv, MCMCpack, coda, npreg
 Suggests: 
     scatter3d, sf, matrixcalc
