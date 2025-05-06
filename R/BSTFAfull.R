@@ -93,7 +93,6 @@
 #'   \item{missing}{A logical vector indicating whether that element's observation was missing or not.}
 #'   \item{doy}{A numeric vector of length \code{n.times} containing the day of year for each element in the original \code{dates}.}
 #'   \item{knots.spatial}{For \code{spatial.style='grid'}, a list of length \code{knot.levels} containing the coordinates for all knots at each resolution.}
-#'   \item{knots.load}{For \code{load.style='grid'}, a list of length \code{knot.levels} containing the coordinates for all knots at each resolution.}
 #'   \item{draws}{The number of saved MCMC iterations after removing the burn-in and thinning.}
 #' }
 #' @author Candace Berrett and Adam Simpson
