@@ -328,10 +328,6 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
   delayFA = min(floor(burn/2), 500)
 
-  if(is.null(sig2)){
-    sig2 <- var(y - Jfullmu.long - Tfullbeta.long - Bfullxi.long - FLambda.long)
-  }
-
   PFmat.save <- matrix(0, nrow=n.factors*n.times, ncol=floor((iters-burn)/thin))
   Omega.save <- matrix(0, nrow=n.factors*n.factors, ncol=floor((iters-burn)/thin))
   Sigma.F.inv.save <- matrix(0, nrow=n.factors*n.factors, ncol=floor((iters-burn)/thin))
@@ -341,6 +337,10 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   phi.lambda.accept <- rep(0, n.factors)
   Omega.accept <- matrix(0, n.factors, n.factors)
   FLambda.long = rep(0, n.times*n.locs)
+
+  if(is.null(sig2)){
+    sig2 <- var(y - Jfullmu.long - Tfullbeta.long - Bfullxi.long - FLambda.long)
+  }
 
   ### Set up variance component
   sig2.save <- matrix(0, nrow=1, ncol=floor((iters-burn)/thin))
