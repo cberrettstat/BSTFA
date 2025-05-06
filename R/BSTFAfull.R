@@ -202,7 +202,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     mu.mean <- mu.var%*%ItJ%*%y
     mu <-  my_mvrnorm(mu.mean, mu.var)
     mu <- as.matrix(mu)
-    Jfullmu.long <- Jfull%*%mu
+    Jfullmu.long <- c(Jfull%*%mu)
     rm(list=c("mu.mean", "mu.var"))
     alpha.mu=rep(0, dim(newS)[2])
     tau2.mu = 1
@@ -228,7 +228,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       beta <- beta + rnorm(length(beta.mean), 0, sd(beta.mean))
       rm(list=c("beta.mean", "beta.var"))
     }
-    Tfullbeta.long <- Tfull%*%beta
+    Tfullbeta.long <- c(Tfull%*%beta)
     model.matrices$linear.Tsub <- Tsub
     alpha.beta <- rep(0, dim(newS)[2])
     tau2.beta <- 1
@@ -255,7 +255,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       xi <- my_mvrnorm(xi.mean, xi.var) + rnorm(length(xi.mean), 0, sd(xi.mean)) #starting values for xi
       rm(list=c("xi.var", "xi.mean"))
     }
-    Bfullxi.long <- Bfull%*%xi
+    Bfullxi.long <- c(Bfull%*%xi)
     model.matrices$seasonal.bs.basis <- bs.basis
     alpha.xi <- rep(0, dim(newS.xi)[2])
     tau2.xi <- 1
