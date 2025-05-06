@@ -141,9 +141,10 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   ### Prepare to deal with missing data
   # Make missing values 0 for now, but they will be estimated differently
   y <- c(ymat)
-  missing = ifelse(is.na(y), TRUE, FALSE)
-  prop.missing = apply(ymat, 2, function(x) sum(is.na(x)) / n.times)
-  y[missing] = 0
+  missing <- is.na(y)
+  whichmis <- which(missing)
+  prop.missing <- apply(ymat, 2, function(x) sum(is.na(x)) / n.times)
+  y[whichmis] <- 0
 
   if(save.missing==T & sum(missing)!=0){
     y.save <- matrix(0, nrow=sum(missing), ncol=floor((iters-burn)/thin))
@@ -668,12 +669,12 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     }
 
     ### Fill in missing data
-    y[missing] = Jfullmu.long[missing] + Tfullbeta.long[missing] +
-      Bfullxi.long[missing] + FLambda.long[missing] + rnorm(sum(missing), 0, sqrt(sig2))
+    y[whichmis] = Jfullmu.long[whichmis] + Tfullbeta.long[whichmis] +
+      Bfullxi.long[whichmis] + FLambda.long[whichmis] + rnorm(sum(missing), 0, sqrt(sig2))
 
     if(save.missing==T){
       if(i%%thin == 0 & i > burn){
-        y.save[,(i-burn)/thin] <- y[missing]
+        y.save[,(i-burn)/thin] <- y[whichmis]
       }
     }
 
@@ -787,13 +788,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
 
 
-STFA_test <- function(y, doy, n.times, n.locs, coords, iters, x=NULL,
-                      n.seasn.knots=7, n.factors=min(4, ceiling(n.locs/20)), factors.fixed=NULL,
-                      thin=1, burn=iters*0.5, n.temp.bases, n.load.bases, verbose=TRUE, ...) {
-  print(y)
-  args = list(...)
-  print(args$mean)
-}
+
 
 ### removed
 # mean, linear, seasonal, factors (all boolean)
