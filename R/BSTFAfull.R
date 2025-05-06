@@ -203,7 +203,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     mu.mean <- mu.var%*%ItJ%*%y
     mu <-  my_mvrnorm(mu.mean, mu.var)
     mu <- as.matrix(mu)
-    Jfullmu.long <- c(Jfull%*%mu)
+    Jfullmu.long <- as.numeric(Jfull%*%mu)
     rm(list=c("mu.mean", "mu.var"))
     alpha.mu=rep(0, dim(newS)[2])
     tau2.mu = 1
@@ -229,7 +229,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       beta <- beta + rnorm(length(beta.mean), 0, sd(beta.mean))
       rm(list=c("beta.mean", "beta.var"))
     }
-    Tfullbeta.long <- c(Tfull%*%beta)
+    Tfullbeta.long <- as.numeric(Tfull%*%beta)
     model.matrices$linear.Tsub <- Tsub
     alpha.beta <- rep(0, dim(newS)[2])
     tau2.beta <- 1
@@ -256,7 +256,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       xi <- my_mvrnorm(xi.mean, xi.var) + rnorm(length(xi.mean), 0, sd(xi.mean)) #starting values for xi
       rm(list=c("xi.var", "xi.mean"))
     }
-    Bfullxi.long <- c(Bfull%*%xi)
+    Bfullxi.long <- as.numeric(Bfull%*%xi)
     model.matrices$seasonal.bs.basis <- bs.basis
     alpha.xi <- rep(0, dim(newS.xi)[2])
     tau2.xi <- 1
@@ -373,7 +373,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       mu.var <- solve((1/sig2)*ItJJ + (1/tau2.mu)*Matrix::Diagonal(n=n.locs))
       mu.mean <- mu.var%*%((1/sig2)*ItJ%*%temp + (1/tau2.mu)*newS%*%alpha.mu)
       mu <- as.vector(mvrnorm(1,mu.mean,mu.var))
-      Jfullmu.long <- Jfull%*%mu
+      Jfullmu.long <- as.numeric(Jfull%*%mu)
       rm(list=c("mu.var", "mu.mean"))
 
       ### Sample tau2.mu
@@ -416,7 +416,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       beta.var <- solve((1/sig2)*ItTT + (1/tau2.beta)*Matrix::Diagonal(n=n.locs))
       beta.mean <- beta.var%*%((1/sig2)*ItT%*%temp + (1/tau2.beta)*newS%*%alpha.beta)
       beta <- my_mvrnorm(beta.mean, beta.var)
-      Tfullbeta.long <- Tfull%*%beta
+      Tfullbeta.long <- as.numeric(Tfull%*%beta)
       rm(list=c("beta.var", "beta.mean"))
 
       ### Sample tau2.beta
@@ -462,7 +462,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       xi.var <- solve((1/sig2)*ItBB + (1/tau2.xi)*Matrix::Diagonal(n=n.locs*n.seasn.knots))
       xi.mean <- xi.var%*%((1/sig2)*ItB%*%temp + (1/tau2.xi)*newS.xi%*%alpha.xi)
       xi <- my_mvrnorm(xi.mean,xi.var)
-      Bfullxi.long <- Bfull%*%xi
+      Bfullxi.long <- as.numeric(Bfull%*%xi)
       rm(list=c("xi.var", "xi.mean"))
 
       ### Sample tau2.xi
