@@ -103,7 +103,7 @@
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                      mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
-                     n.seasn.knots=min(7, ceiling(length(unique(yday(dates)))/3)),
+                     n.seasn.knots=min(7, ceiling(length(unique(lubridate::yday(dates)))/3)),
                      spatial.style='grid', n.spatial.bases=ceiling(n.locs/2),
                      knot.levels=2, max.knot.dist=n.locs*0.05, premade.knots=NULL, plot.knots=FALSE,
                      freq.lon=4*diff(range(coords[,1])),
@@ -196,9 +196,9 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
   ### Set up mean component
   if(mean==TRUE){
-    Jfull = kronecker(Matrix::Diagonal(n=n.locs), rep(1, n.times))
-    ItJJ <- as(kronecker(diag(1,n.locs), t(rep(1,n.times))%*%rep(1,n.times)), "sparseMatrix")
-    ItJ <- as(kronecker(diag(1,n.locs), t(rep(1,n.times))), "sparseMatrix")
+    Jfull = Matrix::kronecker(Matrix::Diagonal(n=n.locs), rep(1, n.times))
+    ItJJ <- as(base::kronecker(diag(1,n.locs), t(rep(1,n.times))%*%rep(1,n.times)), "sparseMatrix")
+    ItJ <- as(base::kronecker(diag(1,n.locs), t(rep(1,n.times))), "sparseMatrix")
     mu.var <- solve(ItJJ)
     mu.mean <- mu.var%*%ItJ%*%y
     mu <-  my_mvrnorm(mu.mean, mu.var)
@@ -218,9 +218,9 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   ### Set up linear component
   if (linear == TRUE) {
     Tsub <- -(n.times/2-0.5):(n.times/2-0.5)
-    Tfull <- kronecker(Matrix::Diagonal(n=n.locs), Tsub)
-    ItTT <- as(kronecker(diag(1,n.locs), t(Tsub)%*%Tsub), "sparseMatrix")
-    ItT <- as(kronecker(diag(1,n.locs), t(Tsub)), "sparseMatrix")
+    Tfull <- Matrix::kronecker(Matrix::Diagonal(n=n.locs), Tsub)
+    ItTT <- as(base::kronecker(diag(1,n.locs), t(Tsub)%*%Tsub), "sparseMatrix")
+    ItT <- as(base::kronecker(diag(1,n.locs), t(Tsub)), "sparseMatrix")
     if(is.null(beta)==T){
       beta.var <- solve(ItTT)
       beta.mean <- beta.var%*%ItT%*%y #starting values for beta
@@ -244,12 +244,12 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
   ### Set up seasonal component
   if(seasonal == TRUE) {
-    newS.xi <- as(kronecker(newS, diag(n.seasn.knots)), "sparseMatrix")
+    newS.xi <- as(base::kronecker(newS, diag(n.seasn.knots)), "sparseMatrix")
     knots <- seq(1, 366, length=n.seasn.knots+1)
     bs.basis <- cSplineDes(doy, knots)
-    Bfull <- kronecker(Matrix::Diagonal(n=n.locs), bs.basis)
-    ItBB <- as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)%*%bs.basis), "sparseMatrix")
-    ItB <- as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)), "sparseMatrix")
+    Bfull <- Matrix::kronecker(Matrix::Diagonal(n=n.locs), bs.basis)
+    ItBB <- as(base::kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)%*%bs.basis), "sparseMatrix")
+    ItB <- as(base::kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)), "sparseMatrix")
     if (is.null(xi)) {
       xi.var <- solve(ItBB)
       xi.mean <- xi.var%*%ItB%*%(y - Tfullbeta.long)
@@ -347,7 +347,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
   ### Useful one-time calculations
   if (mean | linear | seasonal) A.prec = diag(alpha.prec, dim(newS)[2])
-  if (seasonal) StSI <- as(kronecker(t(newS)%*%newS, Matrix::Diagonal(n=n.seasn.knots)), "sparseMatrix")
+  if (seasonal) StSI <- as(Matrix::kronecker(t(newS)%*%newS, Matrix::Diagonal(n=n.seasn.knots)), "sparseMatrix")
 
   ### Set up effective sample size calculations
   eSS.check=1000
@@ -505,7 +505,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     if (factors & i > delayFA) {
       start = Sys.time()
       ### Sample F_1
-      M.mat <- kronecker(Lambda, Pmat.prime)
+      M.mat <- base::kronecker(Lambda, Pmat.prime)
       tt.seq <- seq(1, n.times*n.factors, by=n.times)
       Mt <- M.mat[,tt.seq] # kronecker(Lambda, Pmat.prime[,1])
       FLambda.long.nott <- (FLambda.long - Mt%*%c(Fmat[1,]))
@@ -570,7 +570,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       ### Sample lambda
       for(ll in 1:n.factors){
         temp <- y - Jfullmu.long - Tfullbeta.long - Bfullxi.long - c(PFmat[,-ll]%*%t(Lambda[,-ll]))
-        PF.ll <- kronecker(Matrix::Diagonal(n.locs), PFmat[,ll])
+        PF.ll <- Matrix::kronecker(Matrix::Diagonal(n.locs), PFmat[,ll])
         lambda.var <- solve((1/tau2.lambda[ll])*Sigma.lambda.inv[[ll]] + (1/sig2)*t(PF.ll)%*%PF.ll)
         lambda.mean <- lambda.var%*%((1/sig2)*t(PF.ll)%*%temp)
         lambda.fixed.inv <- solve(lambda.var[factors.fixed,factors.fixed])
