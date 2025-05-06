@@ -16,7 +16,7 @@ BSTFAfull(
   linear = TRUE,
   seasonal = TRUE,
   factors = TRUE,
-  n.seasn.knots = min(7, ceiling(length(unique(yday(dates)))/3)),
+  n.seasn.knots = min(7, ceiling(length(unique(lubridate::yday(dates)))/3)),
   spatial.style = "grid",
   n.spatial.bases = ceiling(n.locs/2),
   knot.levels = 2,
@@ -198,7 +198,6 @@ A list containing the following elements (any elements that are the same as in t
 \item{missing}{A logical vector indicating whether that element's observation was missing or not.}
 \item{doy}{A numeric vector of length \code{n.times} containing the day of year for each element in the original \code{dates}.}
 \item{knots.spatial}{For \code{spatial.style='grid'}, a list of length \code{knot.levels} containing the coordinates for all knots at each resolution.}
-\item{knots.load}{For \code{load.style='grid'}, a list of length \code{knot.levels} containing the coordinates for all knots at each resolution.}
 \item{draws}{The number of saved MCMC iterations after removing the burn-in and thinning.}
 }
 }

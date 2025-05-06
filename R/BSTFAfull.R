@@ -66,6 +66,7 @@
 #' @import Matrix
 #' @import Rcpp
 #' @import RcppArmadillo
+#' @useDynLib BSTFA, .registration = TRUE
 #' @returns A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):
 #' \describe{
 #'   \item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the values will all be zero.}
