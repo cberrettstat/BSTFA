@@ -1,7 +1,17 @@
 ### Functions used to check diagnostics and convergence
 
 #' Plot trace plots
-#' @param out output from STFA or STFAfull
+#' @param out Output from BSTFA or BSTFAfull.
+#' @param parameter Parameter to plot.  See BSTFA and BSTFAfull for parameter names.
+#' @param param.range Indices of the named parameter to plot.  Default is to plot all relevant parameters.
+#' @param par.mfrow Vector of length 2 indicating the number of rows and columns to divide the plotting window.
+#' @param density Logical scalar indicating whether to include the density plot of the posterior draws. Default is \code{TRUE}.
+#' @returns A plot containing the trace plot (and density plot when \code{density=TRUE}) of the listed parameters.
+#' @examples
+#' data(utahDataList)
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' plot.trace(out, parameter="beta", param.range=1)
 #' @export plot.trace
 plot.trace = function(out, parameter, param.range=NULL,
                       par.mfrow=c(1,1), density=TRUE) {
@@ -24,7 +34,13 @@ plot.trace = function(out, parameter, param.range=NULL,
 }
 
 #' Print computation summary
-#' @param out output from STFA or STFAfull
+#' @param out Output from BSTFA or BSTFAfull.
+#' @returns Prints the computation time per iteration for each parameter.
+#' @examples
+#' data(utahDataList)
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' computation.summary(out)
 #' @export computation.summary
 computation.summary = function(out) {
   no.fa.iters = which(out$time.data[,3] == 0)
@@ -45,10 +61,18 @@ computation.summary = function(out) {
 
 
 #' Check effective sample size and geweke diagnostic
-#' @param out output from STFA or STFAfull
+#' @param out Output from BSTFA or BSTFAfull.
+#' @param type Character specifying which diagnostic to compute.  Options are \code{ess} and \code{geweke}.
+#' @param cutoff Numeric scalar indicating the cutoff value to flag parameters that haven't converged.
+#' @returns A list containing convergence diagnostic for all parameters.
+#' @examples
+#' data(utahDataList)
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' check.convergence(out)
 #' @importFrom coda effectiveSize
 #' @importFrom coda geweke.diag
-#' @export computation.summary
+#' @export check.convergence
 check.convergence = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,0.001)) {
 
   library(coda)
@@ -94,7 +118,15 @@ check.convergence = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,0.00
 }
 
 #' Compute log-likelihood
-#' @param out output from BSTFA or BSTFAfull
+#' @param out Output from BSTFA or BSTFAfull.
+#' @param verbose Logical scalar indicating whether to print status of the log-likelihood computation.  Default is \code{FALSE}.
+#' @param addthin Numeric scalar indicating the number of additional draws to thin by to reduce the computation time.  Default is \code{1} (no additional thinning).
+#' @returns A matrix of size \code{n.times*n.locs} by \code{draws} log-likelihood values for each observation and each posterior draw.
+#' @examples
+#' data(utahDataList)
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' loglik <- computeLogLik(out, addthin=2)
 #' @export computeLogLik
 computeLogLik <- function(out, verbose=FALSE, addthin=1) {
   y = out$y
@@ -105,9 +137,7 @@ computeLogLik <- function(out, verbose=FALSE, addthin=1) {
                           ncol=length(myseq))
   if (verbose) print('Starting Log-likelihood calculation')
   for (d in 1:length(myseq)) {
-    for (i in 1:(out$n.times*out$n.locs)) {
-      log_lik[i,d] = dnorm(y[i],mu[i,myseq[d]],sd=out$sig2[myseq[d]],log=TRUE)
-    }
+      log_lik[,d] = dnorm(y,mu[,myseq[d]],sd=out$sig2[myseq[d]],log=TRUE)
     if (verbose) print(paste('Draw', d))
   }
   log_lik

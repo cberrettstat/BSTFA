@@ -3,7 +3,18 @@
 ### Plotting functions for STFA
 
 #' Prediction
-#' @param out output from STFA or STFAfull
+#' @param out Output from BSTFA or BSTFAfull.
+#' @param location Either a single integer indicating the location in the data set to provide predictions or a vector of length 2 providing the longitude and latitude of the new location. If \code{location=NULL} (default), the function will return predictions for all in-sample locations.
+#' @param type One of \code{all}, \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic of the predicted values to return.
+#' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
+#' @param new_x If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.
+#' @param pred.int Logical scalar indicating whether to include additional uncertainty for posterior predictive intervals (\code{TRUE}; default) or not (posterior draws from the mean of \code{location}).
+#' @returns A matrix or vector of predicted values for \code{location}.
+#' @examples
+#' data(utahDataList)
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
 #' @importFrom npreg basis.tps
 #' @export predictBSTFA
 predictBSTFA = function(out, location=NULL, type='mean',
@@ -90,32 +101,41 @@ predictBSTFA = function(out, location=NULL, type='mean',
 
     ### Mu
     mumean <- predS%*%t(out$alpha.mu)
-    muresid = matrix(rnorm(nrow(location)*out$draws,
+    if(pred.int){
+        muresid = matrix(rnorm(nrow(location)*out$draws,
                              mean=rep(0,nrow(location)*out$draws),
                              sd=sqrt(rep(c(out$tau2.mu),each=nrow(location)))),ncol=out$draws,byrow=TRUE)
-    mupred <- mumean + muresid
-    # mupred <- mumean
+        mupred <- mumean + muresid
+    }else{
+     mupred <- mumean
+    }
     mulong = kronecker(Matrix::Diagonal(nrow(location)),
                        rep(1,out$n.times))%*%mupred
 
     ### Beta (linear slope)
     betamean = predS%*%t(out$alpha.beta)
-    betaresid = matrix(rnorm(nrow(location)*out$draws,
+    if(pred.int){
+        betaresid = matrix(rnorm(nrow(location)*out$draws,
                              mean=rep(0,nrow(location)*out$draws),
                              sd=sqrt(rep(c(out$tau2.beta),each=nrow(location)))),ncol=out$draws,byrow=TRUE)
-    betapred <- betamean + betaresid
-    # betapred <- betamean
+        betapred <- betamean + betaresid
+    }else{
+        betapred <- betamean
+    }
     betalong = kronecker(Matrix::Diagonal(nrow(location)),
                          out$model.matrices$linear.Tsub)%*%betapred
 
     ### Xi (seasonal)
     predS.xi = as(kronecker(predS, diag(out$n.seasn.knots)), "sparseMatrix")
     ximean <- predS.xi%*%t(out$alpha.xi)
-    xiresid <- matrix(rnorm(nrow(location)*out$n.seasn.knots*out$draws,
+    if(pred.int){
+        xiresid <- matrix(rnorm(nrow(location)*out$n.seasn.knots*out$draws,
                             mean=rep(0,nrow(location)*out$n.seasn.knots*out$draws),
                             sd=sqrt(rep(c(out$tau2.xi),each=nrow(location)*out$n.seasn.knots))),ncol=out$draws,byrow=TRUE)
-    xipred <- ximean + xiresid
-    # xipred <- ximean
+        xipred <- ximean + xiresid
+    }else{
+        xipred <- ximean
+    }
     xilong = kronecker(Matrix::Diagonal(nrow(location)),
                        out$model.matrices$seasonal.bs.basis)%*%xipred
 
@@ -151,11 +171,14 @@ predictBSTFA = function(out, location=NULL, type='mean',
     Lam = array(dim=c(nrow(predQS),out$n.factors,out$draws))
     for (i in 1:out$draws) {
       Lammean = predQS%*%matrix(out$alphaS[i,],nrow=out$n.load.bases,ncol=out$n.factors,byrow=TRUE)
-      Lamresid = matrix(rnorm(nrow(location)*out$n.factors,
+      if(pred.int){
+          Lamresid = matrix(rnorm(nrow(location)*out$n.factors,
                               mean=rep(0,nrow(location)*out$n.factors),
                               sd=sqrt(rep(c(out$tau2.lambda[i,]),each=out$n.factors))),ncol=out$n.factors,byrow=TRUE)
-      Lam[,,i] = Lammean + Lamresid
-      # Lam[,,i] = Lammean
+          Lam[,,i] = Lammean + Lamresid
+      }else{
+          Lam[,,i] = Lammean
+      }
     }
 
     # F (factor scores)
@@ -197,8 +220,23 @@ predictBSTFA = function(out, location=NULL, type='mean',
 }
 
 
-#' Plot a location
-#' @param out output from STFA or STFAfull
+#' Plot a location's time series of estimated/interpolated values.
+#' @param out Output from BSTFA or BSTFAfull.
+#' @param location Either a single integer indicating the location in the data set to plot or a vector of length 2 providing the longitude and latitude of the new location.
+#' @param new_x If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.
+#' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic of the predicted values to return.
+#' @param par.mfrow A vector of length 2 indicating the number of rows and columns to divide the plotting window. Default is \code{c(1,1)}.
+#' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
+#' @param uncertainty Logical scalar indicating whether to plot the uncertainty bounds (\code{TRUE}; default) or not.
+#' @param xrange A date vector of length 2 providing the lower and upper bounds of the dates to include in the plot.
+#' @param truth Logical scalar indicating whether to include the observed measurements (\code{TRUE}) or not (default).  If \code{TRUE}, \code{location} must be an integer corresponding to the column of the data matrix for the in-sample prediction location.
+#' @param ylim Numeric vector of length 2 providing the lower and upper bounds of the y-axis.  If \code{NULL} (default), the y-axis limits are chosen using the range of the predictions.
+#' @returns A plot of predicted values for \code{location}.
+#' @examples
+#' data(utahDataList)
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' plot.location(out, location=1, pred.int=FALSE)
 #' @export plot.location
 plot.location = function(out, location, new_x=NULL,
                          type='mean', par.mfrow=c(1,1), pred.int=TRUE,
@@ -283,8 +321,20 @@ plot.location = function(out, location, new_x=NULL,
 
 
 
-#' Plot on a grid
-#' @param out output from STFA or STFAfull
+#' Plot the spatially-dependent parameter for in-sample locations.
+#' @param out Output from BSTFA or BSTFAfull.
+#' @param parameter One of \code{"slope"} (default), \code{"loading"}, or \code{"mean"}.
+#' @param loadings If \code{parameter="loading"}, an integer indicating which factor loading to plot.
+#' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.
+#' @param yearscsale If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
+#' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
+#' @param color.gradient The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)}.
+#' @returns A plot of spatially-dependent parameter values for the observed locations.
+#' @examples
+#' data(utahDataList)
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' plot.grid(out, parameter="slope")
 #' @import ggplot2
 #' @importFrom RColorBrewer brewer.pal
 #' @export plot.grid
@@ -349,8 +399,26 @@ plot.grid = function(out, parameter, loadings=1, type='mean', ci.level=c(0.025, 
 }
 
 
-#' Plot on a map
-#' @param out output from STFA or STFAfull
+#' Plot a map of interpolated spatially-dependent parameter values.
+#' @param out Output from BSTFA or BSTFAfull.
+#' @param parameter One of \code{"slope"} (default), \code{"loading"}, or \code{"mean"}.
+#' @param loadings If \code{parameter="loading"}, an integer indicating which factor loading to plot.
+#' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.
+#' @param yearscsale If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
+#' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
+#' @param fine Integer specifying the number of grid points along both the longitude and latitude directions used to interpolate the parameter. The resulting interpolation grid will contain \code{fine*fine} total locations. If \code{map=TRUE}, \code{state=TRUE}, and \code{location} is specified, the grid will be clipped to the boundaries of the specified state, removing locations outside of it.
+#' @param color.gradient The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(fine)}.
+#' @param with.uncertainty Logical scalar indicating whether to include lower and upper credible interval bounds for the parameter.  Default is \code{FALSE}.
+#' @param map Logical scalar indicating whether to include a map. Default value is \code{FALSE}.  If \code{TRUE}, \code{location} must be specified.
+#' @param state Logical scalar used when \code{map=TRUE} indicating whether the \code{location} is a state in the United States (\code{TRUE}) or a country (\code{FALSE}).
+#' @param location Name of region to include in the map.  Fed to \code{region} in the function \code{ggplot2::map_data}.
+#' @param addthin Integer indicating the number of saved draws to thin.  Default is to not thin any \code{addthin=1}.  This can save time when the object is from \code{BSTFAfull} and \code{parameter='loading'}.
+#' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
+#' @examples
+#' data(utahDataList)
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' plot.map(out, parameter="slope", map=T, state=T, location='utah', fine=50)
 #' @importFrom npreg basis.tps
 #' @importFrom sf st_sfc
 #' @importFrom sf st_polygon
@@ -359,11 +427,12 @@ plot.grid = function(out, parameter, loadings=1, type='mean', ci.level=c(0.025, 
 #' @importFrom RColorBrewer brewer.pal
 #' @import sf
 #' @export plot.map
-plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
-                    type='mean', ci.level=c(0.025, 0.975), fine=100,
+plot.map = function(out, parameter='slope', loadings=1, type='mean',
+                    yearscale=TRUE, new_x=NULL,
+                    ci.level=c(0.025, 0.975), fine=100,
                     color.gradient=colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(fine),
                     with.uncertainty=FALSE, map=FALSE, state=FALSE, location=NULL,
-                    loading=1, addthin=1) {
+                    addthin=1) {
 
   # FIX ME - do functions like bisquare2d work in this function?
 
@@ -390,7 +459,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
   names(predloc) <- c("Lon", "Lat")
 
   if (parameter=='loading') {
-    plot.title = paste('Loading', loading)
+    plot.title = paste('Loading', loadings)
     if (out$load.style=='grid') {
       predS <- NULL
       for(kk in 1:length(out$knots.load)) {
@@ -480,7 +549,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
   }
 
   if (parameter=='loading') {
-    legend.name = paste('Loading', loading)
+    legend.name = paste('Loading', loadings)
     if(out$load.style=="full"){
         names(out$coords) <- c("Lon", "Lat")
         npred <- dim(predloc)[1]
@@ -492,7 +561,7 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
         mycount <- 0
         for(d in seq(1, out$draws, by=addthin)){
             mycount <- mycount + 1
-            bigmat <- out$tau2.lambda[d,loading]*exp(-preddist/out$phi.lambda[d,loading])
+            bigmat <- out$tau2.lambda[d,loadings]*exp(-preddist/out$phi.lambda[d,loadings])
             A <- bigmat[condinds, condinds]
             B <- bigmat[condinds, -condinds]
             C <- bigmat[-condinds, -condinds]
@@ -502,16 +571,16 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
             part1 <- t(backsolve(L, LB))
 
             condvar <- C - part1%*%B
-            lammean[mycount,] <- part1%*%out$Lambda.tilde[d, seq(loading, out$n.factors*out$n.locs, by=out$n.factors)] #((loading-1)*out$n.locs) + (1:out$n.locs)]
+            lammean[mycount,] <- part1%*%out$Lambda.tilde[d, seq(loadings, out$n.factors*out$n.locs, by=out$n.factors)] #((loading-1)*out$n.locs) + (1:out$n.locs)]
             cholC <- chol(condvar)
             lamresid[mycount,] <- as.numeric(cholC%*%rnorm(npred))
         }
         pred <- t(lammean)
     }else{
-      lammean <- predS%*%t(out$alphaS)[seq(loading,out$n.load.bases*out$n.factors,by=out$n.factors),seq(1, out$draws, by=addthin)]
+      lammean <- predS%*%t(out$alphaS)[seq(loadings,out$n.load.bases*out$n.factors,by=out$n.factors),seq(1, out$draws, by=addthin)]
       lamresid <- matrix(rnorm(fine^2*floor(out$draws/addthin),
                              mean=rep(0,fine^2*floor(out$draws/addthin)),
-                             sd=sqrt(rep(c(out$tau2.lambda[seq(1, out$draws, by=addthin),loading]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
+                             sd=sqrt(rep(c(out$tau2.lambda[seq(1, out$draws, by=addthin),loadings]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
       pred <- lammean
     }
   }
@@ -668,7 +737,20 @@ plot.map = function(out, parameter='slope', yearscale=TRUE, new_x=NULL,
 
 
 #' Plot the factors
-#' @param out output from STFA or STFAfull
+#' @param out Output from BSTFA or BSTFAfull.
+#' @param factor Integer or vector of integers specifying which factor(s) to plot.
+#' @param together If \code{length(factor)>1}, logical scalar specifying whether to plot all factors on a single plot. Default is \code{FALSE}.
+#' @param include.legend If \code{length(factor)>1} and \code{together=TRUE}, a logical scalar specifying whether to include a legend.  Default is \code{TRUE}.
+#' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.
+#' @param uncertainty Logical scalar indicating whether to include lower and upper credible interval bounds for the parameter.  Default is \code{FALSE}.
+#' @param ci.level A vector of length 2 specifying the quantiles to use for lower and upper bounds for \code{type='lb'}, \code{type='ub'}, or \code{uncertainty=TRUE}.
+#' @param xrange A date vector of length 2 providing the lower and upper bounds of the dates to include in the plot.
+#' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
+#' @examples
+#' data(utahDataList)
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' plot.factor(out, factor=1:4, together=T)
 #' @export plot.factor
 plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
                        type='mean', uncertainty=T, ci.level=c(0.025, 0.975),
@@ -705,7 +787,6 @@ plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
     if (include.legend) {
       legend("topleft",
              legend=paste("Factor", seq(1,out$n.factors)),
-             # legend=c("Wendover","Moab","St. George","Logan/USU"),
              col = mycols,
              lty=1,
              lwd=2,
@@ -729,7 +810,19 @@ plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
 
 
 #' Plot annual curve
-#' @param out output from STFA or STFAfull
+#' @param out Output from BSTFA or BSTFAfull.
+#' @param location Either a single integer indicating the location in the data set to plot or a vector of length 2 providing the longitude and latitude of the new location.
+#' @param add Logical scalar indicating whether the annual/seasonal process should be added to the existing plot.  Default is \code{FALSE}.
+#' @param years Either \code{"one"} (indicating to plot just a single year; default) or \code{"all"} (indicating to plot all years in the observed time period).
+#' @param new_x If the original model included covariates \code{x}, include the same covariates for \code{location}.
+#' @param interval Numeric value between 0 and 1 specifying the probability of the credible interval.
+#' @param yrange Numeric vector of length 2 providing the lower and upper bounds of the y-axis.  If \code{NULL} (default), the y-axis limits are chosen using the range of the seasonal process and data.
+#' @returns A plot of the annual/seasonal process at \code{location}.
+#' @examples
+#' data(utahDataList)
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' plot.annual(out, location=1)
 #' @importFrom mgcv cSplineDes
 #' @export plot.annual
 plot.annual <- function(out, location, add=F,
