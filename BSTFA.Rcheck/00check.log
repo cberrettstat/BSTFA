@@ -1,0 +1,272 @@
+* using log directory ‘/Users/cberrett/Documents/Research/TempChange/STFAModel/BSTFA/BSTFA.Rcheck’
+* using R version 4.5.0 (2025-04-11)
+* using platform: aarch64-apple-darwin20
+* R was compiled by
+    Apple clang version 14.0.0 (clang-1400.0.29.202)
+    GNU Fortran (GCC) 14.2.0
+* running under: macOS Sequoia 15.5
+* using session charset: UTF-8
+* checking for file ‘BSTFA/DESCRIPTION’ ... OK
+* this is package ‘BSTFA’ version ‘0.1.0’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘BSTFA’ can be installed ... OK
+* used C++ compiler: ‘Apple clang version 17.0.0 (clang-1700.0.13.3)’
+* used SDK: ‘MacOSX15.4.sdk’
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... WARNING
+Non-standard license specification:
+  `use_gpl3_license()`
+Standardizable: FALSE
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking dependencies in R code ... WARNING
+'::' or ':::' import not declared from: ‘lubridate’
+'library' or 'require' call not declared from: ‘coda’
+'library' or 'require' call to ‘coda’ in package code.
+  Please use :: or requireNamespace() instead.
+  See section 'Suggested packages' in the 'Writing R Extensions' manual.
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+BSTFA: no visible global function definition for ‘yday’
+BSTFA: no visible global function definition for ‘dist’
+BSTFA: no visible global function definition for ‘var’
+BSTFA: no visible global function definition for ‘as’
+BSTFA: no visible global function definition for ‘rnorm’
+BSTFA: no visible global function definition for ‘sd’
+BSTFA: no visible global function definition for ‘ginv’
+BSTFA: no visible global function definition for ‘combn’
+BSTFA: no visible global function definition for ‘points’
+BSTFA: no visible global function definition for ‘rgamma’
+BSTFAfull: no visible global function definition for ‘par’
+BSTFAfull: no visible global function definition for ‘as’
+BSTFAfull: no visible global function definition for ‘rnorm’
+BSTFAfull: no visible global function definition for ‘sd’
+BSTFAfull: no visible global function definition for ‘ginv’
+BSTFAfull: no visible global function definition for ‘dist’
+BSTFAfull: no visible global function definition for ‘combn’
+BSTFAfull: no visible global function definition for ‘points’
+BSTFAfull: no visible global function definition for ‘var’
+BSTFAfull: no visible global function definition for ‘rgamma’
+BSTFAfull: no visible global function definition for ‘dnorm’
+BSTFAfull: no visible global function definition for ‘runif’
+BSTFAfull: no visible binding for global variable ‘var’
+bisquare2d: no visible global function definition for ‘dist’
+computeLogLik: no visible global function definition for ‘dnorm’
+makeNewS: no visible global function definition for ‘dist’
+makeNewS: no visible global function definition for ‘points’
+makeNewS: no visible global function definition for ‘legend’
+my_mvrnorm: no visible global function definition for ‘rnorm’
+plot.annual: no visible binding for global variable ‘quantile’
+plot.annual: no visible global function definition for ‘lines’
+plot.annual: no visible global function definition for ‘polygon’
+plot.annual: no visible global function definition for ‘rgb’
+plot.annual: no visible global function definition for ‘axis’
+plot.annual: no visible global function definition for ‘points’
+plot.annual: no visible global function definition for ‘complete.cases’
+plot.annual: no visible global function definition for ‘as’
+plot.annual: no visible global function definition for ‘rnorm’
+plot.factor: no visible global function definition for ‘par’
+plot.factor: no visible binding for global variable ‘median’
+plot.factor: no visible binding for global variable ‘quantile’
+plot.factor: no visible global function definition for ‘polygon’
+plot.factor: no visible global function definition for ‘lines’
+plot.factor: no visible global function definition for ‘legend’
+plot.factor: no visible global function definition for ‘rgb’
+plot.fourier.bases: no visible global function definition for ‘par’
+plot.fourier.bases: no visible global function definition for
+  ‘colorRampPalette’
+plot.grid: no visible global function definition for ‘colorRampPalette’
+plot.grid: no visible binding for global variable ‘quantile’
+plot.grid: no visible binding for global variable ‘median’
+plot.location: no visible global function definition for ‘par’
+plot.location: no visible global function definition for ‘polygon’
+plot.location: no visible global function definition for ‘rgb’
+plot.location: no visible global function definition for ‘points’
+plot.location: no visible global function definition for ‘legend’
+plot.map: no visible global function definition for ‘colorRampPalette’
+plot.map: no visible global function definition for ‘complete.cases’
+plot.map: no visible global function definition for ‘rnorm’
+plot.map: no visible global function definition for ‘dist’
+plot.map: no visible binding for global variable ‘median’
+plot.map: no visible binding for global variable ‘quantile’
+plot.map: no visible binding for global variable ‘Lon’
+plot.map: no visible binding for global variable ‘Lat’
+plot.map: no visible binding for global variable ‘predm’
+plot.map: no visible binding for global variable ‘predl’
+plot.map: no visible binding for global variable ‘predu’
+plot.map: no visible binding for global variable ‘long’
+plot.map: no visible binding for global variable ‘lat’
+plot.map: no visible binding for global variable ‘group’
+plot.map: no visible global function definition for ‘rgb’
+predictBSTFA: no visible global function definition for ‘rnorm’
+predictBSTFA: no visible global function definition for
+  ‘complete.cases’
+predictBSTFA: no visible global function definition for ‘as’
+predictBSTFA: no visible binding for global variable ‘quantile’
+Undefined global functions or variables:
+  Lat Lon as axis colorRampPalette combn complete.cases dist dnorm ginv
+  group lat legend lines long median par points polygon predl predm
+  predu quantile rgamma rgb rnorm runif sd var yday
+Consider adding
+  importFrom("grDevices", "colorRampPalette", "rgb")
+  importFrom("graphics", "axis", "legend", "lines", "par", "points",
+             "polygon")
+  importFrom("methods", "as")
+  importFrom("stats", "complete.cases", "dist", "dnorm", "median",
+             "quantile", "rgamma", "rnorm", "runif", "sd", "var")
+  importFrom("utils", "combn")
+to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
+contains 'methods').
+* checking Rd files ... NOTE
+checkRd: (-1) BSTFA.Rd:115: Lost braces; missing escapes or markup?
+   115 | \item{sig2.gamma}{Numeric scalar indicating the prior shape for the residual precision.  Default value is {2}.}
+       |                                                                                                           ^
+checkRd: (-1) BSTFA.Rd:117: Lost braces; missing escapes or markup?
+   117 | \item{sig2.phi}{Numeric scalar indicating the prior rate for the residual precision. Default value is {1e-05}.}
+       |                                                                                                       ^
+checkRd: (-1) BSTFA.Rd:160: Lost braces; missing escapes or markup?
+   160 | \item{time.data}{A data frame of size \code{iters} by {6} containing the time it took to sample each parameter for every iteration.}
+       |                                                       ^
+checkRd: (-1) BSTFAfull.Rd:117: Lost braces; missing escapes or markup?
+   117 | \item{sig2.gamma}{Numeric scalar indicating the prior shape for the residual precision.  Default value is {2}.}
+       |                                                                                                           ^
+checkRd: (-1) BSTFAfull.Rd:119: Lost braces; missing escapes or markup?
+   119 | \item{sig2.phi}{Numeric scalar indicating the prior rate for the residual precision. Default value is {1e-05}.}
+       |                                                                                                       ^
+checkRd: (-1) BSTFAfull.Rd:192: Lost braces; missing escapes or markup?
+   192 | \item{time.data}{A data frame of size \code{iters} by {6} containing the time it took to sample each parameter for every iteration.}
+       |                                                       ^
+* checking Rd metadata ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... WARNING
+Undocumented code objects:
+  ‘utahDataList’
+Undocumented data sets:
+  ‘utahDataList’
+All user-level objects in a package should have documentation entries.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking for code/documentation mismatches ... WARNING
+Codoc mismatches from Rd file 'plot.map.Rd':
+plot.map
+  Code: function(out, parameter = "slope", loadings = 1, type = "mean",
+                 yearscale = TRUE, new_x = NULL, ci.level = c(0.025,
+                 0.975), fine = 100, color.gradient =
+                 colorRampPalette(rev(RColorBrewer::brewer.pal(9, name
+                 = "RdBu")))(fine), with.uncertainty = FALSE, map =
+                 FALSE, state = FALSE, location = NULL, addthin = 1)
+  Docs: function(out, parameter = "slope", yearscale = TRUE, new_x =
+                 NULL, type = "mean", ci.level = c(0.025, 0.975), fine
+                 = 100, color.gradient =
+                 colorRampPalette(rev(RColorBrewer::brewer.pal(9, name
+                 = "RdBu")))(fine), with.uncertainty = FALSE, map =
+                 FALSE, state = FALSE, location = NULL, loading = 1,
+                 addthin = 1)
+  Argument names in code not in docs:
+    loadings
+  Argument names in docs not in code:
+    loading
+  Mismatches in argument names (first 3):
+    Position: 3 Code: loadings Docs: yearscale
+    Position: 4 Code: type Docs: new_x
+    Position: 5 Code: yearscale Docs: type
+
+* checking Rd \usage sections ... WARNING
+Undocumented arguments in Rd file 'check.convergence.Rd'
+  ‘type’ ‘cutoff’
+
+Undocumented arguments in Rd file 'computeLogLik.Rd'
+  ‘verbose’ ‘addthin’
+
+Undocumented arguments in Rd file 'plot.annual.Rd'
+  ‘location’ ‘add’ ‘years’ ‘interval’ ‘yrange’ ‘new_x’
+
+Undocumented arguments in Rd file 'plot.factor.Rd'
+  ‘factor’ ‘together’ ‘include.legend’ ‘type’ ‘uncertainty’ ‘ci.level’
+  ‘xrange’
+
+Undocumented arguments in Rd file 'plot.fourier.bases.Rd'
+  ‘coords’ ‘R’ ‘fine’ ‘plot.3d’ ‘freq.lon’ ‘freq.lat’ ‘par.mfrow’
+Documented arguments not in \usage in Rd file 'plot.fourier.bases.Rd':
+  ‘out’
+
+Undocumented arguments in Rd file 'plot.grid.Rd'
+  ‘parameter’ ‘loadings’ ‘type’ ‘ci.level’ ‘yearscale’ ‘color.gradient’
+
+Undocumented arguments in Rd file 'plot.location.Rd'
+  ‘location’ ‘new_x’ ‘type’ ‘par.mfrow’ ‘pred.int’ ‘ci.level’
+  ‘uncertainty’ ‘xrange’ ‘truth’ ‘ylim’
+
+Undocumented arguments in Rd file 'plot.map.Rd'
+  ‘parameter’ ‘yearscale’ ‘new_x’ ‘type’ ‘ci.level’ ‘fine’
+  ‘color.gradient’ ‘with.uncertainty’ ‘map’ ‘state’ ‘location’
+  ‘loading’ ‘addthin’
+
+Undocumented arguments in Rd file 'plot.trace.Rd'
+  ‘parameter’ ‘param.range’ ‘par.mfrow’ ‘density’
+
+Undocumented arguments in Rd file 'predictBSTFA.Rd'
+  ‘location’ ‘type’ ‘ci.level’ ‘new_x’ ‘pred.int’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking line endings in C/C++/Fortran sources/headers ... OK
+* checking compiled code ... OK
+* checking files in ‘vignettes’ ... WARNING
+Files in the 'vignettes' directory but no files in 'inst/doc':
+  ‘BSTFA.Rmd’ ‘BSTFA_Vignette.pdf’ ‘apa.csl’ ‘basis_comparison3.png’
+  ‘factor_comparison2.png’ ‘loading_comparison3.png’ ‘references.bib’
+  ‘style.css’ ‘style.tex’
+Files named as vignettes but with no recognized vignette engine:
+   ‘vignettes/BSTFA.Rmd’
+(Is a VignetteBuilder field missing?)
+* checking examples ... ERROR
+Running examples in ‘BSTFA-Ex.R’ failed
+The error most likely occurred in:
+
+> ### Name: BSTFA
+> ### Title: Reduced BSTFA function
+> ### Aliases: BSTFA
+> 
+> ### ** Examples
+> 
+> data(utahDataList)
+> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
+Error: object 'TemperatureVals' not found
+Execution halted
+* checking package vignettes ... NOTE
+Package has ‘vignettes’ subdirectory but apparently no vignettes.
+Perhaps the ‘VignetteBuilder’ information is missing from the
+DESCRIPTION file?
+* checking PDF version of manual ... OK
+* DONE
+Status: 1 ERROR, 6 WARNINGs, 3 NOTEs

@@ -75,7 +75,6 @@ computation.summary = function(out) {
 #' @export check.convergence
 check.convergence = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,0.001)) {
 
-  library(coda)
   mcmcVals = list()
   if (type=='eSS') {
     if (sum(out$mu)!=0) mcmcVals$mu = effectiveSize(out$mu)[which(effectiveSize(out$mu)<cutoff)]

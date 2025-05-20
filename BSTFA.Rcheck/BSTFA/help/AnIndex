@@ -1,0 +1,13 @@
+BSTFA	BSTFA
+BSTFAfull	BSTFAfull
+check.convergence	check.convergence
+computation.summary	computation.summary
+computeLogLik	computeLogLik
+plot.annual	plot.annual
+plot.factor	plot.factor
+plot.fourier.bases	plot.fourier.bases
+plot.grid	plot.grid
+plot.location	plot.location
+plot.map	plot.map
+plot.trace	plot.trace
+predictBSTFA	predictBSTFA

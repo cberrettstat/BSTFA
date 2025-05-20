@@ -1,0 +1,14 @@
+BSTFA                   Reduced BSTFA function
+BSTFAfull               Full BSTFA function
+check.convergence       Check effective sample size and geweke
+                        diagnostic
+computation.summary     Print computation summary
+computeLogLik           Compute log-likelihood
+plot.annual             Plot annual curve
+plot.factor             Plot the factors
+plot.fourier.bases      Visualize fourier bases
+plot.grid               Plot on a grid
+plot.location           Plot a location
+plot.map                Plot on a map
+plot.trace              Plot trace plots
+predictBSTFA            Prediction
