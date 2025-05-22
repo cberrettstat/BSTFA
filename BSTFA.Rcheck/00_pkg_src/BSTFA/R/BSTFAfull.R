@@ -63,9 +63,13 @@
 #' @importFrom coda as.mcmc
 #' @importFrom MASS mvrnorm
 #' @importFrom npreg basis.tps
+#' @importFrom lubridate yday
+#' @importFrom utils combn
 #' @import Matrix
 #' @import Rcpp
 #' @import RcppArmadillo
+#' @import stats
+#' @import graphics
 #' @useDynLib BSTFA, .registration = TRUE
 #' @returns A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):
 #' \describe{
@@ -103,7 +107,7 @@
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                      mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
-                     n.seasn.knots=min(7, ceiling(length(unique(lubridate::yday(dates)))/3)),
+                     n.seasn.knots=min(7, ceiling(length(unique(yday(dates)))/3)),
                      spatial.style='grid', n.spatial.bases=ceiling(n.locs/2),
                      knot.levels=2, max.knot.dist=n.locs*0.05, premade.knots=NULL, plot.knots=FALSE,
                      freq.lon=4*diff(range(coords[,1])),
@@ -154,7 +158,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   }
 
   ### Create doy
-  doy <- lubridate::yday(dates)
+  doy <- yday(dates)
 
   ### Change x to matrix if not null
   if (!is.null(x)) x <- as.matrix(x)
@@ -394,19 +398,19 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
         tau2.mu.save[,(i-burn)/thin] <- tau2.mu
       }
 
-      if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
-        eSS = apply(mu.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(mu.save)[1],2)*100
-        print(paste(prop.converged,"% of mu parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(alpha.mu.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(alpha.mu.save)[1],2)*100
-        print(paste(prop.converged,"% of alpha.mu parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(tau2.mu.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.mu.save)[1],2)*100
-        print(paste(prop.converged,"% of tau2.mu parameters have eSS > ",eSS.converged, sep=""))
-      }
+      # if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
+      #   eSS = apply(mu.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(mu.save)[1],2)*100
+      #   print(paste(prop.converged,"% of mu parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(alpha.mu.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(alpha.mu.save)[1],2)*100
+      #   print(paste(prop.converged,"% of alpha.mu parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(tau2.mu.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.mu.save)[1],2)*100
+      #   print(paste(prop.converged,"% of tau2.mu parameters have eSS > ",eSS.converged, sep=""))
+      # }
     }
 
 
@@ -441,19 +445,19 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       }
 
       ### eSS check for beta
-      if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
-        eSS = apply(beta.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(beta.save)[1],2)*100
-        print(paste(prop.converged,"% of beta parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(alpha.beta.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(alpha.beta.save)[1],2)*100
-        print(paste(prop.converged,"% of alpha.beta parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(tau2.beta.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.beta.save)[1],2)*100
-        print(paste(prop.converged,"% of tau2.beta parameters have eSS > ",eSS.converged, sep=""))
-      }
+      # if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
+      #   eSS = apply(beta.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(beta.save)[1],2)*100
+      #   print(paste(prop.converged,"% of beta parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(alpha.beta.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(alpha.beta.save)[1],2)*100
+      #   print(paste(prop.converged,"% of alpha.beta parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(tau2.beta.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.beta.save)[1],2)*100
+      #   print(paste(prop.converged,"% of tau2.beta parameters have eSS > ",eSS.converged, sep=""))
+      # }
     }
 
     ### Sample Xi
@@ -487,19 +491,19 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       }
 
       ### eSS check for xi
-      if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
-        eSS = apply(xi.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(xi.save)[1],2)*100
-        print(paste(prop.converged,"% of xi parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(alpha.xi.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(alpha.xi.save)[1],2)*100
-        print(paste(prop.converged,"% of alpha.xi parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(tau2.xi.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.xi.save)[1],2)*100
-        print(paste(prop.converged,"% of tau2.xi parameters have eSS > ",eSS.converged, sep=""))
-      }
+      # if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
+      #   eSS = apply(xi.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(xi.save)[1],2)*100
+      #   print(paste(prop.converged,"% of xi parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(alpha.xi.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(alpha.xi.save)[1],2)*100
+      #   print(paste(prop.converged,"% of alpha.xi parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(tau2.xi.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.xi.save)[1],2)*100
+      #   print(paste(prop.converged,"% of tau2.xi parameters have eSS > ",eSS.converged, sep=""))
+      # }
     }
 
     # How long to delay FA #
@@ -619,31 +623,31 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       }
 
       ### eSS check for FA
-      if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
-        eSS = apply(PFmat.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(PFmat.save)[1],2)*100
-        print(paste(prop.converged,"% of PFmat parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(Omega.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(Omega.save)[1],2)*100
-        print(paste(prop.converged,"% of Omega parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(Sigma.F.inv.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(Sigma.F.inv.save)[1],2)*100
-        print(paste(prop.converged,"% of Sigma.F.inv parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(Lambda.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(Lambda.save)[1],2)*100
-        print(paste(prop.converged,"% of Lambda parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(phi.lambda.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(phi.lambda.save)[1],2)*100
-        print(paste(prop.converged,"% of phi.lambda parameters have eSS > ",eSS.converged, sep=""))
-
-        eSS = apply(tau2.lambda.save,1,effectiveSize)
-        prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.lambda.save)[1],2)*100
-        print(paste(prop.converged,"% of tau2.lambda parameters have eSS > ",eSS.converged, sep=""))
-      }
+      # if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
+      #   eSS = apply(PFmat.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(PFmat.save)[1],2)*100
+      #   print(paste(prop.converged,"% of PFmat parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(Omega.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(Omega.save)[1],2)*100
+      #   print(paste(prop.converged,"% of Omega parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(Sigma.F.inv.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(Sigma.F.inv.save)[1],2)*100
+      #   print(paste(prop.converged,"% of Sigma.F.inv parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(Lambda.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(Lambda.save)[1],2)*100
+      #   print(paste(prop.converged,"% of Lambda parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(phi.lambda.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(phi.lambda.save)[1],2)*100
+      #   print(paste(prop.converged,"% of phi.lambda parameters have eSS > ",eSS.converged, sep=""))
+      #
+      #   eSS = apply(tau2.lambda.save,1,effectiveSize)
+      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.lambda.save)[1],2)*100
+      #   print(paste(prop.converged,"% of tau2.lambda parameters have eSS > ",eSS.converged, sep=""))
+      # }
     }
 
 
@@ -663,11 +667,11 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     }
 
     ### eSS check for sig2
-    if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
-      eSS = effectiveSize(t(sig2.save))
-      prop.converged=round(length(which(eSS>eSS.converged))/dim(sig2.save)[1],2)*100
-      print(paste(prop.converged,"% of sig2 parameters have eSS > ",eSS.converged, sep=""))
-    }
+    # if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
+    #   eSS = effectiveSize(t(sig2.save))
+    #   prop.converged=round(length(which(eSS>eSS.converged))/dim(sig2.save)[1],2)*100
+    #   print(paste(prop.converged,"% of sig2 parameters have eSS > ",eSS.converged, sep=""))
+    # }
 
     ### Fill in missing data
     y[whichmis] = Jfullmu.long[whichmis] + Tfullbeta.long[whichmis] +

@@ -1,13 +1,18 @@
 ### Function to visualize fourier bases
 
-#' Visualize fourier bases
-#' @param out output from STFA or STFAfull
-#' @importFrom scatterplot3d scatterplot3d
+#' Visualize fourier bases. Used internally.
+#' @param coords A matrix of coordinates of observed locations.
+#' @param R Integer indicating the number of bases to compute.
+#' @param fine Number of grid points to include on both axes.  Total grid size will be \code{fine^2}.  Default is \code{100}.
+#' @param plot.3d Logical scalar indicating whether to plot the bases.  Default is \code{FALSE}.
+#' @param freq.lon Numeric value indicating the frequency to use for the Fourier bases in the longitude direction.  Default is \code{4*diff(range(coords[,1]))}.
+#' @param freq.lat Numeric value indicating the frequency to use for the Fourier bases in the latitude direction.  Default is \code{4*diff(range(coords[,2]))}.
+#' @param par.mfrow If \code{plot.3d=TRUE}, how to divide the plotting window. See \code{help(par)} for more details.
 #' @import scatterplot3d
 #' @export plot.fourier.bases
 plot.fourier.bases = function(coords, R, fine=100, plot.3d=FALSE,
-                              freq.lon=diff(range(coords[,1]))^2,
-                              freq.lat=diff(range(coords[,2]))^2,
+                              freq.lon=4*diff(range(coords[,1])),
+                              freq.lat=4*diff(range(coords[,2])),
                               par.mfrow=c(2,3)) {
 
   # print(paste("Freq.lon =", freq.lon))

@@ -24,7 +24,7 @@
 * checking package directory ... OK
 * checking DESCRIPTION meta-information ... WARNING
 Non-standard license specification:
-  `use_gpl3_license()`
+  use_gpl3_license()
 Standardizable: FALSE
 * checking top-level files ... OK
 * checking for left-over files ... OK
@@ -37,12 +37,7 @@ Standardizable: FALSE
 * checking whether the package can be unloaded cleanly ... OK
 * checking whether the namespace can be loaded with stated dependencies ... OK
 * checking whether the namespace can be unloaded cleanly ... OK
-* checking dependencies in R code ... WARNING
-'::' or ':::' import not declared from: ‘lubridate’
-'library' or 'require' call not declared from: ‘coda’
-'library' or 'require' call to ‘coda’ in package code.
-  Please use :: or requireNamespace() instead.
-  See section 'Suggested packages' in the 'Writing R Extensions' manual.
+* checking dependencies in R code ... OK
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
@@ -57,6 +52,7 @@ BSTFA: no visible global function definition for ‘ginv’
 BSTFA: no visible global function definition for ‘combn’
 BSTFA: no visible global function definition for ‘points’
 BSTFA: no visible global function definition for ‘rgamma’
+BSTFAfull: no visible global function definition for ‘yday’
 BSTFAfull: no visible global function definition for ‘par’
 BSTFAfull: no visible global function definition for ‘as’
 BSTFAfull: no visible global function definition for ‘rnorm’
@@ -167,6 +163,63 @@ All user-level objects in a package should have documentation entries.
 See chapter ‘Writing R documentation files’ in the ‘Writing R
 Extensions’ manual.
 * checking for code/documentation mismatches ... WARNING
+Codoc mismatches from Rd file 'BSTFAfull.Rd':
+BSTFAfull
+  Code: function(ymat, dates, coords, iters = 10000, n.times =
+                 nrow(ymat), n.locs = ncol(ymat), x = NULL, mean =
+                 FALSE, linear = TRUE, seasonal = TRUE, factors = TRUE,
+                 n.seasn.knots = min(7,
+                 ceiling(length(unique(yday(dates)))/3)), spatial.style
+                 = "grid", n.spatial.bases = ceiling(n.locs/2),
+                 knot.levels = 2, max.knot.dist = n.locs * 0.05,
+                 premade.knots = NULL, plot.knots = FALSE, freq.lon = 4
+                 * diff(range(coords[, 1])), freq.lat = 4 *
+                 diff(range(coords[, 2])), n.factors = min(4,
+                 ceiling(n.locs/20)), factors.fixed = NULL,
+                 plot.factors = FALSE, alpha.prec = 1/1e+05, tau2.gamma
+                 = 2, tau2.phi = 1e-07, sig2.gamma = 2, sig2.phi =
+                 1e-05, omega.ii.mean = 1, omega.ii.var = 1,
+                 omega.ij.mean = 0, omega.ij.var = 2, S.F = diag(1,
+                 n.factors), nu.F = n.factors, phi.gamma = 3, phi.phi =
+                 0.5, sig2 = NULL, beta = NULL, xi = NULL, Fmat =
+                 matrix(0, nrow = n.times, ncol = n.factors), Omega =
+                 diag(1, n.factors), Sigma.F = diag(1, n.factors),
+                 Lambda = matrix(0, nrow = n.locs, n.factors),
+                 phi.lambda = rep(1, n.factors), thin = 1, burn =
+                 floor(iters * 0.5), c.omega = matrix(0.001, n.factors,
+                 n.factors), c.phi.lambda = rep(0.001, n.factors),
+                 adapt.iter = (burn + 10), adapt.epsilon = 1e-20,
+                 verbose = TRUE, filename = "STFA.Rdata", save.missing
+                 = TRUE, save.output = FALSE)
+  Docs: function(ymat, dates, coords, iters = 10000, n.times =
+                 nrow(ymat), n.locs = ncol(ymat), x = NULL, mean =
+                 FALSE, linear = TRUE, seasonal = TRUE, factors = TRUE,
+                 n.seasn.knots = min(7,
+                 ceiling(length(unique(lubridate::yday(dates)))/3)),
+                 spatial.style = "grid", n.spatial.bases =
+                 ceiling(n.locs/2), knot.levels = 2, max.knot.dist =
+                 n.locs * 0.05, premade.knots = NULL, plot.knots =
+                 FALSE, freq.lon = 4 * diff(range(coords[, 1])),
+                 freq.lat = 4 * diff(range(coords[, 2])), n.factors =
+                 min(4, ceiling(n.locs/20)), factors.fixed = NULL,
+                 plot.factors = FALSE, alpha.prec = 1/1e+05, tau2.gamma
+                 = 2, tau2.phi = 1e-07, sig2.gamma = 2, sig2.phi =
+                 1e-05, omega.ii.mean = 1, omega.ii.var = 1,
+                 omega.ij.mean = 0, omega.ij.var = 2, S.F = diag(1,
+                 n.factors), nu.F = n.factors, phi.gamma = 3, phi.phi =
+                 0.5, sig2 = NULL, beta = NULL, xi = NULL, Fmat =
+                 matrix(0, nrow = n.times, ncol = n.factors), Omega =
+                 diag(1, n.factors), Sigma.F = diag(1, n.factors),
+                 Lambda = matrix(0, nrow = n.locs, n.factors),
+                 phi.lambda = rep(1, n.factors), thin = 1, burn =
+                 floor(iters * 0.5), c.omega = matrix(0.001, n.factors,
+                 n.factors), c.phi.lambda = rep(0.001, n.factors),
+                 adapt.iter = (burn + 10), adapt.epsilon = 1e-20,
+                 verbose = TRUE, filename = "STFA.Rdata", save.missing
+                 = TRUE, save.output = FALSE)
+  Mismatches in argument default values:
+    Name: 'n.seasn.knots' Code: min(7, ceiling(length(unique(yday(dates)))/3)) Docs: min(7, ceiling(length(unique(lubridate::yday(dates)))/3))
+
 Codoc mismatches from Rd file 'plot.map.Rd':
 plot.map
   Code: function(out, parameter = "slope", loadings = 1, type = "mean",
@@ -269,4 +322,4 @@ Perhaps the ‘VignetteBuilder’ information is missing from the
 DESCRIPTION file?
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 ERROR, 6 WARNINGs, 3 NOTEs
+Status: 1 ERROR, 5 WARNINGs, 3 NOTEs

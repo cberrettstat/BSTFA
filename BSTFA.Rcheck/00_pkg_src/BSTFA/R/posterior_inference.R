@@ -580,7 +580,7 @@ plot.map = function(out, parameter='slope', loadings=1, type='mean',
       lammean <- predS%*%t(out$alphaS)[seq(loadings,out$n.load.bases*out$n.factors,by=out$n.factors),seq(1, out$draws, by=addthin)]
       lamresid <- matrix(rnorm(fine^2*floor(out$draws/addthin),
                              mean=rep(0,fine^2*floor(out$draws/addthin)),
-                             sd=sqrt(rep(c(out$tau2.lambda[seq(1, out$draws, by=addthin),loadings]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
+                             sd=sqrt(rep(c(out$tau2.lambda[seq(1, out$draws, by=addthin)]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
       pred <- lammean
     }
   }

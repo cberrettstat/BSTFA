@@ -14,7 +14,7 @@
 #' @param linear Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or "slope") in time. Otherwise, the model will assume a zero change in slope across time.
 #' @param seasonal Logical scalar. If \code{TRUE} (default), the model will use circular b-splines to model a spatially-dependent annual process.  Otherwise, the model will assume there is no seasonal (annual) process.
 #' @param factors Logical scalar. If \code{TRUE} (default), the model will fit a spatio-temporal factor analysis model with temporally-dependent factors and spatially-dependent loadings.
-#' @param n.seasn.knots Numeric scalar indicating the number of knots to use for the seasonal basis components. The default value is \code{min(7, ceiling(length(unique(yday(dates)))/3))}, where 7 will capture approximately 2 peaks during the year.
+#' @param n.seasn.knots Numeric scalar indicating the number of knots to use for the seasonal basis components. The default value is \code{min(7, ceiling(length(unique(lubridate::yday(dates)))/3))}, where 7 will capture approximately 2 peaks during the year.
 #' @param spatial.style Character scalar indicating the style of bases to use for the mean, linear, and seasonal components.  Style options are \code{'fourier'}, \code{'tps'} for thin plate splines, and \code{'grid'} (default) for multiresolution bisquare bases using knots from a grid across the space.
 #' @param n.spatial.bases Numeric scalar indicating the number of spatial bases to use when \code{spatial.style} is either \code{'fourier'} or \code{'tps'}. Default value is \code{min(8, ceiling(n.locs/3))}.
 #' @param knot.levels Numeric scalar indicating the number of resolutions to use for when \code{spatial.style='grid'}.  Default is 2.
@@ -29,8 +29,8 @@
 #' @param alpha.prec Numeric scalar indicating the prior precision for all model process coefficients. Default value is \code{1/100000}.
 #' @param tau2.gamma Numeric scalar indicating the prior shape for the precision of the model coefficients.  Default value is \code{2}.
 #' @param tau2.phi Numeric scalar indicating the prior rate for the precision of the model coefficients.  Default value is \code{1e-07}.
-#' @param sig2.gamma Numeric scalar indicating the prior shape for the residual precision.  Default value is {2}.
-#' @param sig2.phi Numeric scalar indicating the prior rate for the residual precision. Default value is {1e-05}.
+#' @param sig2.gamma Numeric scalar indicating the prior shape for the residual precision.  Default value is \code{2}.
+#' @param sig2.phi Numeric scalar indicating the prior rate for the residual precision. Default value is \code{1e-05}.
 #' @param omega.ii.mean Numeric scalar indicating the prior mean for the diagonal elements of the autoregressive correlation matrix of the factors.  Default is 1.
 #' @param omega.ii.var Numeric scalar indicating the prior variance for the diagonal elements of the autoregressive correlation matrix of the factors.  Default is 1.
 #' @param omega.ij.mean Numeric scalar indicating the prior mean for the off-diagonal elements of the autoregressive correlation matrix of the factors.  Default is 0.
@@ -89,7 +89,7 @@
 #'   \item{tau2.lambda}{An mcmc object of size \code{draws} by \code{1} indicating the residual variance of the loadings spatial process.}
 #'   \item{sig2}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the residual variance of the data.}
 #'   \item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NULL}. }
-#'   \item{time.data}{A data frame of size \code{iters} by {6} containing the time it took to sample each parameter for every iteration.}
+#'   \item{time.data}{A data frame of size \code{iters} by \code{6} containing the time it took to sample each parameter for every iteration.}
 #'   \item{setup.time}{An object containing the time the model setup took.}
 #'   \item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
 #'   \item{factors.fixed}{A vector of length \code{n.factors} giving the location indices of the fixed loadings.}
@@ -103,6 +103,7 @@
 #' @author Candace Berrett and Adam Simpson
 #' @examples
 #' data(utahDataList)
+#' attach(utahDataList)
 #' out <- BSTFA.full(ymat=TemperatureVals, dates=Dates, coords=Coords)
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,

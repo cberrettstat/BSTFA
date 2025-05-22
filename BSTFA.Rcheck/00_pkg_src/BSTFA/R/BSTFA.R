@@ -49,12 +49,15 @@
 #' @importFrom matrixcalc vec
 #' @importFrom mgcv cSplineDes
 #' @importFrom coda as.mcmc
-#' @importFrom coda effectiveSize
 #' @importFrom MASS mvrnorm
 #' @importFrom npreg basis.tps
+#' @importFrom lubridate yday
+#' @importFrom utils combn
 #' @import matrixcalc
 #' @import Matrix
 #' @import npreg
+#' @import stats
+#' @import graphics
 #' @returns A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):
 #' \describe{
 #'   \item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the values will all be zero.}
@@ -88,6 +91,7 @@
 #' @author Adam Simpson and Candace Berrett
 #' @examples
 #' data(utahDataList)
+#' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
 #' @export BSTFA
 BSTFA <- function(ymat, dates, coords,
@@ -136,7 +140,7 @@ BSTFA <- function(ymat, dates, coords,
   }
 
   ### Create doy
-  doy <- lubridate::yday(dates)
+  doy <- yday(dates)
 
   ### Change x to matrix if not null
   if (!is.null(x)) x <- as.matrix(x)

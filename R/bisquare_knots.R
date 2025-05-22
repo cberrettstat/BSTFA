@@ -1,5 +1,13 @@
 ### Functions used to create bisquare knots
 
+#' Bisquare bases for 2-dimensional space
+#'
+#' Function to evaluate bisquare bases for 2-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
+#' @param locs Matrix of coordinates for observed locations.
+#' @param knots
+#' @importFrom stats dist
+#' @author Candace Berrett and Adam Simpson
+#' @export bisquare2d
 bisquare2d <- function(locs, knots){ #knots are rows
   if(dim(knots)[1]>1){
     knot.width <- min(dist(knots))
@@ -18,6 +26,14 @@ bisquare2d <- function(locs, knots){ #knots are rows
   return(S)
 } #end 2d bisquare function
 
+#' Bisquare bases for 1-dimensional space
+#'
+#' Function to evaluate bisquare bases for 1-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
+#' @param locs Matrix of coordinates for observed locations.
+#' @param knots
+#' @importFrom stats dist
+#' @author Candace Berrett and Adam Simpson
+#' @export bisquare1d
 bisquare1d <- function(locs, knots){
   r <- 1.5*(knots[2]-knots[1])
   S <- matrix(0, nrow=length(locs), ncol=length(knots))
@@ -29,6 +45,20 @@ bisquare1d <- function(locs, knots){
   return(S)
 } #end 1d bisquare function
 
+#' Create a matrix of bisquare bases for a set of observed locations.
+#'
+#' Create a matrix of bisquare bases for a set of observed locations.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
+#' @param coords Matrix of coordinates for new locations.
+#' @param n.locations Number of observed locations.
+#' @param knot.levels Number of levels for the knots. Default is 2.
+#' @param max.knot.dist Maximum distance between an observation and a knot.  Default is \code{mean(dist(coords))}.
+#' @param x Optional matrix of covariates to include in the model.
+#' @param premade.knots Optional list of length \code{knot.levels} each list item containing pre-chosen knots for that level.
+#' @param plot.knots Logical scalar indicating whether or not to plot the knots.  Default is \code{TRUE}.
+#' @param regions Logical scalar indicating if the space should be divided into multiresolution regions. Default is \code{FALSE}.
+#' @importFrom stats dist
+#' @author Candace Berrett and Adam Simpson
+#' @export makeNewS
 makeNewS <- function(coords, n.locations, knot.levels=2,
                      max.knot.dist=mean(dist(coords)), x=NULL, premade.knots=NULL,
                      plot.knots=TRUE, regions=FALSE) {
@@ -320,6 +350,13 @@ makeNewS <- function(coords, n.locations, knot.levels=2,
   list(newS, knots.list)
 }
 
+#' Create a matrix of bisquare bases for new locations.
+#'
+#' Create a matrix of bisquare bases for new locations.  Used internally.
+#' @param out Output object from \code{BSTFA} or \code{BSTFAfull} functions.
+#' @param location Matrix of coordinates for the new locations.
+#' @author Candace Berrett and Adam Simpson
+#' @export makePredS
 makePredS <- function(out, location) {
   long=location[,1]
   lat=location[,2]
@@ -338,6 +375,13 @@ makePredS <- function(out, location) {
   predS
 }
 
+#' Define the initial region of interest.
+#'
+#' Define the region of interest.  Used internally.
+#' @param out Output object from \code{BSTFA} or \code{BSTFAfull} functions.
+#' @param location Matrix of coordinates for the new locations.
+#' @author Candace Berrett and Adam Simpson
+#' @export defineRegion
 defineRegion <- function(out, location) {
   region=list()
   region[[1]]=1
