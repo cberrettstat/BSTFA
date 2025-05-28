@@ -15,8 +15,29 @@
 )
 }
 \arguments{
-\item{out}{output from STFA or STFAfull}
+\item{out}{Output from BSTFA or BSTFAfull.}
+
+\item{location}{Either a single integer indicating the location in the data set to plot or a vector of length 2 providing the longitude and latitude of the new location.}
+
+\item{add}{Logical scalar indicating whether the annual/seasonal process should be added to the existing plot.  Default is \code{FALSE}.}
+
+\item{years}{Either \code{"one"} (indicating to plot just a single year; default) or \code{"all"} (indicating to plot all years in the observed time period).}
+
+\item{interval}{Numeric value between 0 and 1 specifying the probability of the credible interval.}
+
+\item{yrange}{Numeric vector of length 2 providing the lower and upper bounds of the y-axis.  If \code{NULL} (default), the y-axis limits are chosen using the range of the seasonal process and data.}
+
+\item{new_x}{If the original model included covariates \code{x}, include the same covariates for \code{location}.}
+}
+\value{
+A plot of the annual/seasonal process at \code{location}.
 }
 \description{
 Plot annual curve
+}
+\examples{
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+plot.annual(out, location=1)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/posterior_inference.R
 \name{plot.grid}
 \alias{plot.grid}
-\title{Plot on a grid}
+\title{Plot the spatially-dependent parameter for in-sample locations.}
 \usage{
 \method{plot}{grid}(
   out,
@@ -15,8 +15,29 @@
 )
 }
 \arguments{
-\item{out}{output from STFA or STFAfull}
+\item{out}{Output from BSTFA or BSTFAfull.}
+
+\item{parameter}{One of \code{"slope"} (default), \code{"loading"}, or \code{"mean"}.}
+
+\item{loadings}{If \code{parameter="loading"}, an integer indicating which factor loading to plot.}
+
+\item{type}{One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.}
+
+\item{ci.level}{If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.}
+
+\item{color.gradient}{The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)}.}
+
+\item{yearscsale}{If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).}
+}
+\value{
+A plot of spatially-dependent parameter values for the observed locations.
 }
 \description{
-Plot on a grid
+Plot the spatially-dependent parameter for in-sample locations.
+}
+\examples{
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+plot.grid(out, parameter="slope")
 }

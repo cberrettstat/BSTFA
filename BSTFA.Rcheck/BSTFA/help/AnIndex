@@ -1,8 +1,13 @@
+bisquare1d	bisquare1d
+bisquare2d	bisquare2d
 BSTFA	BSTFA
 BSTFAfull	BSTFAfull
 check.convergence	check.convergence
 computation.summary	computation.summary
 computeLogLik	computeLogLik
+defineRegion	defineRegion
+makeNewS	makeNewS
+makePredS	makePredS
 plot.annual	plot.annual
 plot.factor	plot.factor
 plot.fourier.bases	plot.fourier.bases
@@ -11,3 +16,4 @@ plot.location	plot.location
 plot.map	plot.map
 plot.trace	plot.trace
 predictBSTFA	predictBSTFA
+utahDataList	utahDataList

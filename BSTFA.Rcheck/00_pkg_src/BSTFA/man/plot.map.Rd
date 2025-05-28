@@ -2,14 +2,15 @@
 % Please edit documentation in R/posterior_inference.R
 \name{plot.map}
 \alias{plot.map}
-\title{Plot on a map}
+\title{Plot a map of interpolated spatially-dependent parameter values.}
 \usage{
 \method{plot}{map}(
   out,
   parameter = "slope",
+  loadings = 1,
+  type = "mean",
   yearscale = TRUE,
   new_x = NULL,
-  type = "mean",
   ci.level = c(0.025, 0.975),
   fine = 100,
   color.gradient = colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =
@@ -18,13 +19,45 @@
   map = FALSE,
   state = FALSE,
   location = NULL,
-  loading = 1,
   addthin = 1
 )
 }
 \arguments{
-\item{out}{output from STFA or STFAfull}
+\item{out}{Output from BSTFA or BSTFAfull.}
+
+\item{parameter}{One of \code{"slope"} (default), \code{"loading"}, or \code{"mean"}.}
+
+\item{loadings}{If \code{parameter="loading"}, an integer indicating which factor loading to plot.}
+
+\item{type}{One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.}
+
+\item{ci.level}{If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.}
+
+\item{fine}{Integer specifying the number of grid points along both the longitude and latitude directions used to interpolate the parameter. The resulting interpolation grid will contain \code{fine*fine} total locations. If \code{map=TRUE}, \code{state=TRUE}, and \code{location} is specified, the grid will be clipped to the boundaries of the specified state, removing locations outside of it.}
+
+\item{color.gradient}{The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(fine)}.}
+
+\item{with.uncertainty}{Logical scalar indicating whether to include lower and upper credible interval bounds for the parameter.  Default is \code{FALSE}.}
+
+\item{map}{Logical scalar indicating whether to include a map. Default value is \code{FALSE}.  If \code{TRUE}, \code{location} must be specified.}
+
+\item{state}{Logical scalar used when \code{map=TRUE} indicating whether the \code{location} is a state in the United States (\code{TRUE}) or a country (\code{FALSE}).}
+
+\item{location}{Name of region to include in the map.  Fed to \code{region} in the function \code{ggplot2::map_data}.}
+
+\item{addthin}{Integer indicating the number of saved draws to thin.  Default is to not thin any \code{addthin=1}.  This can save time when the object is from \code{BSTFAfull} and \code{parameter='loading'}.}
+
+\item{yearscsale}{If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).}
+}
+\value{
+A plot of spatially-dependent parameter values for a grid of interpolated locations.
 }
 \description{
-Plot on a map
+Plot a map of interpolated spatially-dependent parameter values.
+}
+\examples{
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+plot.map(out, parameter="slope", map=T, state=T, location='utah', fine=50)
 }

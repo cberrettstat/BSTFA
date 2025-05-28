@@ -7,8 +7,17 @@
 computation.summary(out)
 }
 \arguments{
-\item{out}{output from STFA or STFAfull}
+\item{out}{Output from BSTFA or BSTFAfull.}
+}
+\value{
+Prints the computation time per iteration for each parameter.
 }
 \description{
 Print computation summary
+}
+\examples{
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+computation.summary(out)
 }

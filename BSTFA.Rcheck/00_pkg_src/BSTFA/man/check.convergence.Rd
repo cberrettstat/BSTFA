@@ -11,8 +11,21 @@ check.convergence(
 )
 }
 \arguments{
-\item{out}{output from STFA or STFAfull}
+\item{out}{Output from BSTFA or BSTFAfull.}
+
+\item{type}{Character specifying which diagnostic to compute.  Options are \code{ess} and \code{geweke}.}
+
+\item{cutoff}{Numeric scalar indicating the cutoff value to flag parameters that haven't converged.}
+}
+\value{
+A list containing convergence diagnostic for all parameters.
 }
 \description{
 Check effective sample size and geweke diagnostic
+}
+\examples{
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+check.convergence(out)
 }

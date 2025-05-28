@@ -16,8 +16,31 @@
 )
 }
 \arguments{
-\item{out}{output from STFA or STFAfull}
+\item{out}{Output from BSTFA or BSTFAfull.}
+
+\item{factor}{Integer or vector of integers specifying which factor(s) to plot.}
+
+\item{together}{If \code{length(factor)>1}, logical scalar specifying whether to plot all factors on a single plot. Default is \code{FALSE}.}
+
+\item{include.legend}{If \code{length(factor)>1} and \code{together=TRUE}, a logical scalar specifying whether to include a legend.  Default is \code{TRUE}.}
+
+\item{type}{One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.}
+
+\item{uncertainty}{Logical scalar indicating whether to include lower and upper credible interval bounds for the parameter.  Default is \code{FALSE}.}
+
+\item{ci.level}{A vector of length 2 specifying the quantiles to use for lower and upper bounds for \code{type='lb'}, \code{type='ub'}, or \code{uncertainty=TRUE}.}
+
+\item{xrange}{A date vector of length 2 providing the lower and upper bounds of the dates to include in the plot.}
+}
+\value{
+A plot of spatially-dependent parameter values for a grid of interpolated locations.
 }
 \description{
 Plot the factors
+}
+\examples{
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+plot.factor(out, factor=1:4, together=T)
 }

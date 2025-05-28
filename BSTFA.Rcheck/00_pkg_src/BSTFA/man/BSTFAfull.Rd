@@ -16,7 +16,7 @@ BSTFAfull(
   linear = TRUE,
   seasonal = TRUE,
   factors = TRUE,
-  n.seasn.knots = min(7, ceiling(length(unique(lubridate::yday(dates)))/3)),
+  n.seasn.knots = min(7, ceiling(length(unique(yday(dates)))/3)),
   spatial.style = "grid",
   n.spatial.bases = ceiling(n.locs/2),
   knot.levels = 2,
@@ -84,7 +84,7 @@ BSTFAfull(
 
 \item{factors}{Logical scalar. If \code{TRUE} (default), the model will fit a spatio-temporal factor analysis model with temporally-dependent factors and spatially-dependent loadings.}
 
-\item{n.seasn.knots}{Numeric scalar indicating the number of knots to use for the seasonal basis components. The default value is \code{min(7, ceiling(length(unique(yday(dates)))/3))}, where 7 will capture approximately 2 peaks during the year.}
+\item{n.seasn.knots}{Numeric scalar indicating the number of knots to use for the seasonal basis components. The default value is \code{min(7, ceiling(length(unique(lubridate::yday(dates)))/3))}, where 7 will capture approximately 2 peaks during the year.}
 
 \item{spatial.style}{Character scalar indicating the style of bases to use for the mean, linear, and seasonal components.  Style options are \code{'fourier'}, \code{'tps'} for thin plate splines, and \code{'grid'} (default) for multiresolution bisquare bases using knots from a grid across the space.}
 
@@ -114,9 +114,9 @@ BSTFAfull(
 
 \item{tau2.phi}{Numeric scalar indicating the prior rate for the precision of the model coefficients.  Default value is \code{1e-07}.}
 
-\item{sig2.gamma}{Numeric scalar indicating the prior shape for the residual precision.  Default value is {2}.}
+\item{sig2.gamma}{Numeric scalar indicating the prior shape for the residual precision.  Default value is \code{2}.}
 
-\item{sig2.phi}{Numeric scalar indicating the prior rate for the residual precision. Default value is {1e-05}.}
+\item{sig2.phi}{Numeric scalar indicating the prior rate for the residual precision. Default value is \code{1e-05}.}
 
 \item{omega.ii.mean}{Numeric scalar indicating the prior mean for the diagonal elements of the autoregressive correlation matrix of the factors.  Default is 1.}
 
@@ -189,7 +189,7 @@ A list containing the following elements (any elements that are the same as in t
 \item{tau2.lambda}{An mcmc object of size \code{draws} by \code{1} indicating the residual variance of the loadings spatial process.}
 \item{sig2}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the residual variance of the data.}
 \item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NULL}. }
-\item{time.data}{A data frame of size \code{iters} by {6} containing the time it took to sample each parameter for every iteration.}
+\item{time.data}{A data frame of size \code{iters} by \code{6} containing the time it took to sample each parameter for every iteration.}
 \item{setup.time}{An object containing the time the model setup took.}
 \item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
 \item{factors.fixed}{A vector of length \code{n.factors} giving the location indices of the fixed loadings.}
@@ -206,6 +206,7 @@ This function uses MCMC to draw from posterior distributions of a Bayesian spati
 }
 \examples{
 data(utahDataList)
+attach(utahDataList)
 out <- BSTFA.full(ymat=TemperatureVals, dates=Dates, coords=Coords)
 }
 \author{

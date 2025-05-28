@@ -1,21 +1,18 @@
 ---
 title: "BSTFA Package"
 output:
-  bookdown::pdf_document2:
-    includes:
-      before_body: style.tex
-    toc: yes
-    number_sections: yes
-    keep_tex: true
+  rmarkdown::html_vignette:
+    toc: true
     toc_depth: 3
-header-includes:
-  - \pagestyle{empty}
-css: style.css
-cache: true
-cache.path: "/Users/adamiser/Desktop/BSTFA/vignettes"
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{BSTFA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 bibliography: references.bib
 csl: apa.csl
-vignette: "%\\VignetteIndexEntry{BSTFA} %\\VignetteEngine{knitr::rmarkdown} %\\VignetteEncoding{UTF-8}\n"
+cache: true
+css: style.css
 abstract: "The BSTFA package for R is a tool for fitting fully Bayesian spatio-temporal
   factor analysis models with a normal likelihood. The package implements
   a computationally rapid approach using dimension reduction via basis functions.
@@ -28,7 +25,7 @@ abstract: "The BSTFA package for R is a tool for fitting fully Bayesian spatio-t
 
 
 
-```{r, include = FALSE}
+```{r setup1, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -36,7 +33,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup, echo=FALSE, include=FALSE}
+```{r setup2, echo=FALSE, include=FALSE}
 library(knitr)
 devtools::load_all()
 # library(BSTFA)
@@ -49,8 +46,6 @@ This document is intended to help even novice statistics students implement a fu
 The outline is as follows. First, we introduce the motivation behind our Bayesian spatio-temporal factor analysis models and why simplifying the model for fast computation is important. Section 1 outlines the available functions and procedures within the `BSTFA` package along with demonstrations on a real data set. Some basic theory and methodology are contained in Section 2, and Section 3 details specific features of the package. The appendix contains references and additional notes on computation.
 
 # Motivation {.unnumbered}
-
-<!-- Modeling environmental processes presents specific challenges and "has itself become a highly diverse effort". The modeling scheme must be catered towards solving the specific challenges presented by the data. Common challenges include accounting for dependencies in space and time, modeling known versus unknown trends, and understanding global versus local processes.  -->
 
 Consider for example the motivating data for the `BSTFA` package: a collection of temperature measurements across the state of Utah. The data were collected from May 1912 through January 2015 from 146 weather stations across the state. These measurements are 30-day averages of daily minimum observed temperatures in degrees Celcius, with each location's measurements zero-centered. This environmental process exhibits some of the challenges common in environmental modeling; that is, the data show obvious spatial and temporal dependence and not all contributing agents are known or easy to include in a modeling scheme. 
 
@@ -112,7 +107,7 @@ The `BSTFA` and `BSTFAfull` functions are demonstrated below. Additional MCMC ar
 
 The `utahDataList` list object in the `BSTFA` package contains the observed temperature data (`TemperatureVals`), the corresponding dates (`Dates`), the coordinates (`Coords`), and the weather station names (`Locations`).
 
-```{r BSTFA Function, echo=FALSE, include=FALSE, cache=FALSE}
+```{r BSTFAFunction, echo=FALSE, include=FALSE, cache=FALSE}
 # This code runs the function correctly but isn't shown in the vignette
 set.seed(23416)
 bstfa.output = BSTFA(ymat=utahDataList$TemperatureVals,
@@ -126,14 +121,14 @@ bstfa.output = BSTFA(ymat=utahDataList$TemperatureVals,
                      save.output=FALSE)
 ```
 
-```{r, eval=FALSE, cache=FALSE}
+```{r reducedmod, eval=FALSE, cache=FALSE}
 bstfa.output = BSTFA(ymat=utahDataList$TemperatureVals,
                      dates=utahDataList$Dates,
                      coords=utahDataList$Coords,
                      verbose=FALSE)
 ```
 
-```{r, eval=FALSE}
+```{r fullmod, eval=FALSE}
 bstfa_full.output = BSTFAfull(ymat=utahDataList$TemperatureVals,
                          dates=utahDataList$Dates,
                          coords=utahDataList$Coords,
@@ -147,7 +142,7 @@ The `BSTFA` and `BSTFAfull` functions output a list object. It should be noted t
 
 - Each object that is a parameter (i.e., `beta`) is an MCMC object from the `coda` package [@codapackage] with number of rows equal to the number of MCMC draws.
 
-- `time.data` is a matrix with number of rows equal to `iters` and columns indicating the computation time (in seconds) for the given parameter on that given iteration. This is the object used to create the `computation.summary` mentioned in Section 1.4.
+- `time.data` is a matrix with number of rows equal to `iters` and columns indicating the computation time (in seconds) for the given parameter on that given iteration. This is the object used to create the `compute_summary` mentioned in Section 1.4.
 
 - `y.missing` is a matrix with number of rows equal to the number of missing data points in `ymat` and number of columns equal to the number of MCMC draws. These are posterior draws from relevant distributions of the missing values of `ymat`. If `save.missing=FALSE` in the function, this will be `NULL`.
 
@@ -170,7 +165,7 @@ If the argument `type` is set to `"all"`, the function will return draws of $Y(\
 
 The code below predicts at an observed location, "Alpine, Utah". Since `type == "all"`, the function will return a $t \times d$ MCMC object matrix of posterior draws of $Y(\mathbf{s}, t) \text{ } \forall \text{ } t$ with $d$ being the number of MCMC draws. Each column represents one draw of the $T \times 1$ vector, $\mathbf{Y}$.
 
-```{r}
+```{r plotpredall}
 loc = 1 # Alpine, Utah in our data set
 preds = predictBSTFA(bstfa.output, 
                      location = loc,
@@ -182,7 +177,7 @@ dim(preds)
 
 The code below sets `type == "mean"` and returns a $t \times 1$ MCMC object vector containing the posterior $\textit{mean}$ of $Y(\mathbf{s}, t) \text{ } \forall \text{ } t$.
 
-```{r}
+```{r plotpredobs}
 loc = 1 # Alpine, Utah in our data set
 preds = predictBSTFA(bstfa.output, 
                      location = loc,
@@ -195,7 +190,7 @@ length(preds)
 
 The code below predicts at an $\textit{unobserved}$ location by setting the `location` argument to a data frame of coordinate values. In this case, we predict to a city without a monitor, Torrey, Utah, with longitude 111.41$^\circ$ W and latitude 38.29$^\circ$ N.
 
-```{r}
+```{r plotpred}
 loc = data.frame('Longitude' = 111.41, 'Latitude' = 38.29) # Torrey, Utah
 preds_new = predictBSTFA(bstfa.output, 
                          location = loc,
@@ -204,13 +199,13 @@ preds_new = predictBSTFA(bstfa.output,
                          ci.level=c(0.025,0.975))
 ```
 
-The `predictBSTFA` function is also called within the `plot.location` function, which takes similar arguments as `predictBSTFA` with the addition of a few extra plotting arguments. `xrange` defines the time points $t \in T$ at which the estimates are plotted, with default value `NULL` indicating to plot on all of $T$. `truth` (default value `FALSE`) will plot the observed data along with the estimates if the `location` comes from the data set. `uncertainty` (default value `TRUE`) indicates whether to plot a prediction interval (`pred.int==TRUE`) or a credible interval (`pred.int==FALSE`) with the estimate.
+The `predictBSTFA` function is also called within the `plot_location` function, which takes similar arguments as `predictBSTFA` with the addition of a few extra plotting arguments. `xrange` defines the time points $t \in T$ at which the estimates are plotted, with default value `NULL` indicating to plot on all of $T$. `truth` (default value `FALSE`) will plot the observed data along with the estimates if the `location` comes from the data set. `uncertainty` (default value `TRUE`) indicates whether to plot a prediction interval (`pred.int==TRUE`) or a credible interval (`pred.int==FALSE`) with the estimate.
 
 Below is an example of code used to plot predicted means at an observed location, "Alpine, Utah", along with the resulting plot, where the green dashed line represents prediction interval bands, the black dashed line represents the estimated mean, and the black solid line represents the observed data.
 
-```{r}
+```{r plotobserved}
 loc = 1 # Alpine, Utah in our data set
-plot.location(bstfa.output,
+plot_location(bstfa.output,
               location=loc,
               type='mean',
               pred.int=TRUE,
@@ -222,9 +217,9 @@ plot.location(bstfa.output,
 
 Below is an example of code used to plot the estimated posterior mean temperature measurements at an $\textit{unobserved}$ location, "Torrey, Utah". The resulting plot follows where again, the green dashed line represents prediction interval bands and the black dashed line represents the estimated mean
 
-```{r}
+```{r plotprediction}
 loc = data.frame('Longitude' = 111.41, 'Latitude' = 38.29) # Torrey, Utah
-plot.location(bstfa.output,
+plot_location(bstfa.output,
               location=loc,
               type='mean',
               pred.int=TRUE,
@@ -243,25 +238,25 @@ The `BSTFA` package contains multiple functions for plotting and visualizing the
 
 |Function| Description        |
 |------|----------------------|
-| plot.location | Plot predicted response variable at a specific location (either observed or unobserved) for a specified time range. Credible or prediction interval bands for a given probability (default is 95%) can be included. Uses base R for plotting. |
-| plot.annual  | Plot the estimated annual seasonal behavior at a specific location (either observed or unobserved). Credible interval bands for a given probability (default is 95%) can be included. Uses base R for plotting. |
-| plot.grid    | Plot the estimated spatially dependent linear slope or specific factor loading (the user specifies the parameter of interest) at all observed locations. Credible interval bounds for a given probability (default is 95%) can also be plotted. Uses `ggplot2` for plotting. |
-| plot.map     | Plot the estimated spatially dependent linear slope or specific factor loading (the user specifies the parameter of interest) at a grid of unobserved locations. Credible interval bounds for a given probability (default is 95%) can also be plotted. Contains arguments to import and plot the grid on a map using functions from the `sf` package. Uses `ggplot2` for plotting. |
-| plot.factor  | Plot the estimated factors, either individually or all together. Credible interval bands for a given probability (default is 95%) can be included. Uses base R for plotting. |
+| plot_location | Plot predicted response variable at a specific location (either observed or unobserved) for a specified time range. Credible or prediction interval bands for a given probability (default is 95%) can be included. Uses base R for plotting. |
+| plot_annual  | Plot the estimated annual seasonal behavior at a specific location (either observed or unobserved). Credible interval bands for a given probability (default is 95%) can be included. Uses base R for plotting. |
+| plot_spatial_param   | Plot the estimated spatially dependent linear slope or specific factor loading (the user specifies the parameter of interest) at all observed locations. Credible interval bounds for a given probability (default is 95%) can also be plotted. Uses `ggplot2` for plotting. |
+| map_spatial_param     | Plot the estimated spatially dependent linear slope or specific factor loading (the user specifies the parameter of interest) at a grid of unobserved locations. Credible interval bounds for a given probability (default is 95%) can also be plotted. Contains arguments to import and plot the grid on a map using functions from the `sf` package. Uses `ggplot2` for plotting. |
+| plot_factor  | Plot the estimated factors, either individually or all together. Credible interval bands for a given probability (default is 95%) can be included. Uses base R for plotting. |
 
 
-For instance, `plot.annual` can plot the estimated annual seasonal trend at any (observed or unobserved) location. The code for doing this for the observed location, Alpine, Utah, is provided below, along with the corresponding plot, where the black line is the average and the gray band is the 95\% credible interval for the average, and the gray dots are the observations plotted on their day of year. This shows the expected seasonal behavior - that the temperatures tend to increase in the spring/summer months and decrease in the fall/winter months. 
+For instance, `plot_annual` can plot the estimated annual seasonal trend at any (observed or unobserved) location. The code for doing this for the observed location, Alpine, Utah, is provided below, along with the corresponding plot, where the black line is the average and the gray band is the 95\% credible interval for the average, and the gray dots are the observations plotted on their day of year. This shows the expected seasonal behavior - that the temperatures tend to increase in the spring/summer months and decrease in the fall/winter months. 
 
-```{r}
-plot.annual(bstfa.output,
+```{r plotseason}
+plot_annual(bstfa.output,
             location=1,
             years='one')
 ```
 
-The `plot.grid` function can plot the estimated linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year". If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. The color of the resulting plot shows the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Notice that most locations show an average increase in temperature of between 0 and 0.025 degrees Celcius per year.
+The `plot_spatial_param` function can plot the estimated linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year". If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. The color of the resulting plot shows the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Notice that most locations show an average increase in temperature of between 0 and 0.025 degrees Celcius per year.
 
-```{r}
-plot.grid(bstfa.output,
+```{r plotobsslope}
+plot_spatial_param(bstfa.output,
           type='mean',
           parameter='slope',
           yearscale=TRUE)
@@ -271,18 +266,18 @@ plot.grid(bstfa.output,
 
 Next, we provide example code for plotting a particular loading, in this case, the loadings for the first factor. The resulting plot shows the weights that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The big red dot shows the location of the fixed factor; in this case, the first factor, fixed at Wendover, Utah.
 
-```{r}
-plot.grid(bstfa.output,
+```{r plotobsloading1}
+plot_spatial_param(bstfa.output,
           type='mean',
           parameter='loading',
           loadings=1)
 ```
 
 
-The `plot.factor` function plots the estimated temporally dependent factors either together (setting `together=TRUE`) or separate (setting `together=FALSE` and `factor` to whichever factor you want to plot). The example code below plots the first factor, corresponding to the loadings shown in the previous example. The resulting plot shows the posterior mean of the first factor across the observed time period. Notice how this first factor in the 1920's & 30's tends to have lower values (values < 0), but from the 1940's-90's, the factor values are at or above 0. Locations whose loadings are close to 1 will have temperature series that follow a similar pattern.
+The `plot_factor` function plots the estimated temporally dependent factors either together (setting `together=TRUE`) or separate (setting `together=FALSE` and `factor` to whichever factor you want to plot). The example code below plots the first factor, corresponding to the loadings shown in the previous example. The resulting plot shows the posterior mean of the first factor across the observed time period. Notice how this first factor in the 1920's & 30's tends to have lower values (values < 0), but from the 1940's-90's, the factor values are at or above 0. Locations whose loadings are close to 1 will have temperature series that follow a similar pattern.
 
-```{r}
-plot.factor(bstfa.output,
+```{r factorexample2}
+plot_factor(bstfa.output,
             together=FALSE,
             include.legend=FALSE,
             factor=1,
@@ -291,8 +286,8 @@ plot.factor(bstfa.output,
 
 To plot the factors together, set `together==TRUE`, as in the example code below. This figure provides a plot of all four estimated factors, or common behaviors of the temperature measurements across time that weren't explicitly modeled (in contrast to the linear increasing/decreasing and seasonal behaviors that were explicitly modeled). Notice that Factor 1 is higher in the 1940's than the other factors, indicating that locations who load heavily on this first factor tend to have higher temperatures in the 1940s than the other locations.
 
-```{r}
-plot.factor(bstfa.output,
+```{r factorexample1}
+plot_factor(bstfa.output,
             together=TRUE,
             include.legend=TRUE,
             type='mean')
@@ -300,10 +295,10 @@ plot.factor(bstfa.output,
 
 
 
-The `plot.map` function is similar to `plot.grid`, but the parameter is plotted on a grid of unobserved locations. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=100` creates a $100 \times 100$ grid of locations to estimate parameter values.  This function is demonstrated below for the estimated linear increase/decrease of temperatures across Utah (once again, setting `yearscale=TRUE` to provide "per year" estimates). The figure below the code shows the temperatures tend to be increasing across the state by between $\approx$ 0.01 and 0.02$^{\circ}$ C each year, with locations in the west at 40$^{\circ}$ latitude showing a small decrease in temperatures across this time period.
+The `map_spatial_param` function is similar to `plot_spatial_param`, but the parameter is plotted on a grid of unobserved locations. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=100` creates a $100 \times 100$ grid of locations to estimate parameter values.  This function is demonstrated below for the estimated linear increase/decrease of temperatures across Utah (once again, setting `yearscale=TRUE` to provide "per year" estimates). The figure below the code shows the temperatures tend to be increasing across the state by between $\approx$ 0.01 and 0.02$^{\circ}$ C each year, with locations in the west at 40$^{\circ}$ latitude showing a small decrease in temperatures across this time period.
 
-```{r, cache=FALSE, warning=FALSE}
-plot.map(bstfa.output,
+```{r mapexample1, cache=FALSE, warning=FALSE}
+map_spatial_param(bstfa.output,
          parameter='slope',
          yearscale=TRUE,
          type='mean',
@@ -354,10 +349,10 @@ The plots below illustrate that there is a tradeoff between computation speed an
 
 ![](factor_comparison2.png){width=600px}
 
-The `BSTFA` package contains a function `computation.summary` that takes as an argument the object from `BSTFA` or `BSTFAfull` and prints a detailed summary of computation time.
+The `BSTFA` package contains a function `compute_summary` that takes as an argument the object from `BSTFA` or `BSTFAfull` and prints a detailed summary of computation time.
 
-```{r}
-computation.summary(bstfa.output)
+```{r comptime}
+compute_summary(bstfa.output)
 ```
 
 # Methodology
@@ -487,8 +482,8 @@ where $\mathbf{s}_{[1]}$ represents the first coordinate of $\mathbf{s}$ (e.g., 
 
 The `BSTFA` package contains a helper function to visualize spatial Fourier bases over a given set of coordinates. This can be useful when trying to decide frequencies (`freq.lon` and `freq.lat`) and number of bases (`R_s`) to fit in your model. This function is demonstrated below using the Utah temperature data.
 
-```{r}
-plot.fourier.bases(utahDataList$Coords,
+```{r fourierplots}
+plot_fourier_bases(utahDataList$Coords,
                    R=6,
                    plot.3d=TRUE,
                    freq.lon = diff(range(utahDataList$Coords[,1]))^2,
@@ -544,7 +539,7 @@ Factor analysis allows for interpretability of the factors and/or loadings. Sinc
 
 It's important that the fixed factor locations have a low proportion of missing data. If fixed factor locations are not given, they will be smartly chosen by the function according to distance and proportion of missing data.
 
-```{r, echo=FALSE, warning=FALSE, include=FALSE}
+```{r dataplotsetup, echo=FALSE, warning=FALSE, include=FALSE}
 library(ggplot2)
 map_data_loc <- ggplot2::map_data('state')[ggplot2::map_data('state')$region == 'utah',]
 full_map <- ggplot2::map_data('state')
@@ -576,7 +571,7 @@ m = ggplot() +
   ylab("")
 ```
 
-```{r, echo=FALSE}
+```{r dataplot, echo=FALSE}
 m
 ```
 
@@ -584,16 +579,16 @@ m
 
 Because Logan is the fourth fixed loading location, the estimates for the fourth loading indicate the strength of the relationship of each location's temperatures to Logan's temperatures, after accounting for linear and seasonal processes. A higher value of the loading estimates greater similarity. Thus, the next code chunks and plots show the posterior mean estimate of Factor 4 (the common temperature behavior among those locations that have higher loading values), and a map of the predicted loading values on a grid across Utah. This map shows that locations in the northeast have higher loading values and thus will have temperature measurements that behave similarly to that of the fourth factor.
 
-```{r}
-plot.factor(bstfa.output,
+```{r factorexample}
+plot_factor(bstfa.output,
             together=FALSE,
             include.legend=FALSE,
             factor=4,
             type='mean')
 ```
 
-```{r, cache=FALSE, warning=FALSE}
-plot.map(bstfa.output,
+```{r mapexample, cache=FALSE, warning=FALSE}
+map_spatial_param(bstfa.output,
          parameter='loading',
          loading=4,
          yearscale=TRUE,
@@ -610,7 +605,7 @@ The choice of basis functions is assigned using the `spatial.style` and `load.st
 
 ### Fourier
 
-When using Fourier bases, the user needs to specify number of bases and the spatial frequency in both the longitude and latitude directions. As demonstrated in Section 2.2, the function `plot.fourier.bases` can help the user visualize Fourier bases and choose the appropriate amount of bases and frequencies. After exploratory analysis methods (demonstrated in Section 3.2.4), it seems that assigning `freq.lon` and `freq.lat` values of 40 and 30 respectively and setting `n.spatial.bases` and `n.load.bases` equal to 8 and 6, respectively, works well for the Utah data set.
+When using Fourier bases, the user needs to specify number of bases and the spatial frequency in both the longitude and latitude directions. As demonstrated in Section 2.2, the function `plot_fourier_bases` can help the user visualize Fourier bases and choose the appropriate amount of bases and frequencies. After exploratory analysis methods (demonstrated in Section 3.2.4), it seems that assigning `freq.lon` and `freq.lat` values of 40 and 30 respectively and setting `n.spatial.bases` and `n.load.bases` equal to 8 and 6, respectively, works well for the Utah data set.
 
 The user should also consider the frequency (`freq.temp`) and number of bases (`n.temp.bases`) for the temporal factors, which always use Fourier bases. The default values (see Table 2.5) tend to work well, but increasing the number of bases can create a finer estimate at the cost of reduced computational speed.
 
@@ -632,7 +627,7 @@ BSTFA(ymat=utahDataList$TemperatureVals,
 
 As described in Table 2.5, multiple arguments to `BSTFA` and `BSTFAfull` are used only for bisquare bases. The argument given to `spatial.style` or `load.style` to use these basis functions is `'grid'`. The `knot.levels` argument indicates how many resolutions of knots to create, where the $r^{th}$ resolution uses $2^{2r}$ bases distributed evenly in a square grid across the coordinates of the data. Setting `plot.knots=TRUE` outputs a plot of knots in all resolutions.
 
-```{r plotting knots}
+```{r plottingknots}
 bstfa.plot_knots = BSTFA(ymat=utahDataList$TemperatureVals,
                          dates=utahDataList$Dates,
                          coords=utahDataList$Coords,
@@ -720,25 +715,25 @@ Table 3.1 compares the WAIC and LOO-CV for 12 different model fits on the Utah d
 
 Notice that in this case, the choice of spatial basis function does not matter much, while increasing the number of temporal bases from 126 to 200 leads to a reduction in WAIC, indicating better model fit. However, increasing the number of temporal bases reduces computational efficiency (in this instance, moving from 126 to 200 temporal bases added about 0.2 seconds to each iteration). 
 
-In addition to model diagnostics, it's also important to visually assess estimates using the different basis functions and other settings. For instance, this can be done by fitting a model with each basis function and estimating the linear slope using `plot.map`, as demonstrated in Section 1.3. The row of plots below show three estimates of the second loading (based on the "East" factor for fixed loading Moab, Utah) when the loadings are fit with Fourier bases (using default values for frequency), bisquare bases, and thin-plate spline bases. The estimates for the different basis functions look quite different; this is partly because the estimated associated factors are different.
+In addition to model diagnostics, it's also important to visually assess estimates using the different basis functions and other settings. For instance, this can be done by fitting a model with each basis function and estimating the linear slope using `map_spatial_param`, as demonstrated in Section 1.3. The row of plots below show three estimates of the second loading (based on the "East" factor for fixed loading Moab, Utah) when the loadings are fit with Fourier bases (using default values for frequency), bisquare bases, and thin-plate spline bases. The estimates for the different basis functions look quite different; this is partly because the estimated associated factors are different.
 
 ![](basis_comparison3.png){width=600px}
 
 ## Assessing MCMC Convergence
 
-The `BSTFA` package has built-in helper functions for assessing convergence. They use the fact that all matrices of parameter draws are MCMC objects from the `coda` package. To look at trace plots, you can use the `plot.trace` function. This function takes as input your `BSTFA` or `BSTFAfull` object, a string value `parameter` indicating which parameter to view (corresponds directly to what the parameter is called in the `BSTFA` list output), and `param.range` which accepts a numeric vector indicating which of these parameters you want to view.
+The `BSTFA` package has built-in helper functions for assessing convergence. They use the fact that all matrices of parameter draws are MCMC objects from the `coda` package. To look at trace plots, you can use the `plot_trace` function. This function takes as input your `BSTFA` or `BSTFAfull` object, a string value `parameter` indicating which parameter to view (corresponds directly to what the parameter is called in the `BSTFA` list output), and `param.range` which accepts a numeric vector indicating which of these parameters you want to view.
 
 ```{r}
-plot.trace(bstfa.output,
+plot_trace(bstfa.output,
            parameter='beta',
            param.range=c(27),
            density=FALSE)
 ```
 
-The other available helper function is `check.convergence`. This function takes as input the `BSTFA` or `BSTFAfull` function output and returns the effective sample size or Geweke diagnostic (indicated by `type='eSS'` or `type='geweke'`) for all parameters above a given cutoff (indicated by `cutoff`). For instance, the function below will return all parameters with an effective sample size below 100.
+The other available helper function is `convergence_diag`. This function takes as input the `BSTFA` or `BSTFAfull` function output and returns the effective sample size or Geweke diagnostic (indicated by `type='eSS'` or `type='geweke'`) for all parameters above a given cutoff (indicated by `cutoff`). For instance, the function below will return all parameters with an effective sample size below 100.
 
 ```{r, eval=FALSE}
-check.convergence(bstfa.output,
+convergence_diag(bstfa.output,
                   type='eSS',
                   cutoff = 100)
 ```
@@ -751,7 +746,7 @@ Below are specific notes about computation not explicitly mentioned in the vigne
 
 - The values for `n.spatial.bases`, `n.load.bases` and `n.temp.bases` need to be even numbers. If they are not, the function will add 1 to the supplied value.
 
-- To help with convergence of the residual factor analysis component, the sampler waits to sample $\mathbf{F}$ and $\mathbf{\Lambda}$ until $\textit{min(floor(burn/2), 500)}$. That is why, for example, the `computation.summary` function divides computation time into "Pre-Factor Analysis" and "Post-Factor Analysis".
+- To help with convergence of the residual factor analysis component, the sampler waits to sample $\mathbf{F}$ and $\mathbf{\Lambda}$ until $\textit{min(floor(burn/2), 500)}$. That is why, for example, the `compute_summary` function divides computation time into "Pre-Factor Analysis" and "Post-Factor Analysis".
 
 ## References
 

@@ -65,7 +65,6 @@
 #' @importFrom npreg basis.tps
 #' @importFrom lubridate yday
 #' @importFrom utils combn
-#' @import Matrix
 #' @import Rcpp
 #' @import RcppArmadillo
 #' @import stats
@@ -104,7 +103,7 @@
 #' @examples
 #' data(utahDataList)
 #' attach(utahDataList)
-#' out <- BSTFA.full(ymat=TemperatureVals, dates=Dates, coords=Coords)
+#' out <- BSTFAfull(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=50)
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                      mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
@@ -127,21 +126,6 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
 
   start <- Sys.time()
-
-  ### Necessary libraries
-  # require(MASS)
-  # require(ggplot2)
-  # require(Matrix)
-  # require(matrixcalc)
-  # require(splines)
-  # require(mgcv)
-  # require(MCMCpack) # rwish
-  # require(coda)
-  # source('usefulFunctions.R')
-  # require(Rcpp)
-  # require(RcppArmadillo)
-  # sourceCpp('SampleFactorsOriginal.cpp')
-
 
 
   ### Prepare to deal with missing data
@@ -203,8 +187,8 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   ### Set up mean component
   if(mean==TRUE){
     Jfull = Matrix::kronecker(Matrix::Diagonal(n=n.locs), rep(1, n.times))
-    ItJJ <- as(base::kronecker(diag(1,n.locs), t(rep(1,n.times))%*%rep(1,n.times)), "sparseMatrix")
-    ItJ <- as(base::kronecker(diag(1,n.locs), t(rep(1,n.times))), "sparseMatrix")
+    ItJJ <- methods::as(base::kronecker(diag(1,n.locs), t(rep(1,n.times))%*%rep(1,n.times)), "sparseMatrix")
+    ItJ <- methods::as(base::kronecker(diag(1,n.locs), t(rep(1,n.times))), "sparseMatrix")
     mu.var <- solve(ItJJ)
     mu.mean <- mu.var%*%ItJ%*%y
     mu <-  my_mvrnorm(mu.mean, mu.var)
@@ -225,8 +209,8 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   if (linear == TRUE) {
     Tsub <- -(n.times/2-0.5):(n.times/2-0.5)
     Tfull <- Matrix::kronecker(Matrix::Diagonal(n=n.locs), Tsub)
-    ItTT <- as(base::kronecker(diag(1,n.locs), t(Tsub)%*%Tsub), "sparseMatrix")
-    ItT <- as(base::kronecker(diag(1,n.locs), t(Tsub)), "sparseMatrix")
+    ItTT <- methods::as(base::kronecker(diag(1,n.locs), t(Tsub)%*%Tsub), "sparseMatrix")
+    ItT <- methods::as(base::kronecker(diag(1,n.locs), t(Tsub)), "sparseMatrix")
     if(is.null(beta)==T){
       beta.var <- solve(ItTT)
       beta.mean <- beta.var%*%ItT%*%y #starting values for beta
@@ -250,12 +234,12 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
   ### Set up seasonal component
   if(seasonal == TRUE) {
-    newS.xi <- as(base::kronecker(newS, diag(n.seasn.knots)), "sparseMatrix")
+    newS.xi <- methods::as(base::kronecker(newS, diag(n.seasn.knots)), "sparseMatrix")
     knots <- seq(1, 366, length=n.seasn.knots+1)
     bs.basis <- cSplineDes(doy, knots)
     Bfull <- Matrix::kronecker(Matrix::Diagonal(n=n.locs), bs.basis)
-    ItBB <- as(base::kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)%*%bs.basis), "sparseMatrix")
-    ItB <- as(base::kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)), "sparseMatrix")
+    ItBB <- methods::as(base::kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)%*%bs.basis), "sparseMatrix")
+    ItB <- methods::as(base::kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)), "sparseMatrix")
     if (is.null(xi)) {
       xi.var <- solve(ItBB)
       xi.mean <- xi.var%*%ItB%*%(y - Tfullbeta.long)
@@ -284,7 +268,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     tCC <- t(Cmat)%*%Cmat
     tCC <- (t(tCC) + tCC)/2
     if (mean) {
-      Pmat <- Cmat%*%ginv(tCC)%*%t(Cmat)
+      Pmat <- Cmat%*%MASS::ginv(tCC)%*%t(Cmat)
     } else {
       Pmat <- Cmat%*%solve(tCC)%*%t(Cmat)
     }
@@ -353,7 +337,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
   ### Useful one-time calculations
   if (mean | linear | seasonal) A.prec = diag(alpha.prec, dim(newS)[2])
-  if (seasonal) StSI <- as(Matrix::kronecker(t(newS)%*%newS, Matrix::Diagonal(n=n.seasn.knots)), "sparseMatrix")
+  if (seasonal) StSI <- methods::as(Matrix::kronecker(t(newS)%*%newS, Matrix::Diagonal(n=n.seasn.knots)), "sparseMatrix")
 
   ### Set up effective sample size calculations
   eSS.check=1000
@@ -473,12 +457,12 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
       ### Sample tau2.xi
       tau2.shape <- tau2.gamma + length(xi)/2
-      tau2.rate <- tau2.phi + 0.5*t(xi - newS.xi%*%alpha.xi)%*%(xi - newS.xi%*%alpha.xi)
+      tau2.rate <- tau2.phi + 0.5*(Matrix::t(xi - newS.xi%*%alpha.xi))%*%(xi - newS.xi%*%alpha.xi)
       tau2.xi <- 1/rgamma(1, shape=tau2.shape, rate=as.vector(tau2.rate)) #scale of IG corresponds to rate of Gamma
 
       ### Sample alpha.xi
       alpha.var <- solve((1/tau2.xi)*StSI + Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
-      alpha.mean <- alpha.var%*%((1/tau2.xi)*t(newS.xi)%*%xi)
+      alpha.mean <- alpha.var%*%((1/tau2.xi)*(Matrix::t(newS.xi))%*%xi)
       alpha.xi <- as.vector(mvrnorm(1,alpha.mean,alpha.var))
       rm(list=c("tau2.shape", "tau2.rate", "alpha.var", "alpha.mean"))
       end = Sys.time()
@@ -577,8 +561,8 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       for(ll in 1:n.factors){
         temp <- y - Jfullmu.long - Tfullbeta.long - Bfullxi.long - c(PFmat[,-ll]%*%t(Lambda[,-ll]))
         PF.ll <- Matrix::kronecker(Matrix::Diagonal(n.locs), PFmat[,ll])
-        lambda.var <- solve((1/tau2.lambda[ll])*Sigma.lambda.inv[[ll]] + (1/sig2)*t(PF.ll)%*%PF.ll)
-        lambda.mean <- lambda.var%*%((1/sig2)*t(PF.ll)%*%temp)
+        lambda.var <- solve((1/tau2.lambda[ll])*Sigma.lambda.inv[[ll]] + (1/sig2)*(Matrix::t(PF.ll))%*%PF.ll)
+        lambda.mean <- lambda.var%*%((1/sig2)*(Matrix::t(PF.ll))%*%temp)
         lambda.fixed.inv <- solve(lambda.var[factors.fixed,factors.fixed])
         cond.var <- lambda.var[-factors.fixed, -factors.fixed] - lambda.var[-factors.fixed, factors.fixed]%*%lambda.fixed.inv%*%lambda.var[factors.fixed,-factors.fixed]
         cond.mean <- lambda.mean[-factors.fixed] + lambda.var[-factors.fixed, factors.fixed]%*%lambda.fixed.inv%*%(Lambda[factors.fixed,ll] - lambda.mean[factors.fixed])

@@ -7,8 +7,21 @@
 computeLogLik(out, verbose = FALSE, addthin = 1)
 }
 \arguments{
-\item{out}{output from BSTFA or BSTFAfull}
+\item{out}{Output from BSTFA or BSTFAfull.}
+
+\item{verbose}{Logical scalar indicating whether to print status of the log-likelihood computation.  Default is \code{FALSE}.}
+
+\item{addthin}{Numeric scalar indicating the number of additional draws to thin by to reduce the computation time.  Default is \code{1} (no additional thinning).}
+}
+\value{
+A matrix of size \code{n.times*n.locs} by \code{draws} log-likelihood values for each observation and each posterior draw.
 }
 \description{
 Compute log-likelihood
+}
+\examples{
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+loglik <- computeLogLik(out, addthin=2)
 }

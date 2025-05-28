@@ -7,8 +7,25 @@
 \method{plot}{trace}(out, parameter, param.range = NULL, par.mfrow = c(1, 1), density = TRUE)
 }
 \arguments{
-\item{out}{output from STFA or STFAfull}
+\item{out}{Output from BSTFA or BSTFAfull.}
+
+\item{parameter}{Parameter to plot.  See BSTFA and BSTFAfull for parameter names.}
+
+\item{param.range}{Indices of the named parameter to plot.  Default is to plot all relevant parameters.}
+
+\item{par.mfrow}{Vector of length 2 indicating the number of rows and columns to divide the plotting window.}
+
+\item{density}{Logical scalar indicating whether to include the density plot of the posterior draws. Default is \code{TRUE}.}
+}
+\value{
+A plot containing the trace plot (and density plot when \code{density=TRUE}) of the listed parameters.
 }
 \description{
 Plot trace plots
+}
+\examples{
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+plot.trace(out, parameter="beta", param.range=1)
 }

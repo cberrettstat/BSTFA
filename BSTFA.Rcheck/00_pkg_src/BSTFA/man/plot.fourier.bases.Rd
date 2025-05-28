@@ -2,21 +2,33 @@
 % Please edit documentation in R/plot_fourier_bases.R
 \name{plot.fourier.bases}
 \alias{plot.fourier.bases}
-\title{Visualize fourier bases}
+\title{Visualize fourier bases. Used internally.}
 \usage{
 \method{plot}{fourier.bases}(
   coords,
   R,
   fine = 100,
   plot.3d = FALSE,
-  freq.lon = diff(range(coords[, 1]))^2,
-  freq.lat = diff(range(coords[, 2]))^2,
+  freq.lon = 4 * diff(range(coords[, 1])),
+  freq.lat = 4 * diff(range(coords[, 2])),
   par.mfrow = c(2, 3)
 )
 }
 \arguments{
-\item{out}{output from STFA or STFAfull}
+\item{coords}{A matrix of coordinates of observed locations.}
+
+\item{R}{Integer indicating the number of bases to compute.}
+
+\item{fine}{Number of grid points to include on both axes.  Total grid size will be \code{fine^2}.  Default is \code{100}.}
+
+\item{plot.3d}{Logical scalar indicating whether to plot the bases.  Default is \code{FALSE}.}
+
+\item{freq.lon}{Numeric value indicating the frequency to use for the Fourier bases in the longitude direction.  Default is \code{4*diff(range(coords[,1]))}.}
+
+\item{freq.lat}{Numeric value indicating the frequency to use for the Fourier bases in the latitude direction.  Default is \code{4*diff(range(coords[,2]))}.}
+
+\item{par.mfrow}{If \code{plot.3d=TRUE}, how to divide the plotting window. See \code{help(par)} for more details.}
 }
 \description{
-Visualize fourier bases
+Visualize fourier bases. Used internally.
 }

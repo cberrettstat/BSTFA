@@ -4,7 +4,7 @@
 #'
 #' Function to evaluate bisquare bases for 2-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
 #' @param locs Matrix of coordinates for observed locations.
-#' @param knots
+#' @param knots A vector of the number of knots for each resolution.
 #' @importFrom stats dist
 #' @author Candace Berrett and Adam Simpson
 #' @export bisquare2d
@@ -30,7 +30,7 @@ bisquare2d <- function(locs, knots){ #knots are rows
 #'
 #' Function to evaluate bisquare bases for 1-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
 #' @param locs Matrix of coordinates for observed locations.
-#' @param knots
+#' @param knots A vector of the number of knots for each resolution.
 #' @importFrom stats dist
 #' @author Candace Berrett and Adam Simpson
 #' @export bisquare1d

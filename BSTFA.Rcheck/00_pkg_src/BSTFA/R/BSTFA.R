@@ -33,8 +33,8 @@
 #' @param alpha.prec Numeric scalar indicating the prior precision for all model process coefficients. Default value is \code{1/100000}.
 #' @param tau2.gamma Numeric scalar indicating the prior shape for the precision of the model coefficients.  Default value is \code{2}.
 #' @param tau2.phi Numeric scalar indicating the prior rate for the precision of the model coefficients.  Default value is \code{1e-07}.
-#' @param sig2.gamma Numeric scalar indicating the prior shape for the residual precision.  Default value is {2}.
-#' @param sig2.phi Numeric scalar indicating the prior rate for the residual precision. Default value is {1e-05}.
+#' @param sig2.gamma Numeric scalar indicating the prior shape for the residual precision.  Default value is \code{2}.
+#' @param sig2.phi Numeric scalar indicating the prior rate for the residual precision. Default value is \code{1e-05}.
 #' @param sig2 Numeric scalar indicating the starting value for the residual variance. If \code{NULL} (default), the function will select a reasonable starting value.
 #' @param beta Numeric vector of length \code{n.locs + p} indicating starting values for the slopes.  If \code{NULL} (default), the function will select reasonable starting values.
 #' @param xi Numeric vector of length \code{(n.locs + p)*n.seasn.knots} indicating starting values for the coefficients of the seasonal component. If \code{NULL} (default), the function will select reasonable starting values.
@@ -76,7 +76,7 @@
 #'   \item{tau2.lambda}{An mcmc object of size \code{draws} by \code{1} indicating the residual variance of the loadings spatial process.}
 #'   \item{sig2}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the residual variance of the data.}
 #'   \item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NULL}. }
-#'   \item{time.data}{A data frame of size \code{iters} by {6} containing the time it took to sample each parameter for every iteration.}
+#'   \item{time.data}{A data frame of size \code{iters} by \code{6} containing the time it took to sample each parameter for every iteration.}
 #'   \item{setup.time}{An object containing the time the model setup took.}
 #'   \item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
 #'   \item{factors.fixed}{A vector of length \code{n.factors} giving the location indices of the fixed loadings.}

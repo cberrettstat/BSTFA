@@ -9,8 +9,8 @@
 #' @param freq.lat Numeric value indicating the frequency to use for the Fourier bases in the latitude direction.  Default is \code{4*diff(range(coords[,2]))}.
 #' @param par.mfrow If \code{plot.3d=TRUE}, how to divide the plotting window. See \code{help(par)} for more details.
 #' @import scatterplot3d
-#' @export plot.fourier.bases
-plot.fourier.bases = function(coords, R, fine=100, plot.3d=FALSE,
+#' @export plot_fourier_bases
+plot_fourier_bases = function(coords, R, fine=100, plot.3d=FALSE,
                               freq.lon=4*diff(range(coords[,1])),
                               freq.lat=4*diff(range(coords[,2])),
                               par.mfrow=c(2,3)) {
@@ -57,7 +57,7 @@ plot.fourier.bases = function(coords, R, fine=100, plot.3d=FALSE,
       tt = ifelse(i > 0.5*ncol(S), "cos", "sin")
       print(ggplot(mapping=aes(x=predgrid[,1], y=predgrid[,2], color=S[,i])) + geom_point() +
               ggtitle(paste("Basis", tt, ints[i])) +
-              scale_colour_gradientn(colours=colorRampPalette(rev(brewer.pal(9, name='RdBu')))(fine),
+              scale_colour_gradientn(colours=grDevices::colorRampPalette(rev(brewer.pal(9, name='RdBu')))(fine),
                                      name="Value"))
     }
   }

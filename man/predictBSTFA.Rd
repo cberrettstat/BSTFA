@@ -14,8 +14,27 @@ predictBSTFA(
 )
 }
 \arguments{
-\item{out}{output from STFA or STFAfull}
+\item{out}{Output from BSTFA or BSTFAfull.}
+
+\item{location}{Either a single integer indicating the location in the data set to provide predictions or a vector of length 2 providing the longitude and latitude of the new location. If \code{location=NULL} (default), the function will return predictions for all in-sample locations.}
+
+\item{type}{One of \code{all}, \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic of the predicted values to return.}
+
+\item{ci.level}{If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.}
+
+\item{new_x}{If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.}
+
+\item{pred.int}{Logical scalar indicating whether to include additional uncertainty for posterior predictive intervals (\code{TRUE}; default) or not (posterior draws from the mean of \code{location}).}
+}
+\value{
+A matrix or vector of predicted values for \code{location}.
 }
 \description{
 Prediction
+}
+\examples{
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
 }

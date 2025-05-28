@@ -21,6 +21,10 @@ Type 'q()' to quit R.
 > source(file.path(R.home("share"), "R", "examples-header.R"))
 > options(warn = 1)
 > library('BSTFA')
+Warning: replacing previous import ‘Matrix::image’ by ‘graphics::image’ when loading ‘BSTFA’
+Warning: replacing previous import ‘Matrix::cov2cor’ by ‘stats::cov2cor’ when loading ‘BSTFA’
+Warning: replacing previous import ‘Matrix::toeplitz’ by ‘stats::toeplitz’ when loading ‘BSTFA’
+Warning: replacing previous import ‘Matrix::update’ by ‘stats::update’ when loading ‘BSTFA’
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 > base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
@@ -37,6 +41,44 @@ Type 'q()' to quit R.
 > ### ** Examples
 > 
 > data(utahDataList)
+> attach(utahDataList)
 > out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
-Error: object 'TemperatureVals' not found
+[1] "Setup complete! Time taken: 0.01 minutes."
+[1] "Starting MCMC, 10000 iterations."
+[1] "Starting FA now."
+[1] "Finished iteration 1000: taken 0.69 minutes."
+[1] "Finished iteration 2000: taken 1.88 minutes."
+[1] "Finished iteration 3000: taken 3.09 minutes."
+[1] "Finished iteration 4000: taken 4.3 minutes."
+[1] "Finished iteration 5000: taken 5.54 minutes."
+[1] "Burn complete. Saving iterations now."
+[1] "Finished iteration 6000: taken 6.77 minutes."
+[1] "Finished iteration 7000: taken 8.01 minutes."
+[1] "Finished iteration 8000: taken 9.25 minutes."
+[1] "Finished iteration 9000: taken 10.5 minutes."
+[1] "Finished iteration 10000: taken 11.73 minutes."
+[1] "Finished MCMC Sampling"
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘utahDataList’
+
+> nameEx("BSTFAfull")
+> ### * BSTFAfull
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: BSTFAfull
+> ### Title: Full BSTFA function
+> ### Aliases: BSTFAfull
+> 
+> ### ** Examples
+> 
+> data(utahDataList)
+> attach(utahDataList)
+> out <- BSTFA.full(ymat=TemperatureVals, dates=Dates, coords=Coords)
+Error in BSTFA.full(ymat = TemperatureVals, dates = Dates, coords = Coords) : 
+  could not find function "BSTFA.full"
 Execution halted
