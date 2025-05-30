@@ -48,8 +48,10 @@ A plot of predicted values for \code{location}.
 Plot a location's time series of estimated/interpolated values.
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 plot_location(out, location=1, pred.int=FALSE)
+}
 }

@@ -20,8 +20,10 @@ A matrix of size \code{n.times*n.locs} by \code{draws} log-likelihood values for
 Compute log-likelihood
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 loglik <- computeLogLik(out, addthin=2)
+}
 }

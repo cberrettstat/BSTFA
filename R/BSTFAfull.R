@@ -101,9 +101,12 @@
 #' }
 #' @author Candace Berrett and Adam Simpson
 #' @examples
+#' \dontrun{
+#' #Example below not run; even the ten iterations will take a minute or two to run.
 #' data(utahDataList)
 #' attach(utahDataList)
-#' out <- BSTFAfull(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=50)
+#' out <- BSTFAfull(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=10)
+#' }
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                      mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
@@ -779,11 +782,3 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
 
 
-
-### removed
-# mean, linear, seasonal, factors (all boolean)
-# knot.levels, max.knot.dist, premade.knots, plot.knots (make default FALSE?)
-# plot.factors (make default FALSE?), n.temp.bases, n.load.bases, phi.T, phi.S,
-# alpha.prec, tau2.gamma, tau2.phi, sig2.gamma, sig2.phi,
-# sig2, beta, xi, Fmat, Lambda,
-# save.missing, filename

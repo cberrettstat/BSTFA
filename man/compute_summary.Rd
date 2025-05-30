@@ -16,8 +16,10 @@ Prints the computation time per iteration for each parameter.
 Print computation summary
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 compute_summary(out)
+}
 }

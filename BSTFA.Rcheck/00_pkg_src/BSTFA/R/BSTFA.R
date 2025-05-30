@@ -54,7 +54,6 @@
 #' @importFrom lubridate yday
 #' @importFrom utils combn
 #' @import matrixcalc
-#' @import Matrix
 #' @import npreg
 #' @import stats
 #' @import graphics
@@ -92,7 +91,7 @@
 #' @examples
 #' data(utahDataList)
 #' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=1000)
 #' @export BSTFA
 BSTFA <- function(ymat, dates, coords,
                  iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
@@ -219,8 +218,8 @@ BSTFA <- function(ymat, dates, coords,
   ### Set up mean component
   if(mean==TRUE){
     Jfull = kronecker(Matrix::Diagonal(n=n.locs), rep(1, n.times))
-    ItJJ <- as(kronecker(diag(1,n.locs), t(rep(1,n.times))%*%rep(1,n.times)), "sparseMatrix")
-    ItJ <- as(kronecker(diag(1,n.locs), t(rep(1,n.times))), "sparseMatrix")
+    ItJJ <- methods::as(kronecker(diag(1,n.locs), t(rep(1,n.times))%*%rep(1,n.times)), "sparseMatrix")
+    ItJ <- methods::as(kronecker(diag(1,n.locs), t(rep(1,n.times))), "sparseMatrix")
     mu.var <- solve(ItJJ)
     mu.mean <- mu.var%*%ItJ%*%y
     mu <-  my_mvrnorm(mu.mean, mu.var)
@@ -242,8 +241,8 @@ BSTFA <- function(ymat, dates, coords,
   if (linear == TRUE) {
     Tsub <- -(n.times/2-0.5):(n.times/2-0.5)
     Tfull <- kronecker(Matrix::Diagonal(n=n.locs), Tsub)
-    ItTT <- as(kronecker(Matrix::Diagonal(n=n.locs), t(Tsub)%*%Tsub), "sparseMatrix")
-    ItT <- as(kronecker(Matrix::Diagonal(n=n.locs), t(Tsub)), "sparseMatrix")
+    ItTT <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(Tsub)%*%Tsub), "sparseMatrix")
+    ItT <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(Tsub)), "sparseMatrix")
     if(is.null(beta)==T){
       beta.var <- solve(ItTT)
       beta.mean <- beta.var%*%ItT%*%y #starting values for beta
@@ -268,13 +267,13 @@ BSTFA <- function(ymat, dates, coords,
   ### Set up seasonal component
   model.matrices$seasonal.bs.basis <- matrix(0,nrow=n.times,ncol=n.seasn.knots)
   if(seasonal == TRUE) {
-    newS.xi <- as(kronecker(newS, diag(n.seasn.knots)), "sparseMatrix")
+    newS.xi <- methods::as(kronecker(newS, diag(n.seasn.knots)), "sparseMatrix")
     # newS.xi <- kronecker(newS,diag(n.seasn.knots))
     knots <- seq(1, 366, length=n.seasn.knots+1)
     bs.basis <- mgcv::cSplineDes(doy, knots)
     Bfull <- kronecker(Matrix::Diagonal(n=n.locs), bs.basis)
-    ItBB <- as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)%*%bs.basis), "sparseMatrix")
-    ItB <- as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)), "sparseMatrix")
+    ItBB <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)%*%bs.basis), "sparseMatrix")
+    ItB <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)), "sparseMatrix")
     if (is.null(xi)) {
       xi.var <- solve(ItBB)
       xi.mean <- xi.var%*%ItB%*%(y - Tfullbeta.long)
@@ -303,7 +302,7 @@ BSTFA <- function(ymat, dates, coords,
     tCC <- t(Cmat)%*%Cmat
     tCC <- (t(tCC) + tCC)/2
     if (mean) {
-      Pmat <- Cmat%*%ginv(tCC)%*%t(Cmat)
+      Pmat <- Cmat%*%MASS::ginv(tCC)%*%t(Cmat)
     } else {
       Pmat <- Cmat%*%solve(tCC)%*%t(Cmat)
     }
@@ -486,13 +485,13 @@ BSTFA <- function(ymat, dates, coords,
 
   ### Useful one-time calculations
   A.prec = diag(alpha.prec, dim(newS)[2])
-  if (seasonal) StSI <- as(kronecker(t(newS)%*%newS, Matrix::Diagonal(n=n.seasn.knots)), "sparseMatrix")
+  if (seasonal) StSI <- methods::as(kronecker(t(newS)%*%newS, Matrix::Diagonal(n=n.seasn.knots)), "sparseMatrix")
   if (factors) {
     PQT <- Pmat.prime%*%QT
     PQTtPQT = t(PQT)%*%PQT
-    QsI <- as(kronecker(QS, diag(1, n.factors)), "sparseMatrix")
+    QsI <- methods::as(kronecker(QS, diag(1, n.factors)), "sparseMatrix")
     #QsI <- kronecker(QS, diag(1,n.factors))
-    QstQsI <- as(kronecker(t(QS)%*%QS, diag(1, n.factors)), "sparseMatrix")
+    QstQsI <- methods::as(kronecker(t(QS)%*%QS, diag(1, n.factors)), "sparseMatrix")
     #QstQsI <- kronecker(t(QS)%*%QS, diag(1, n.factors))
   }
 
@@ -672,7 +671,7 @@ BSTFA <- function(ymat, dates, coords,
 
       temp = y - Jfullmu.long - Tfullbeta.long - Bfullxi.long
       tempmat = matrix(temp, nrow=n.times, ncol=n.locs)
-      IkPFtPF <- as(kronecker(diag(1, n.locs), t(F.tilde)%*%F.tilde), "sparseMatrix")
+      IkPFtPF <- methods::as(kronecker(diag(1, n.locs), t(F.tilde)%*%F.tilde), "sparseMatrix")
       lam.var <- solve((1/sig2)*IkPFtPF + Matrix::Diagonal(x=1/tau2.lambda, n=n.locs*n.factors))
       lam.mean <- lam.var%*%((1/sig2)*matrixcalc::vec(t(F.tilde)%*%tempmat) + (1/tau2.lambda)*QsI%*%alphaS)
 

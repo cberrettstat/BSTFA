@@ -89,9 +89,11 @@
 #' }
 #' @author Adam Simpson and Candace Berrett
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=1000)
+#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
+#' }
 #' @export BSTFA
 BSTFA <- function(ymat, dates, coords,
                  iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,

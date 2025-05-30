@@ -11,10 +11,12 @@
 #' @param pred.int Logical scalar indicating whether to include additional uncertainty for posterior predictive intervals (\code{TRUE}; default) or not (posterior draws from the mean of \code{location}).
 #' @returns A matrix or vector of predicted values for \code{location}.
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
+#' }
 #' @importFrom npreg basis.tps
 #' @export predictBSTFA
 predictBSTFA = function(out, location=NULL, type='mean',
@@ -231,10 +233,12 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' @param ylim Numeric vector of length 2 providing the lower and upper bounds of the y-axis.  If \code{NULL} (default), the y-axis limits are chosen using the range of the predictions.
 #' @returns A plot of predicted values for \code{location}.
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' plot_location(out, location=1, pred.int=FALSE)
+#' }
 #' @export plot_location
 plot_location = function(out, location, new_x=NULL,
                          type='mean', par.mfrow=c(1,1), pred.int=TRUE,
@@ -328,10 +332,12 @@ plot_location = function(out, location, new_x=NULL,
 #' @param color.gradient The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)}.
 #' @returns A plot of spatially-dependent parameter values for the observed locations.
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' plot_spatial_param(out, parameter="slope")
+#' }
 #' @import ggplot2
 #' @importFrom RColorBrewer brewer.pal
 #' @export plot_spatial_param
@@ -413,10 +419,12 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
 #' @param addthin Integer indicating the number of saved draws to thin.  Default is to not thin any \code{addthin=1}.  This can save time when the object is from \code{BSTFAfull} and \code{parameter='loading'}.
 #' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' map_spatial_param(out, parameter="slope", map=TRUE, state=TRUE, location='utah', fine=50)
+#' }
 #' @importFrom npreg basis.tps
 #' @importFrom sf st_sfc
 #' @importFrom sf st_polygon
@@ -736,10 +744,12 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
 #' @param xrange A date vector of length 2 providing the lower and upper bounds of the dates to include in the plot.
 #' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' plot_factor(out, factor=1:4, together=TRUE)
+#' }
 #' @export plot_factor
 plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
                        type='mean', uncertainty=TRUE, ci.level=c(0.025, 0.975),
@@ -806,10 +816,12 @@ plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
 #' @param yrange Numeric vector of length 2 providing the lower and upper bounds of the y-axis.  If \code{NULL} (default), the y-axis limits are chosen using the range of the seasonal process and data.
 #' @returns A plot of the annual/seasonal process at \code{location}.
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' plot_annual(out, location=1)
+#' }
 #' @importFrom mgcv cSplineDes
 #' @export plot_annual
 plot_annual <- function(out, location, add=F,
@@ -863,7 +875,7 @@ plot_annual <- function(out, location, add=F,
       if(years=="all"){
         plot(dates.pred, ann.pred.mean, lwd=1.5, type='l', xlab="Date", ylab="Annual Seasonal Cycle", ylim=ylims, main=paste("Location", location))
       }else{
-        plot(doy.pred, ann.pred.mean, lwd=1.5, type='l', xaxt="n", xlab="Date", ylab="Annual Seasonal Cycle", ylim=ylims)
+        plot(doy.pred, ann.pred.mean, lwd=1.5, type='l', xaxt="n", xlab="Date", ylab="Annual Seasonal Cycle", ylim=ylims, main=paste("Seasonal Behavior of Location", location))
         axis(1, at=at.doy.plot, labels=months.plot)
       }
       if(interval>0){

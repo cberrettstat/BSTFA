@@ -423,3 +423,56 @@ defineRegion <- function(out, location) {
 }
 
 
+# #' Plot the location of the multiresolution bisquare knots with data locations from model output.
+# #'
+# #' @param out Output object from \code{BSTFA} or \code{BSTFAfull} functions.
+# #' @param style Character scalar indicating whether to plot the knots for the mean, linear, and seasonal components (\code{"spatial"}; default) or for the factor loadings (\code{"load"}).  If it is an object from \code{BSTFAfull}, only the knots from \code{spatial.style} are relevant.
+# #' @export plot_knots
+# plot_knots <- function(out, style="spatial"){
+	
+	# coords <- out$coords
+	
+	# if (is.matrix(coords) | is.data.frame(coords)) {
+    # if (dim(coords)[2]>1) dist.bisquare='D2'
+    # else dist.bisquare='D1'
+  # } else {
+    # dist.bisquare = 'D1'
+  # }
+  
+  # if(style=="spatial"){
+  	# if(out$spatial.style=="grid"){
+  		# knots <- out$knots.spatial
+  	# }else{
+  		# print("Error: Spatial bases are not multiresolution bisquare bases.")
+  	# }
+  # }else{
+  	# if(out$load.style=="grid"){
+  		# knots <- out$knots.load
+  	# }else{
+  		# print("Error: Loading bases are not multiresolution bisquare bases.")
+  	# }
+  # }
+	
+	# if(dist.bisquare=="D2"){
+      # legend.txt = c()
+      # colors=c()
+      # plot(x=coords[,1],y=coords[,2],xlab='Longitude',ylab="Latitude",
+           # main = "Knots and Spatial Locations")
+      # for (kkk in 1:knot.levels) {
+        # points(knots.list[[kkk]], col=kkk+1, cex=2, pch=19)
+        # legend.txt[kkk] = paste('Resolution',kkk)
+      # }
+      # legend("topleft",legend=legend.txt,lwd=1,col=seq(2,knot.levels+1),pch=19,lty='blank')
+    # }else{
+    	# legend.txt = c()
+      # colors=c()
+      # plot(x=coords,y=rep(0,length(coords)),xlab='Spatial Location',ylab="",yaxt="n",
+           # main = "Knots and Spatial Locations")
+      # for (kkk in 1:knot.levels) {
+        # points(x=knots.list[[kkk]],y=rep(0,length(knots.list[[kkk]])), col=kkk+1, cex=2, pch=19)
+        # legend.txt[kkk] = paste('Resolution',kkk)
+      # }
+      # legend("topleft",legend=legend.txt,lwd=1,col=seq(2,knot.levels+1),pch=19,lty='blank')
+    # }
+
+# }

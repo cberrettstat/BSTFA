@@ -8,10 +8,12 @@
 #' @param density Logical scalar indicating whether to include the density plot of the posterior draws. Default is \code{TRUE}.
 #' @returns A plot containing the trace plot (and density plot when \code{density=TRUE}) of the listed parameters.
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' plot_trace(out, parameter="beta", param.range=1)
+#' }
 #' @export plot_trace
 plot_trace = function(out, parameter, param.range=NULL,
                       par.mfrow=c(1,1), density=TRUE) {
@@ -37,10 +39,12 @@ plot_trace = function(out, parameter, param.range=NULL,
 #' @param out Output from BSTFA or BSTFAfull.
 #' @returns Prints the computation time per iteration for each parameter.
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' compute_summary(out)
+#' }
 #' @export compute_summary
 compute_summary = function(out) {
   no.fa.iters = which(out$time.data[,3] == 0)
@@ -66,10 +70,12 @@ compute_summary = function(out) {
 #' @param cutoff Numeric scalar indicating the cutoff value to flag parameters that haven't converged.
 #' @returns A list containing convergence diagnostic for all parameters.
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' convergence_diag(out)
+#' }
 #' @importFrom coda effectiveSize
 #' @importFrom coda geweke.diag
 #' @export convergence_diag
@@ -122,10 +128,12 @@ convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,0.001
 #' @param addthin Numeric scalar indicating the number of additional draws to thin by to reduce the computation time.  Default is \code{1} (no additional thinning).
 #' @returns A matrix of size \code{n.times*n.locs} by \code{draws} log-likelihood values for each observation and each posterior draw.
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' loglik <- computeLogLik(out, addthin=2)
+#' }
 #' @export computeLogLik
 computeLogLik <- function(out, verbose=FALSE, addthin=1) {
   y = out$y
@@ -143,69 +151,3 @@ computeLogLik <- function(out, verbose=FALSE, addthin=1) {
 }
 
 
-
-
-# compute.DIC <- function(out){
-#   #in-sample DIC only (this function removes ALL data treated as missing)
-#
-#   n.total <- out$n.times*out$n.locs
-#
-#   if(sum(out$mu)!=0){
-#     meanmat <- kronecker(diag(1, out$n.locs), rep(1, out$n.times))
-#     mu.mean <- apply(out$mu, 2, mean)
-#     mulong <- mean.mat%*%mu.mean
-#   }else{
-#     mulong <- rep(0, n.total)
-#   }
-#
-#   if(sum(out$beta)!=0){
-#     Tfull <- kronecker(diag(1, out$n.locs), out$model.matrices$linear.Tsub)
-#     beta.mean <- apply(out$beta, 2, mean)
-#     betalong <- Tfull%*%beta.mean
-#   }else{
-#     betalong <- rep(0, n.total)
-#   }
-#
-#   if(sum(out$xi)!=0){
-#     knots <- seq(1, 366, length=out$n.seasn.knots+1)
-#     bs.basis <- cSplineDes(doy, knots)
-#     Bfull <- kronecker(diag(1, out$n.locs), out$model.matrices$seasonal.bs.basis)
-#     xi.mean <- apply(out$xi, 2, mean)
-#     xilong <- Bfull%*%xi.mean
-#   }else{
-#     xilong <- rep(0, n.total)
-#   }
-#
-#   if(sum(out$Lambda)!=0){
-#     PF.mat.mean <- matrix(apply(out$PFmat, 2, mean),nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)
-#     Lambda.mean <- matrix(apply(out$Lambda, 2, mean),nrow=out$n.locs,ncol=out$n.factors,byrow=TRUE)
-#     factors.mean <- PF.mat.mean%*%t(Lambda.mean)
-#     factorslong <- c(factors.mean)
-#   }else{
-#     factorslong <- rep(0, n.total)
-#   }
-#
-#   sigma2.mean <- mean(out$sig2)
-#
-#   D.thetabar <- sum(-2*dnorm(out$y[!out$missing], (mulong+betalong+xilong+factorslong)[!out$missing], sqrt(sigma2.mean), log=T), na.rm=T)
-#   D <- rep(0, draws)
-#   for(ii in 1:length(D)){
-#     this.mean <- 0
-#     if(sum(out$mu)!=0){
-#       this.mean <- this.mean + mean.mat%*%out$mu[ii,]
-#     }
-#     if(sum(out$beta)!=0){
-#       this.mean <- this.mean + Tfull%*%out$beta[ii,]
-#     }
-#     if(sum(out$xi)!=0){
-#       this.mean <- this.mean + Bfull%*%out$xi[ii,]
-#     }
-#     if(sum(out$Lambda)!=0){
-#       this.mean <- this.mean + c(matrix(out$PFmat[ii,],nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)%*%t(matrix(out$Lambda[ii,],nrow=out$n.locs,ncol=out$n.factors,byrow=TRUE)))
-#     }
-#     D[ii] <- sum(-2*dnorm(out$y[!out$missing], this.mean[!out$missing], sqrt(out$sig2), log=T), na.rm=T)
-#   }
-#   D.bar <- mean(D)
-#   DIC <- 2*D.bar - D.thetabar
-#   DIC
-# }

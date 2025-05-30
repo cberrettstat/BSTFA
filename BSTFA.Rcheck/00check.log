@@ -17,21 +17,13 @@
 * checking for hidden files and directories ... OK
 * checking for portable file names ... OK
 * checking for sufficient/correct file permissions ... OK
-* checking whether package ‘BSTFA’ can be installed ... WARNING
-Found the following significant warnings:
-  Warning: replacing previous import ‘Matrix::image’ by ‘graphics::image’ when loading ‘BSTFA’
-  Warning: replacing previous import ‘Matrix::cov2cor’ by ‘stats::cov2cor’ when loading ‘BSTFA’
-  Warning: replacing previous import ‘Matrix::toeplitz’ by ‘stats::toeplitz’ when loading ‘BSTFA’
-  Warning: replacing previous import ‘Matrix::update’ by ‘stats::update’ when loading ‘BSTFA’
-See ‘/Users/cberrett/Documents/Research/TempChange/STFAModel/BSTFA/BSTFA.Rcheck/00install.out’ for details.
+* checking whether package ‘BSTFA’ can be installed ... OK
 * used C++ compiler: ‘Apple clang version 17.0.0 (clang-1700.0.13.3)’
 * used SDK: ‘MacOSX15.4.sdk’
 * checking installed package size ... OK
 * checking package directory ... OK
-* checking DESCRIPTION meta-information ... WARNING
-Non-standard license specification:
-  `use_mit_license()`
-Standardizable: FALSE
+* checking ‘build’ directory ... OK
+* checking DESCRIPTION meta-information ... OK
 * checking top-level files ... OK
 * checking for left-over files ... OK
 * checking index information ... OK
@@ -47,60 +39,13 @@ Standardizable: FALSE
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
-* checking R code for possible problems ... NOTE
-BSTFA: no visible global function definition for ‘as’
-BSTFA: no visible global function definition for ‘ginv’
-BSTFAfull: no visible global function definition for ‘as’
-BSTFAfull: no visible global function definition for ‘ginv’
-plot.annual: no visible global function definition for ‘rgb’
-plot.annual: no visible global function definition for ‘as’
-plot.factor: no visible global function definition for ‘rgb’
-plot.fourier.bases: no visible global function definition for
-  ‘colorRampPalette’
-plot.grid: no visible global function definition for ‘colorRampPalette’
-plot.location: no visible global function definition for ‘rgb’
-plot.map: no visible global function definition for ‘colorRampPalette’
-plot.map: no visible binding for global variable ‘Lon’
-plot.map: no visible binding for global variable ‘Lat’
-plot.map: no visible binding for global variable ‘predm’
-plot.map: no visible binding for global variable ‘predl’
-plot.map: no visible binding for global variable ‘predu’
-plot.map: no visible binding for global variable ‘long’
-plot.map: no visible binding for global variable ‘lat’
-plot.map: no visible binding for global variable ‘group’
-plot.map: no visible global function definition for ‘rgb’
-predictBSTFA: no visible global function definition for ‘as’
-Undefined global functions or variables:
-  Lat Lon as colorRampPalette ginv group lat long predl predm predu rgb
-Consider adding
-  importFrom("grDevices", "colorRampPalette", "rgb")
-  importFrom("methods", "as")
-to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
-contains 'methods').
+* checking R code for possible problems ... OK
 * checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd cross-references ... OK
 * checking for missing documentation entries ... OK
 * checking for code/documentation mismatches ... OK
-* checking Rd \usage sections ... WARNING
-Undocumented arguments in Rd file 'plot.grid.Rd'
-  ‘yearscale’
-Documented arguments not in \usage in Rd file 'plot.grid.Rd':
-  ‘yearscsale’
-
-Undocumented arguments in Rd file 'plot.location.Rd'
-  ‘pred.int’
-
-Undocumented arguments in Rd file 'plot.map.Rd'
-  ‘yearscale’ ‘new_x’
-Documented arguments not in \usage in Rd file 'plot.map.Rd':
-  ‘yearscsale’
-
-Functions with \usage entries need to have the appropriate \alias
-entries, and all their arguments documented.
-The \usage entries must correspond to syntactically valid R code.
-See chapter ‘Writing R documentation files’ in the ‘Writing R
-Extensions’ manual.
+* checking Rd \usage sections ... OK
 * checking Rd contents ... OK
 * checking for unstated dependencies in examples ... OK
 * checking contents of ‘data’ directory ... OK
@@ -109,34 +54,12 @@ Extensions’ manual.
 * checking data for ASCII and uncompressed saves ... OK
 * checking line endings in C/C++/Fortran sources/headers ... OK
 * checking compiled code ... OK
-* checking files in ‘vignettes’ ... WARNING
-Files in the 'vignettes' directory but no files in 'inst/doc':
-  ‘BSTFA-Vignette.Rmd’ ‘BSTFA_Vignette.pdf’ ‘apa.csl’
-  ‘basis_comparison3.png’ ‘factor_comparison2.png’
-  ‘loading_comparison3.png’ ‘references.bib’ ‘style.css’ ‘style.tex’
-Files named as vignettes but with no recognized vignette engine:
-   ‘vignettes/BSTFA-Vignette.Rmd’
-(Is a VignetteBuilder field missing?)
-* checking examples ... ERROR
-Running examples in ‘BSTFA-Ex.R’ failed
-The error most likely occurred in:
-
-> ### Name: BSTFAfull
-> ### Title: Full BSTFA function
-> ### Aliases: BSTFAfull
-> 
-> ### ** Examples
-> 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA.full(ymat=TemperatureVals, dates=Dates, coords=Coords)
-Error in BSTFA.full(ymat = TemperatureVals, dates = Dates, coords = Coords) : 
-  could not find function "BSTFA.full"
-Execution halted
-* checking package vignettes ... NOTE
-Package has ‘vignettes’ subdirectory but apparently no vignettes.
-Perhaps the ‘VignetteBuilder’ information is missing from the
-DESCRIPTION file?
+* checking installed files from ‘inst/doc’ ... OK
+* checking files in ‘vignettes’ ... OK
+* checking examples ... OK
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... OK
+* checking re-building of vignette outputs ... OK
 * checking PDF version of manual ... OK
 * DONE
-Status: 1 ERROR, 4 WARNINGs, 2 NOTEs
+Status: OK

@@ -19,7 +19,7 @@ flush(stderr()); flush(stdout())
 
 data(utahDataList)
 attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=1000)
 
 
 
@@ -37,45 +37,7 @@ flush(stderr()); flush(stdout())
 
 data(utahDataList)
 attach(utahDataList)
-out <- BSTFA.full(ymat=TemperatureVals, dates=Dates, coords=Coords)
-
-
-
-cleanEx()
-nameEx("check.convergence")
-### * check.convergence
-
-flush(stderr()); flush(stdout())
-
-### Name: check.convergence
-### Title: Check effective sample size and geweke diagnostic
-### Aliases: check.convergence
-
-### ** Examples
-
-data(utahDataList)
-attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-check.convergence(out)
-
-
-
-cleanEx()
-nameEx("computation.summary")
-### * computation.summary
-
-flush(stderr()); flush(stdout())
-
-### Name: computation.summary
-### Title: Print computation summary
-### Aliases: computation.summary
-
-### ** Examples
-
-data(utahDataList)
-attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-computation.summary(out)
+out <- BSTFAfull(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=50)
 
 
 
@@ -99,116 +61,154 @@ loglik <- computeLogLik(out, addthin=2)
 
 
 cleanEx()
-nameEx("plot.annual")
-### * plot.annual
+nameEx("compute_summary")
+### * compute_summary
 
 flush(stderr()); flush(stdout())
 
-### Name: plot.annual
-### Title: Plot annual curve
-### Aliases: plot.annual
+### Name: compute_summary
+### Title: Print computation summary
+### Aliases: compute_summary
 
 ### ** Examples
 
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-plot.annual(out, location=1)
+compute_summary(out)
 
 
 
 cleanEx()
-nameEx("plot.factor")
-### * plot.factor
+nameEx("convergence_diag")
+### * convergence_diag
 
 flush(stderr()); flush(stdout())
 
-### Name: plot.factor
-### Title: Plot the factors
-### Aliases: plot.factor
+### Name: convergence_diag
+### Title: Check effective sample size and geweke diagnostic
+### Aliases: convergence_diag
 
 ### ** Examples
 
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-plot.factor(out, factor=1:4, together=T)
+convergence_diag(out)
 
 
 
 cleanEx()
-nameEx("plot.grid")
-### * plot.grid
+nameEx("map_spatial_param")
+### * map_spatial_param
 
 flush(stderr()); flush(stdout())
 
-### Name: plot.grid
-### Title: Plot the spatially-dependent parameter for in-sample locations.
-### Aliases: plot.grid
-
-### ** Examples
-
-data(utahDataList)
-attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-plot.grid(out, parameter="slope")
-
-
-
-cleanEx()
-nameEx("plot.location")
-### * plot.location
-
-flush(stderr()); flush(stdout())
-
-### Name: plot.location
-### Title: Plot a location's time series of estimated/interpolated values.
-### Aliases: plot.location
-
-### ** Examples
-
-data(utahDataList)
-attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-plot.location(out, location=1, pred.int=FALSE)
-
-
-
-cleanEx()
-nameEx("plot.map")
-### * plot.map
-
-flush(stderr()); flush(stdout())
-
-### Name: plot.map
+### Name: map_spatial_param
 ### Title: Plot a map of interpolated spatially-dependent parameter values.
-### Aliases: plot.map
+### Aliases: map_spatial_param
 
 ### ** Examples
 
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-plot.map(out, parameter="slope", map=T, state=T, location='utah', fine=50)
+map_spatial_param(out, parameter="slope", map=TRUE, state=TRUE, location='utah', fine=50)
 
 
 
 cleanEx()
-nameEx("plot.trace")
-### * plot.trace
+nameEx("plot_annual")
+### * plot_annual
 
 flush(stderr()); flush(stdout())
 
-### Name: plot.trace
-### Title: Plot trace plots
-### Aliases: plot.trace
+### Name: plot_annual
+### Title: Plot annual curve
+### Aliases: plot_annual
 
 ### ** Examples
 
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-plot.trace(out, parameter="beta", param.range=1)
+plot_annual(out, location=1)
+
+
+
+cleanEx()
+nameEx("plot_factor")
+### * plot_factor
+
+flush(stderr()); flush(stdout())
+
+### Name: plot_factor
+### Title: Plot the factors
+### Aliases: plot_factor
+
+### ** Examples
+
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+plot_factor(out, factor=1:4, together=TRUE)
+
+
+
+cleanEx()
+nameEx("plot_location")
+### * plot_location
+
+flush(stderr()); flush(stdout())
+
+### Name: plot_location
+### Title: Plot a location's time series of estimated/interpolated values.
+### Aliases: plot_location
+
+### ** Examples
+
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+plot_location(out, location=1, pred.int=FALSE)
+
+
+
+cleanEx()
+nameEx("plot_spatial_param")
+### * plot_spatial_param
+
+flush(stderr()); flush(stdout())
+
+### Name: plot_spatial_param
+### Title: Plot the spatially-dependent parameter for in-sample locations.
+### Aliases: plot_spatial_param
+
+### ** Examples
+
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+plot_spatial_param(out, parameter="slope")
+
+
+
+cleanEx()
+nameEx("plot_trace")
+### * plot_trace
+
+flush(stderr()); flush(stdout())
+
+### Name: plot_trace
+### Title: Plot trace plots
+### Aliases: plot_trace
+
+### ** Examples
+
+data(utahDataList)
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+plot_trace(out, parameter="beta", param.range=1)
 
 
 

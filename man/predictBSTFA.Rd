@@ -33,8 +33,10 @@ A matrix or vector of predicted values for \code{location}.
 Prediction
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
+}
 }

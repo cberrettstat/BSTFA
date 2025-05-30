@@ -7,7 +7,7 @@ Authors@R:
     	person("Adam", "Simpson", , "adamiser810@gmail.com", role = c("aut")),
 	person("Candace", "Berrett", email="cberrett@stat.byu.edu", role=c("aut","cre"), comment=c(ORCID="0000-0003-4721-3065"))
      )
-License: `use_mit_license()`
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -17,12 +17,12 @@ LinkingTo: Rcpp, RcppArmadillo
 LazyData: true
 Imports: MASS, RColorBrewer, ggplot2, ggpubr, mgcv, MCMCpack, coda,
         npreg, matrixcalc, scatterplot3d, sf, Rcpp, RcppArmadillo,
-        lubridate, Matrix, stats
-Suggests: knitr, rmarkdown, utils
+        lubridate, Matrix, stats, methods
+Suggests: knitr, rmarkdown, utils, devtools
 NeedsCompilation: yes
-Packaged: 2025-05-22 20:07:48 UTC; cberrett
+Packaged: 2025-05-28 19:57:13 UTC; cberrett
 Author: Adam Simpson [aut],
   Candace Berrett [aut, cre] (ORCID:
     <https://orcid.org/0000-0003-4721-3065>)
 Maintainer: Candace Berrett <cberrett@stat.byu.edu>
-Built: R 4.5.0; aarch64-apple-darwin20; 2025-05-22 20:10:05 UTC; unix
+Built: R 4.5.0; aarch64-apple-darwin20; 2025-05-28 20:17:37 UTC; unix

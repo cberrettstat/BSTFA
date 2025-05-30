@@ -118,45 +118,48 @@ Overfull \hbox (6.6876pt too wide) in paragraph at lines 481--482
 [13]
 [14]
 [15]
-Overfull \hbox (33.8784pt too wide) in paragraph at lines 659--660
+Overfull \hbox (33.8784pt too wide) in paragraph at lines 655--656
 []\T1/ptm/m/n/10 Maximum dis-tance be-tween an ob-ser-va-tion and a knot. De-fault is []\T1/zi4/m/n/10 mean(dist(coords))[]\T1/ptm/m/n/10 . 
 
 [16]
+Overfull \hbox (24.76044pt too wide) in paragraph at lines 710--710
+ []  \T1/zi4/m/n/10 color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =[] 
+
 [17]
+Overfull \hbox (104.41895pt too wide) in paragraph at lines 739--740
+[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
+
+Overfull \hbox (37.80907pt too wide) in paragraph at lines 747--748
+[]\T1/ptm/m/n/10 Name of re-gion to in-clude in the map. Fed to []\T1/zi4/m/n/10 region []\T1/ptm/m/n/10 in the func-tion []\T1/zi4/m/n/10 ggplot2::map_data[]\T1/ptm/m/n/10 . 
+
 [18]
 [19]
-Overfull \hbox (33.09036pt too wide) in paragraph at lines 856--856
- []  \T1/zi4/m/n/10 color.gradient = colorRampPalette(rev(RColorBrewer::brewer.pal(9, name = "RdBu")))(50)[] 
-
-Overfull \hbox (104.41895pt too wide) in paragraph at lines 873--874
-[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
-
 [20]
 [21]
-Overfull \hbox (104.41895pt too wide) in paragraph at lines 995--996
-[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
+Overfull \hbox (24.76044pt too wide) in paragraph at lines 982--982
+ []  \T1/zi4/m/n/10 color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =[] 
 
 [22]
-Overfull \hbox (37.80907pt too wide) in paragraph at lines 1003--1004
-[]\T1/ptm/m/n/10 Name of re-gion to in-clude in the map. Fed to []\T1/zi4/m/n/10 region []\T1/ptm/m/n/10 in the func-tion []\T1/zi4/m/n/10 ggplot2::map_data[]\T1/ptm/m/n/10 . 
+Overfull \hbox (104.41895pt too wide) in paragraph at lines 1002--1003
+[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
 
 [23]
 [24]
 No file Rd2.ind.
 
-[25] (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.aux)
+[25] (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
 (rerunfilecheck)                or use package `bookmark'.
 
  )
-(see the transcript file for additional information) </Users/cberrett/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (25 pages, 135494 bytes).
+(see the transcript file for additional information)</Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (25 pages, 135238 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.17 [TeX Live 2024] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (20 entries accepted, 0 rejected).
-Sorting entries....done (109 comparisons).
+Sorting entries....done (110 comparisons).
 Generating output file Rd2.ind....done (43 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
@@ -172,7 +175,7 @@ Document Class: book 2024/06/29 v1.4n Standard LaTeX document class
 For additional information on amsmath, use the `?' option.
 (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsmath/amstext.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsmath/amsgen.sty)) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsmath/amsbsy.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsmath/amsopn.sty)) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/amsfonts.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/amssymb.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/jknapltx/mathrsfs.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/base/fontenc.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/psnfss/times.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/zi4.sty `inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/xkeyval/xkeyval.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/xkeyval.tex (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/xkvutils.tex (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/keyval.tex))))) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/graphics/color.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/graphics-cfg/color.cfg) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/graphics-def/pdftex.def) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/graphics/mathcolor.ltx)) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/pdfescape/pdfescape.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/infwarerr/infwarerr.sty))) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hycolor/hycolor.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/refcount/refcount.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/kvoptions/kvoptions.sty))) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/etoolbox/etoolbox.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/stringenc/stringenc.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/intcalc/intcalc.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hyperref/puenc.def) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/bitset/bitset.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty)) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/base/atbegshi-ltx.sty)) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hpdftex.def (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/base/atveryend-ltx.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty)))) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/base/makeidx.sty)
 Writing index file Rd2.idx
-(/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/psnfss/t1ptm.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.aux) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.out) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.out) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/t1zi4.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/jknapltx/ursfs.fd) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.toc
+(/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/psnfss/t1ptm.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.aux) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.out) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.out) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/t1zi4.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/jknapltx/ursfs.fd) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.toc
 [1{/Users/cberrett/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/Users/cberrett/Library/TinyTeX/texmf-dist/fonts/enc/dvips/base/8r.enc}{/Users/cberrett/Library/TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}])
 Overfull \hbox (9.36694pt too wide) in paragraph at lines 43--44
 []\T1/ptm/m/n/10 Function to eval-u-ate bisquare bases for 1-dimensional space. Used in-ter-nally in []\T1/zi4/m/n/10 BSTFA []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 BSTFAfull[]\T1/ptm/m/n/10 . 
@@ -272,45 +275,48 @@ Overfull \hbox (6.6876pt too wide) in paragraph at lines 481--482
 [13]
 [14]
 [15]
-Overfull \hbox (33.8784pt too wide) in paragraph at lines 659--660
+Overfull \hbox (33.8784pt too wide) in paragraph at lines 655--656
 []\T1/ptm/m/n/10 Maximum dis-tance be-tween an ob-ser-va-tion and a knot. De-fault is []\T1/zi4/m/n/10 mean(dist(coords))[]\T1/ptm/m/n/10 . 
 
 [16]
+Overfull \hbox (24.76044pt too wide) in paragraph at lines 710--710
+ []  \T1/zi4/m/n/10 color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =[] 
+
 [17]
-[18]
-[19]
-Overfull \hbox (33.09036pt too wide) in paragraph at lines 856--856
- []  \T1/zi4/m/n/10 color.gradient = colorRampPalette(rev(RColorBrewer::brewer.pal(9, name = "RdBu")))(50)[] 
-
-Overfull \hbox (104.41895pt too wide) in paragraph at lines 873--874
+Overfull \hbox (104.41895pt too wide) in paragraph at lines 739--740
 []\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
 
-[20]
-[21]
-Overfull \hbox (104.41895pt too wide) in paragraph at lines 995--996
-[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
-
-[22]
-Overfull \hbox (37.80907pt too wide) in paragraph at lines 1003--1004
+Overfull \hbox (37.80907pt too wide) in paragraph at lines 747--748
 []\T1/ptm/m/n/10 Name of re-gion to in-clude in the map. Fed to []\T1/zi4/m/n/10 region []\T1/ptm/m/n/10 in the func-tion []\T1/zi4/m/n/10 ggplot2::map_data[]\T1/ptm/m/n/10 . 
 
+[18]
+[19]
+[20]
+[21]
+Overfull \hbox (24.76044pt too wide) in paragraph at lines 982--982
+ []  \T1/zi4/m/n/10 color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =[] 
+
+[22]
+Overfull \hbox (104.41895pt too wide) in paragraph at lines 1002--1003
+[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
+
 [23]
-[24] (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.ind
+[24] (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.ind
 [25]
 
-[26]) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.aux)
+[26]) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
 (rerunfilecheck)                or use package `bookmark'.
 
  )
-(see the transcript file for additional information) </Users/cberrett/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (26 pages, 147553 bytes).
+(see the transcript file for additional information)</Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (26 pages, 147644 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.17 [TeX Live 2024] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (20 entries accepted, 0 rejected).
-Sorting entries....done (109 comparisons).
+Sorting entries....done (110 comparisons).
 Generating output file Rd2.ind....done (43 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
@@ -326,7 +332,7 @@ Document Class: book 2024/06/29 v1.4n Standard LaTeX document class
 For additional information on amsmath, use the `?' option.
 (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsmath/amstext.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsmath/amsgen.sty)) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsmath/amsbsy.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsmath/amsopn.sty)) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/amsfonts.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/amssymb.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/jknapltx/mathrsfs.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/base/fontenc.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/psnfss/times.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/zi4.sty `inconsolata-zi4' v1.12, 2019/05/17 Text macros for Inconsolata (msharpe) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/xkeyval/xkeyval.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/xkeyval.tex (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/xkvutils.tex (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/xkeyval/keyval.tex))))) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/graphics/color.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/graphics-cfg/color.cfg) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/graphics-def/pdftex.def) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/graphics/mathcolor.ltx)) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/pdfescape/pdfescape.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/infwarerr/infwarerr.sty))) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hycolor/hycolor.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/refcount/refcount.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/kvoptions/kvoptions.sty))) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/etoolbox/etoolbox.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/stringenc/stringenc.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.def) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/intcalc/intcalc.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hyperref/puenc.def) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/bitset/bitset.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty)) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/base/atbegshi-ltx.sty)) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/hyperref/hpdftex.def (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/base/atveryend-ltx.sty) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty)))) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/base/makeidx.sty)
 Writing index file Rd2.idx
-(/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/psnfss/t1ptm.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.aux) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.out) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.out) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/t1zi4.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/jknapltx/ursfs.fd) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.toc
+(/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/psnfss/t1ptm.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.aux) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.out) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.out) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/t1zi4.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd) (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/jknapltx/ursfs.fd) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.toc
 [1{/Users/cberrett/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/Users/cberrett/Library/TinyTeX/texmf-dist/fonts/enc/dvips/base/8r.enc}{/Users/cberrett/Library/TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}])
 Overfull \hbox (9.36694pt too wide) in paragraph at lines 43--44
 []\T1/ptm/m/n/10 Function to eval-u-ate bisquare bases for 1-dimensional space. Used in-ter-nally in []\T1/zi4/m/n/10 BSTFA []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 BSTFAfull[]\T1/ptm/m/n/10 . 
@@ -426,36 +432,39 @@ Overfull \hbox (6.6876pt too wide) in paragraph at lines 481--482
 [13]
 [14]
 [15]
-Overfull \hbox (33.8784pt too wide) in paragraph at lines 659--660
+Overfull \hbox (33.8784pt too wide) in paragraph at lines 655--656
 []\T1/ptm/m/n/10 Maximum dis-tance be-tween an ob-ser-va-tion and a knot. De-fault is []\T1/zi4/m/n/10 mean(dist(coords))[]\T1/ptm/m/n/10 . 
 
 [16]
+Overfull \hbox (24.76044pt too wide) in paragraph at lines 710--710
+ []  \T1/zi4/m/n/10 color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =[] 
+
 [17]
-[18]
-[19]
-Overfull \hbox (33.09036pt too wide) in paragraph at lines 856--856
- []  \T1/zi4/m/n/10 color.gradient = colorRampPalette(rev(RColorBrewer::brewer.pal(9, name = "RdBu")))(50)[] 
-
-Overfull \hbox (104.41895pt too wide) in paragraph at lines 873--874
+Overfull \hbox (104.41895pt too wide) in paragraph at lines 739--740
 []\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
 
-[20]
-[21]
-Overfull \hbox (104.41895pt too wide) in paragraph at lines 995--996
-[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
-
-[22]
-Overfull \hbox (37.80907pt too wide) in paragraph at lines 1003--1004
+Overfull \hbox (37.80907pt too wide) in paragraph at lines 747--748
 []\T1/ptm/m/n/10 Name of re-gion to in-clude in the map. Fed to []\T1/zi4/m/n/10 region []\T1/ptm/m/n/10 in the func-tion []\T1/zi4/m/n/10 ggplot2::map_data[]\T1/ptm/m/n/10 . 
 
+[18]
+[19]
+[20]
+[21]
+Overfull \hbox (24.76044pt too wide) in paragraph at lines 982--982
+ []  \T1/zi4/m/n/10 color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =[] 
+
+[22]
+Overfull \hbox (104.41895pt too wide) in paragraph at lines 1002--1003
+[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
+
 [23]
-[24] (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.ind
+[24] (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.ind
 [25]
 
-[26]) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.aux) )
-(see the transcript file for additional information) </Users/cberrett/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (26 pages, 147913 bytes).
+[26]) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.aux) )
+(see the transcript file for additional information)</Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (26 pages, 147895 bytes).
 Transcript written on Rd2.log.
 Saving output to ‘BSTFA-manual.pdf’ ...
 Done
-You may want to clean up by 'rm -Rf /var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T//RtmpxMlgIy/Rd2pdfecdb71d5960'
+You may want to clean up by 'rm -Rf /var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T//RtmpPm2lkA/Rd2pdfad8b640c519e'

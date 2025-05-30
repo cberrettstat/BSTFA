@@ -2,24 +2,24 @@ BSTFA                   Reduced BSTFA function
 BSTFAfull               Full BSTFA function
 bisquare1d              Bisquare bases for 1-dimensional space
 bisquare2d              Bisquare bases for 2-dimensional space
-check.convergence       Check effective sample size and geweke
-                        diagnostic
-computation.summary     Print computation summary
 computeLogLik           Compute log-likelihood
+compute_summary         Print computation summary
+convergence_diag        Check effective sample size and geweke
+                        diagnostic
 defineRegion            Define the initial region of interest.
 makeNewS                Create a matrix of bisquare bases for a set of
                         observed locations.
 makePredS               Create a matrix of bisquare bases for new
                         locations.
-plot.annual             Plot annual curve
-plot.factor             Plot the factors
-plot.fourier.bases      Visualize fourier bases. Used internally.
-plot.grid               Plot the spatially-dependent parameter for
-                        in-sample locations.
-plot.location           Plot a location's time series of
-                        estimated/interpolated values.
-plot.map                Plot a map of interpolated spatially-dependent
+map_spatial_param       Plot a map of interpolated spatially-dependent
                         parameter values.
-plot.trace              Plot trace plots
+plot_annual             Plot annual curve
+plot_factor             Plot the factors
+plot_fourier_bases      Visualize fourier bases. Used internally.
+plot_location           Plot a location's time series of
+                        estimated/interpolated values.
+plot_spatial_param      Plot the spatially-dependent parameter for
+                        in-sample locations.
+plot_trace              Plot trace plots
 predictBSTFA            Prediction
 utahDataList            Utah Minimum Temperatures

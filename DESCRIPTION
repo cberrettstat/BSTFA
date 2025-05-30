@@ -17,5 +17,5 @@ LinkingTo: Rcpp, RcppArmadillo
 LazyData: true
 Imports: 
     MASS, RColorBrewer, ggplot2, ggpubr, mgcv, MCMCpack, coda, npreg, matrixcalc, scatterplot3d, sf, Rcpp, RcppArmadillo, lubridate, Matrix, stats, methods
-Suggests: knitr, rmarkdown, utils, devtools
+Suggests: knitr, rmarkdown, utils, devtools, kableExtra
 

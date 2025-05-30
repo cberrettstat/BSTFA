@@ -11,9 +11,9 @@
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' plot.trace(out, parameter="beta", param.range=1)
-#' @export plot.trace
-plot.trace = function(out, parameter, param.range=NULL,
+#' plot_trace(out, parameter="beta", param.range=1)
+#' @export plot_trace
+plot_trace = function(out, parameter, param.range=NULL,
                       par.mfrow=c(1,1), density=TRUE) {
 
   vals = out[[parameter]]
@@ -40,9 +40,9 @@ plot.trace = function(out, parameter, param.range=NULL,
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' computation.summary(out)
-#' @export computation.summary
-computation.summary = function(out) {
+#' compute_summary(out)
+#' @export compute_summary
+compute_summary = function(out) {
   no.fa.iters = which(out$time.data[,3] == 0)
   fa.iters = which(out$time.data[,3] != 0)
   print(paste('Setup Time:', round(out$setup.time,3), 'seconds.'))
@@ -69,11 +69,11 @@ computation.summary = function(out) {
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' check.convergence(out)
+#' convergence_diag(out)
 #' @importFrom coda effectiveSize
 #' @importFrom coda geweke.diag
-#' @export check.convergence
-check.convergence = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,0.001)) {
+#' @export convergence_diag
+convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,0.001)) {
 
   mcmcVals = list()
   if (type=='eSS') {

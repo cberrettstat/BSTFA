@@ -20,9 +20,6 @@
 predictBSTFA = function(out, location=NULL, type='mean',
                        ci.level = c(0.025, 0.975), new_x=NULL, pred.int=TRUE) {
 
-  # FIX ME - do useful functions like bisquare still work?
-  # FIX ME - add resid to "predict all locations"
-
   if (is.null(location)) { # predict for all observed locations
     facts <- matrix(0, ncol=out$draws, nrow=out$n.times*out$n.locs)
     for(i in 1:out$draws){
@@ -126,7 +123,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
                          out$model.matrices$linear.Tsub)%*%betapred
 
     ### Xi (seasonal)
-    predS.xi = as(kronecker(predS, diag(out$n.seasn.knots)), "sparseMatrix")
+    predS.xi = methods::as(kronecker(predS, diag(out$n.seasn.knots)), "sparseMatrix")
     ximean <- predS.xi%*%t(out$alpha.xi)
     if(pred.int){
         xiresid <- matrix(rnorm(nrow(location)*out$n.seasn.knots*out$draws,
@@ -226,6 +223,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' @param new_x If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.
 #' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic of the predicted values to return.
 #' @param par.mfrow A vector of length 2 indicating the number of rows and columns to divide the plotting window. Default is \code{c(1,1)}.
+#' @param pred.int Logical scalar indicating whether the interval should be a posterior predictive interval (default; \code{TRUE}) or a posterior credible interval (\code{FALSE}).
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param uncertainty Logical scalar indicating whether to plot the uncertainty bounds (\code{TRUE}; default) or not.
 #' @param xrange A date vector of length 2 providing the lower and upper bounds of the dates to include in the plot.
@@ -236,9 +234,9 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' plot.location(out, location=1, pred.int=FALSE)
-#' @export plot.location
-plot.location = function(out, location, new_x=NULL,
+#' plot_location(out, location=1, pred.int=FALSE)
+#' @export plot_location
+plot_location = function(out, location, new_x=NULL,
                          type='mean', par.mfrow=c(1,1), pred.int=TRUE,
                          ci.level = c(0.025, 0.975),
                          uncertainty=TRUE, xrange=NULL, truth=FALSE,
@@ -297,20 +295,19 @@ plot.location = function(out, location, new_x=NULL,
     mylegcols <- c("black")
     mylwd <- c(1)
     if (uncertainty) {
-      polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(ymat.preds.lb[xlims,i], rev(ymat.preds.ub[xlims,i])), border=NA, col=rgb(.5, .5, .5, .4))
-      #lines(ymat.preds.ub[xlims,i], x=out$dates[xlims], col='green', lty=2)
+      polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(ymat.preds.lb[xlims,i], rev(ymat.preds.ub[xlims,i])), border=NA, col=grDevices::rgb(.5, .5, .5, .4))
       mylegend <- c(mylegend, paste(100*(ci.level[2]-ci.level[1]), "% Uncertainty", sep=""))
       mylines <- c(mylines, 1)
       mydots <- c(mydots, NA)
-      mylegcols <- c(mylegcols, rgb(.5, .5, .5, .4))
+      mylegcols <- c(mylegcols, grDevices::rgb(.5, .5, .5, .4))
       mylwd <- c(mylwd, 3)
     }
     if (truth & is.null(dim(location))) {
-      points(y=out$ymat[xlims,location[i]],x=out$dates[xlims], col=rgb(.5, .5, .5,1))
+      points(y=out$ymat[xlims,location[i]],x=out$dates[xlims], col=grDevices::rgb(.5, .5, .5,1))
       mylegend <- c(mylegend, paste("Observations"))
       mylines <- c(mylines, NA)
       mydots <- c(mydots, 21)
-      mylegcols <- c(mylegcols, rgb(.5, .5, .5, 1))
+      mylegcols <- c(mylegcols, grDevices::rgb(.5, .5, .5, 1))
       mylwd <- c(mylwd, NA)
     }
     legend("topright", legend=mylegend, lty=mylines, lwd=mylwd, col=mylegcols, pch=mydots)
@@ -326,7 +323,7 @@ plot.location = function(out, location, new_x=NULL,
 #' @param parameter One of \code{"slope"} (default), \code{"loading"}, or \code{"mean"}.
 #' @param loadings If \code{parameter="loading"}, an integer indicating which factor loading to plot.
 #' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.
-#' @param yearscsale If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
+#' @param yearscale If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param color.gradient The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)}.
 #' @returns A plot of spatially-dependent parameter values for the observed locations.
@@ -334,12 +331,12 @@ plot.location = function(out, location, new_x=NULL,
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' plot.grid(out, parameter="slope")
+#' plot_spatial_param(out, parameter="slope")
 #' @import ggplot2
 #' @importFrom RColorBrewer brewer.pal
-#' @export plot.grid
-plot.grid = function(out, parameter, loadings=1, type='mean', ci.level=c(0.025, 0.975), yearscale=TRUE,
-                     color.gradient=colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)) {
+#' @export plot_spatial_param
+plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=c(0.025, 0.975), yearscale=TRUE,
+                     color.gradient=grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)) {
 
   if (parameter=='slope') {
     if (type=='mean') vals = apply(out$beta,2,mean)
@@ -404,7 +401,8 @@ plot.grid = function(out, parameter, loadings=1, type='mean', ci.level=c(0.025, 
 #' @param parameter One of \code{"slope"} (default), \code{"loading"}, or \code{"mean"}.
 #' @param loadings If \code{parameter="loading"}, an integer indicating which factor loading to plot.
 #' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.
-#' @param yearscsale If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
+#' @param yearscale If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
+#' @param new_x If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param fine Integer specifying the number of grid points along both the longitude and latitude directions used to interpolate the parameter. The resulting interpolation grid will contain \code{fine*fine} total locations. If \code{map=TRUE}, \code{state=TRUE}, and \code{location} is specified, the grid will be clipped to the boundaries of the specified state, removing locations outside of it.
 #' @param color.gradient The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(fine)}.
@@ -418,7 +416,7 @@ plot.grid = function(out, parameter, loadings=1, type='mean', ci.level=c(0.025, 
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' plot.map(out, parameter="slope", map=T, state=T, location='utah', fine=50)
+#' map_spatial_param(out, parameter="slope", map=TRUE, state=TRUE, location='utah', fine=50)
 #' @importFrom npreg basis.tps
 #' @importFrom sf st_sfc
 #' @importFrom sf st_polygon
@@ -426,15 +424,13 @@ plot.grid = function(out, parameter, loadings=1, type='mean', ci.level=c(0.025, 
 #' @importFrom ggpubr ggarrange
 #' @importFrom RColorBrewer brewer.pal
 #' @import sf
-#' @export plot.map
-plot.map = function(out, parameter='slope', loadings=1, type='mean',
+#' @export map_spatial_param
+map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
                     yearscale=TRUE, new_x=NULL,
                     ci.level=c(0.025, 0.975), fine=100,
-                    color.gradient=colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(fine),
+                    color.gradient=grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(fine),
                     with.uncertainty=FALSE, map=FALSE, state=FALSE, location=NULL,
                     addthin=1) {
-
-  # FIX ME - do functions like bisquare2d work in this function?
 
   if (map) {
     if (!state) {
@@ -613,27 +609,24 @@ plot.map = function(out, parameter='slope', loadings=1, type='mean',
   }
 
   if (!map) {
-    m <- ggplot2::ggplot(aes(x=Lon, y=Lat, fill=predm), data=predloc) +
-      #geom_point(aes(x=Lon, y=Lat, color=predm)) +
-      geom_raster(interpolate=T) +
+    m <- ggplot2::ggplot(aes(x=.data$Lon, y=.data$Lat, fill=.data$predm), data=predloc) +
+      geom_raster(interpolate=TRUE) +
       scale_fill_gradientn(colours=color.gradient, name=legend.name,
                              limits = c(min_value, max_value)) +
       ggtitle(plot.title) + xlab("Longitude") + ylab("Latitude")
     if (!with.uncertainty) print(m)
     if (with.uncertainty) {
-      l <- ggplot(data=predloc, aes(x=Lon, y=Lat, fill=predl)) +
-        #geom_point(aes(x=Lon, y=Lat, color=predl)) +
-        geom_raster(interpolate=T) +
+      l <- ggplot(data=predloc, aes(x=.data$Lon, y=.data$Lat, fill=.data$predl)) +
+        geom_raster(interpolate=TRUE) +
         scale_fill_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Lower Bound')) + xlab("Longitude") + ylab("Latitude")
-      u <- ggplot(data=predloc, aes(x=Lon, y=Lat, fill=predu)) +
-        #geom_point(aes(x=Lon, y=Lat, color=predu)) +
-        geom_raster(interpolate=T) +
+      u <- ggplot(data=predloc, aes(x=.data$Lon, y=.data$Lat, fill=.data$predu)) +
+        geom_raster(interpolate=TRUE) +
         scale_fill_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Upper Bound')) + xlab("Longitude") + ylab("Latitude")
-      print(ggpubr::ggarrange(l, m, u, nrow=1, common.legend=T, legend="right"))
+      print(ggpubr::ggarrange(l, m, u, nrow=1, common.legend=TRUE, legend="right"))
     }
   }
 
@@ -662,23 +655,21 @@ plot.map = function(out, parameter='slope', loadings=1, type='mean',
     m = ggplot() +
       ## First layer: worldwide map
       geom_polygon(data = full_map,
-                   aes(x=long, y=lat, group = group),
+                   aes(x=.data$long, y=.data$lat, group = .data$group),
                    color = '#9c9c9c', fill = '#f3f3f3') +
       ## Second layer: Country map
       geom_polygon(data = map_data_loc,
-                   aes(x=long, y=lat, group = group),
+                   aes(x=.data$long, y=.data$lat, group = .data$group),
                    color = '#9c9c9c', fill='#f3f3f3') +
       coord_map() +
       coord_fixed(1.3,
                   xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                   ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
       ggtitle(plot.title) + # FIX ME
-      theme(panel.background =element_rect(fill = rgb(0.67, .84, .89, .35))) +
-      #geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predm)) +
-      geom_raster(data=predloc.inside, aes(x=Lon, y=Lat, fill=predm)) +
+      theme(panel.background =element_rect(fill = grDevices::rgb(0.67, .84, .89, .35))) +
+      geom_raster(data=predloc.inside, aes(x=.data$Lon, y=.data$Lat, fill=.data$predm)) +
       scale_fill_gradientn(colours=color.gradient, name=legend.name,
                              limits = c(min_value, max_value)) +
-                             # limits = c(-0.7, 0.7)) + # FIX ME
       xlab('Longitude') +
       ylab('Latitude')
     if(!with.uncertainty){print(m)}
@@ -688,20 +679,19 @@ plot.map = function(out, parameter='slope', loadings=1, type='mean',
       l = ggplot() +
         ## First layer: worldwide map
         geom_polygon(data = full_map,
-                     aes(x=long, y=lat, group = group),
+                     aes(x=.data$long, y=.data$lat, group = .data$group),
                      color = '#9c9c9c', fill = '#f3f3f3') +
         ## Second layer: Country map
         geom_polygon(data = map_data_loc,
-                     aes(x=long, y=lat, group = group),
+                     aes(x=.data$long, y=.data$lat, group = .data$group),
                      color = 'gray', fill='gray') +
         coord_map() +
         coord_fixed(1.3,
                     xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                     ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Lower Bound')) +
-        theme(panel.background =element_rect(fill = rgb(0.67, .84, .89, .35))) +
-        #geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predl)) +
-        geom_raster(data=predloc.inside, aes(x=Lon, y=Lat, fill=predl), interpolate=T) +
+        theme(panel.background =element_rect(fill = grDevices::rgb(0.67, .84, .89, .35))) +
+        geom_raster(data=predloc.inside, aes(x=.data$Lon, y=.data$Lat, fill=.data$predl), interpolate=TRUE) +
         scale_fill_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +
         xlab('Longitude') +
@@ -710,26 +700,25 @@ plot.map = function(out, parameter='slope', loadings=1, type='mean',
       u = ggplot() +
         ## First layer: worldwide map
         geom_polygon(data = full_map,
-                     aes(x=long, y=lat, group = group),
+                     aes(x=.data$long, y=.data$lat, group = .data$group),
                      color = '#9c9c9c', fill = '#f3f3f3') +
         ## Second layer: Country map
         geom_polygon(data = map_data_loc,
-                     aes(x=long, y=lat, group = group),
+                     aes(x=.data$long, y=.data$lat, group = .data$group),
                      color = 'gray', fill='gray') +
         coord_map() +
         coord_fixed(1.3,
                     xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                     ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Upper Bound')) +
-        theme(panel.background =element_rect(fill = rgb(0.67, .84, .89, .35))) +
-        #geom_point(data=predloc.inside, aes(x=Lon, y=Lat, color=predu)) +
-        geom_raster(data=predloc.inside, aes(x=Lon, y=Lat, fill=predu), interpolate=T) +
+        theme(panel.background =element_rect(fill = grDevices::rgb(0.67, .84, .89, .35))) +
+        geom_raster(data=predloc.inside, aes(x=.data$Lon, y=.data$Lat, fill=.data$predu), interpolate=TRUE) +
         scale_fill_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +
         xlab('Longitude') +
         ylab('Latitude')
 
-      print(ggpubr::ggarrange(l, m, u, nrow=1, common.legend=T, legend="right"))
+      print(ggpubr::ggarrange(l, m, u, nrow=1, common.legend=TRUE, legend="right"))
     }
   }
 
@@ -750,13 +739,11 @@ plot.map = function(out, parameter='slope', loadings=1, type='mean',
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' plot.factor(out, factor=1:4, together=T)
-#' @export plot.factor
-plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
-                       type='mean', uncertainty=T, ci.level=c(0.025, 0.975),
+#' plot_factor(out, factor=1:4, together=TRUE)
+#' @export plot_factor
+plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
+                       type='mean', uncertainty=TRUE, ci.level=c(0.025, 0.975),
                        xrange=NULL) {
-
-  par(mfrow=c(1,1))
 
   if (type=='mean') F.tilde = matrix(apply(out$F.tilde,2,mean),nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)
   if (type=='median') F.tilde = matrix(apply(out$F.tilde,2,median),nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)
@@ -802,7 +789,7 @@ plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
       }else{ylims <- range(F.tilde)}
       plot(y=F.tilde[xlims,i], x=out$dates[xlims], type='l', main=paste('Factor', i),
            xlab = 'Time', ylab='Value', lwd=2, ylim=ylims)
-      if(uncertainty){polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(F.tilde.lb[xlims,i], rev(F.tilde.ub[xlims,i])), col=rgb(.5, .5, .5,.4), border=NA)}
+      if(uncertainty){polygon(x=c(out$dates[xlims], rev(out$dates[xlims])), y=c(F.tilde.lb[xlims,i], rev(F.tilde.ub[xlims,i])), col=grDevices::rgb(.5, .5, .5,.4), border=NA)}
     }
   }
 
@@ -822,10 +809,10 @@ plot.factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' plot.annual(out, location=1)
+#' plot_annual(out, location=1)
 #' @importFrom mgcv cSplineDes
-#' @export plot.annual
-plot.annual <- function(out, location, add=F,
+#' @export plot_annual
+plot_annual <- function(out, location, add=F,
                         years="one",
                         interval=0.95, yrange=NULL,
                         new_x=NULL){
@@ -840,7 +827,7 @@ plot.annual <- function(out, location, add=F,
     doy.pred <- as.numeric(strftime(dates.pred, format="%j"))
     months.plot <- seq(as.Date("2001-01-01"), as.Date("2001-12-31"), by="month") # 2001 doesn't matter; just gets correct month
     at.doy.plot <- as.numeric(strftime(months.plot, format="%j"))
-    months.plot <- months(months.plot, abbreviate=T)
+    months.plot <- months(months.plot, abbreviate=TRUE)
   }
 
   knots <- seq(1, 366, length=out$n.seasn.knots+1)
@@ -856,10 +843,10 @@ plot.annual <- function(out, location, add=F,
     }else{
       ann.pred.bounds <- NULL
     }
-    if(add==T){
+    if(add){
       lines(dates.pred, ann.pred.mean, lwd=1.5)
       if(interval>0){
-        polygon(c(dates.pred, rev(dates.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=rgb(.5, .5, .5, .4), border=NA)
+        polygon(c(dates.pred, rev(dates.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=grDevices::rgb(.5, .5, .5, .4), border=NA)
       }
       lines(dates.pred, ann.pred.mean, lwd=2)
     }else{ #end if add==T
@@ -868,8 +855,8 @@ plot.annual <- function(out, location, add=F,
       }else{
         y.this <- NULL
       }
-      if(is.null(yrange)==T){
-        ylims <- range(c(ann.pred.mean, ann.pred.bounds, y.this), na.rm=T)
+      if(is.null(yrange)==TRUE){
+        ylims <- range(c(ann.pred.mean, ann.pred.bounds, y.this), na.rm=TRUE)
       }else{
         ylims <- yrange
       }
@@ -881,10 +868,10 @@ plot.annual <- function(out, location, add=F,
       }
       if(interval>0){
         if(years=="all"){
-          polygon(c(dates.pred, rev(dates.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=rgb(.5, .5, .5, .4), border=NA)
+          polygon(c(dates.pred, rev(dates.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=grDevices::rgb(.5, .5, .5, .4), border=NA)
           lines(dates.pred, ann.pred.mean, lwd=1.5)
         }else{
-          polygon(c(doy.pred, rev(doy.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=rgb(.5, .5, .5, .4), border=NA)
+          polygon(c(doy.pred, rev(doy.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=grDevices::rgb(.5, .5, .5, .4), border=NA)
           lines(doy.pred, ann.pred.mean, lwd=1.5)
         }
       }
@@ -892,9 +879,9 @@ plot.annual <- function(out, location, add=F,
       if(length(y)>0){
         if(years=="all"){
           dates.data <- as.Date(out$dates)
-          points(dates.data, y.this, col=rgb(.5, .5, .5, .25))
+          points(dates.data, y.this, col=grDevices::rgb(.5, .5, .5, .25))
         }else{
-          points(x_set, y.this, col=rgb(.5, .5, .5,.25))
+          points(x_set, y.this, col=grDevices::rgb(.5, .5, .5,.25))
         }
       }
     }
@@ -935,7 +922,7 @@ plot.annual <- function(out, location, add=F,
       predS <- predS[complete.cases(predS),]
     }
 
-    predS.xi = as(kronecker(predS, diag(out$n.seasn.knots)), "sparseMatrix")
+    predS.xi = methods::as(kronecker(predS, diag(out$n.seasn.knots)), "sparseMatrix")
     ximean <- predS.xi%*%t(out$alpha.xi)
     xiresid <- matrix(rnorm(nrow(location)*out$n.seasn.knots*out$draws,
                             mean=rep(0,nrow(location)*out$n.seasn.knots*out$draws),
@@ -950,8 +937,8 @@ plot.annual <- function(out, location, add=F,
       ann.pred.bounds <- NULL
     }
 
-    if(is.null(yrange)==T){
-      ylims <- range(c(ann.pred.mean, ann.pred.bounds), na.rm=T)
+    if(is.null(yrange)){
+      ylims <- range(c(ann.pred.mean, ann.pred.bounds), na.rm=TRUE)
     }else{
       ylims <- yrange
     }
@@ -963,10 +950,10 @@ plot.annual <- function(out, location, add=F,
     }
     if(interval>0){
       if(years=="all"){
-        polygon(c(dates.pred, rev(dates.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=rgb(.5, .5, .5, .4), border=NA)
+        polygon(c(dates.pred, rev(dates.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=grDevices::rgb(.5, .5, .5, .4), border=NA)
         lines(dates.pred, ann.pred.mean, lwd=1.5)
       }else{
-        polygon(c(doy.pred, rev(doy.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=rgb(.5, .5, .5, .4), border=NA)
+        polygon(c(doy.pred, rev(doy.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=grDevices::rgb(.5, .5, .5, .4), border=NA)
         lines(doy.pred, ann.pred.mean, lwd=1.5)
       }
     }

@@ -176,7 +176,7 @@ This function uses MCMC to draw from posterior distributions of a Bayesian spati
 \examples{
 data(utahDataList)
 attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=1000)
 }
 \author{
 Adam Simpson and Candace Berrett

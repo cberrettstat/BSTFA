@@ -37,8 +37,10 @@ A plot of spatially-dependent parameter values for the observed locations.
 Plot the spatially-dependent parameter for in-sample locations.
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 plot_spatial_param(out, parameter="slope")
+}
 }

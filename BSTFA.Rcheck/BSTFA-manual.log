@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.13)  22 MAY 2025 13:22
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.13)  28 MAY 2025 14:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -288,7 +288,7 @@ File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count302
 \l__pdf_internal_box=\box59
-) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.aux)
+) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -310,16 +310,10 @@ LaTeX Font Info:    ... okay on input line 8.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 8.
 LaTeX Font Info:    ... okay on input line 8.
 Package hyperref Info: Link coloring ON on input line 8.
- (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.out) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.out)
+ (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.out) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
-LaTeX Info: Symbol \textasciigrave not provided by
-            font family ptm in TS1 encoding.
-            Default family used instead on input line 21.
-LaTeX Info: Symbol \textasciigrave not provided by
-            font family ptm in TS1 encoding.
-            Default family used instead on input line 21.
 LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 36.
  (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
@@ -337,7 +331,7 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 LaTeX Font Info:    Trying to load font information for U+rsfs on input line 36.
  (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
-) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.toc
+) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.toc
 
 [1
 
@@ -523,51 +517,56 @@ Overfull \hbox (6.6876pt too wide) in paragraph at lines 481--482
 [14]
 
 [15]
-Overfull \hbox (33.8784pt too wide) in paragraph at lines 659--660
+Overfull \hbox (33.8784pt too wide) in paragraph at lines 655--656
 []\T1/ptm/m/n/10 Maximum dis-tance be-tween an ob-ser-va-tion and a knot. De-fault is []\T1/zi4/m/n/10 mean(dist(coords))[]\T1/ptm/m/n/10 . 
  []
 
 
 
 [16]
+Overfull \hbox (24.76044pt too wide) in paragraph at lines 710--710
+ []  \T1/zi4/m/n/10 color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =[] 
+ []
+
+
 
 [17]
+Overfull \hbox (104.41895pt too wide) in paragraph at lines 739--740
+[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
+ []
+
+
+Overfull \hbox (37.80907pt too wide) in paragraph at lines 747--748
+[]\T1/ptm/m/n/10 Name of re-gion to in-clude in the map. Fed to []\T1/zi4/m/n/10 region []\T1/ptm/m/n/10 in the func-tion []\T1/zi4/m/n/10 ggplot2::map_data[]\T1/ptm/m/n/10 . 
+ []
+
+LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
+(Font)              scaled to size 9.0pt on input line 762.
+
 
 [18]
 
 [19]
-Overfull \hbox (33.09036pt too wide) in paragraph at lines 856--856
- []  \T1/zi4/m/n/10 color.gradient = colorRampPalette(rev(RColorBrewer::brewer.pal(9, name = "RdBu")))(50)[] 
- []
-
-
-Overfull \hbox (104.41895pt too wide) in paragraph at lines 873--874
-[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
- []
-
-
 
 [20]
 
 [21]
-Overfull \hbox (104.41895pt too wide) in paragraph at lines 995--996
-[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
+Overfull \hbox (24.76044pt too wide) in paragraph at lines 982--982
+ []  \T1/zi4/m/n/10 color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =[] 
  []
 
 
 
 [22]
-Overfull \hbox (37.80907pt too wide) in paragraph at lines 1003--1004
-[]\T1/ptm/m/n/10 Name of re-gion to in-clude in the map. Fed to []\T1/zi4/m/n/10 region []\T1/ptm/m/n/10 in the func-tion []\T1/zi4/m/n/10 ggplot2::map_data[]\T1/ptm/m/n/10 . 
+Overfull \hbox (104.41895pt too wide) in paragraph at lines 1002--1003
+[]\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
  []
 
-LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 9.0pt on input line 1020.
 
 
 [23]
 
-[24] (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.ind
+[24] (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.ind
 
 [25]
 
@@ -576,27 +575,27 @@ LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
 [26
 
 
-]) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpxMlgIy/Rd2pdfecdb71d5960/Rd2.aux)
+]) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `Rd2.out' has not changed.
-(rerunfilecheck)             Checksum: D19996014CE5E5579722B5C2A53AE278;2133.
+(rerunfilecheck)             Checksum: BF10395461C6C8D7D639502B1B12CC5C;2295.
  ) 
 Here is how much of TeX's memory you used:
- 10503 strings out of 475111
- 160752 string characters out of 5762982
+ 10500 strings out of 475111
+ 160909 string characters out of 5762982
  553985 words of memory out of 5000000
- 33183 multiletter control sequences out of 15000+600000
- 593303 words of font info for 81 fonts, out of 8000000 for 9000
+ 33181 multiletter control sequences out of 15000+600000
+ 592968 words of font info for 80 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 92i,6n,95p,989b,735s stack positions out of 10000i,1000n,20000p,200000b,200000s
- </Users/cberrett/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.600pk></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (26 pages, 147913 bytes).
+ 92i,6n,95p,989b,733s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (26 pages, 147895 bytes).
 PDF statistics:
- 427 PDF objects out of 1000 (max. 8388607)
- 381 compressed objects within 4 object streams
+ 422 PDF objects out of 1000 (max. 8388607)
+ 377 compressed objects within 4 object streams
  157 named destinations out of 1000 (max. 500000)
  161 words of extra memory for PDF output out of 10000 (max. 10000000)
 

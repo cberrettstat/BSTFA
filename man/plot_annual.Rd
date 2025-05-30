@@ -36,8 +36,10 @@ A plot of the annual/seasonal process at \code{location}.
 Plot annual curve
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 plot_annual(out, location=1)
+}
 }
