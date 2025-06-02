@@ -20,8 +20,13 @@ A list containing convergence diagnostic for all parameters.
 Check effective sample size and geweke diagnostic
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 convergence_diag(out)
+}
+}
+\author{
+Adam Simpson
 }

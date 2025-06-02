@@ -13,13 +13,15 @@ makePredS               Create a matrix of bisquare bases for new
                         locations.
 map_spatial_param       Plot a map of interpolated spatially-dependent
                         parameter values.
-plot_annual             Plot annual curve
-plot_factor             Plot the factors
-plot_fourier_bases      Visualize fourier bases. Used internally.
+plot_annual             Plot annual/seasonal behavior at a specific
+                        location.
+plot_factor             Plot the temporally-dependent factors.
+plot_fourier_bases      Visualize fourier bases.
 plot_location           Plot a location's time series of
-                        estimated/interpolated values.
+                        estimated/predicted values.
 plot_spatial_param      Plot the spatially-dependent parameter for
                         in-sample locations.
 plot_trace              Plot trace plots
-predictBSTFA            Prediction
+predictBSTFA            Estimate/predict values of the time series at a
+                        specific location.
 utahDataList            Utah Minimum Temperatures

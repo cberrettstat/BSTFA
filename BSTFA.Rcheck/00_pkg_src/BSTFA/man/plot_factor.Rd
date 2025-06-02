@@ -2,7 +2,7 @@
 % Please edit documentation in R/posterior_inference.R
 \name{plot_factor}
 \alias{plot_factor}
-\title{Plot the factors}
+\title{Plot the temporally-dependent factors.}
 \usage{
 plot_factor(
   out,
@@ -36,11 +36,16 @@ plot_factor(
 A plot of spatially-dependent parameter values for a grid of interpolated locations.
 }
 \description{
-Plot the factors
+Plot the temporally-dependent factors.
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 plot_factor(out, factor=1:4, together=TRUE)
+}
+}
+\author{
+Candace Berrett and Adam Simpson
 }

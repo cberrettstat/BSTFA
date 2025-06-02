@@ -25,13 +25,13 @@ map_spatial_param(
 \arguments{
 \item{out}{Output from BSTFA or BSTFAfull.}
 
-\item{parameter}{One of \code{"slope"} (default), \code{"loading"}, or \code{"mean"}.}
+\item{parameter}{One of \code{'slope'} (default), \code{'loading'}, or \code{'mean'}.}
 
-\item{loadings}{If \code{parameter="loading"}, an integer indicating which factor loading to plot.}
+\item{loadings}{If \code{parameter='loading'}, an integer indicating which factor loading to plot.}
 
 \item{type}{One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.}
 
-\item{yearscale}{If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).}
+\item{yearscale}{If \code{parameter='slope'}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).}
 
 \item{new_x}{If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.}
 
@@ -62,6 +62,9 @@ Plot a map of interpolated spatially-dependent parameter values.
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-map_spatial_param(out, parameter="slope", map=TRUE, state=TRUE, location='utah', fine=50)
+map_spatial_param(out, parameter='slope', map=TRUE, state=TRUE, location='utah', fine=50)
 }
+}
+\author{
+Adam Simpson and Candace Berrett
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/posterior_inference.R
 \name{predictBSTFA}
 \alias{predictBSTFA}
-\title{Prediction}
+\title{Estimate/predict values of the time series at a specific location.}
 \usage{
 predictBSTFA(
   out,
@@ -27,14 +27,19 @@ predictBSTFA(
 \item{pred.int}{Logical scalar indicating whether to include additional uncertainty for posterior predictive intervals (\code{TRUE}; default) or not (posterior draws from the mean of \code{location}).}
 }
 \value{
-A matrix or vector of predicted values for \code{location}.
+A matrix or vector of estimated/predicted values for \code{location}.
 }
 \description{
-Prediction
+Estimate/predict values of the time series at a specific location.
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
+}
+}
+\author{
+Candace Berrett and Adam Simpson
 }

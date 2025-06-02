@@ -23,3 +23,6 @@ out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 compute_summary(out)
 }
 }
+\author{
+Adam Simpson
+}

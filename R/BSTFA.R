@@ -4,14 +4,14 @@
 #'
 #' This function uses MCMC to draw from posterior distributions of a Bayesian spatio-temporal factor analysis model.  All spatial processes use one of Fourier, thin plate spline, or multiresolution basis functions.  The temporally-dependent factors use Fourier bases.  The default values are chosen to work well for many data sets.  Thus, it is possible to use this function using only three arguments: \code{ymat}, \code{dates}, and \code{coords}.  The default number of MCMC iterations is 10000 (saving 5000); however, depending on the number of observations and processes modeled, it may need more draws than this to ensure the posterior draws are representative of the entire posterior distribution space.
 #' @param ymat Data matrix of size \code{n.times} by \code{n.locs}. Any missing data should be marked by \code{NA}.  The model works best if the data are zero-centered for each location.
-#' @param dates \code{n.times} length vector of class \code{"Date"} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).
+#' @param dates \code{n.times} length vector of class \code{'Date'} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).
 #' @param coords \code{n.locs} by \code{2} matrix or data frame of coordinates for the locations of the observed data. If using longitude and latitude, longitude is assumed to be the first coordinate.
 #' @param iters Number of MCMC iterations to draw.  Default value is \code{10000}.  Function only saves \code{(iters-burn)/thin} drawn values.
 #' @param n.times Number of observations for each location. Default is \code{nrow(ymat)}.
 #' @param n.locs Number of observed locations.  Default is \code{ncol(ymat)}.
 #' @param x Optional \code{n.locs} by \code{p} matrix of covariates for each location.  If there are no covariates, set to \code{NULL} (default).
 #' @param mean Logical scalar.  If \code{TRUE}, the model will fit a spatially-dependent mean for each location.  Otherwise, the model will assume the means are zero at each location (default).
-#' @param linear Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or "slope") in time. Otherwise, the model will assume a zero change in slope across time.
+#' @param linear Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or slope) in time. Otherwise, the model will assume a zero change in slope across time.
 #' @param seasonal Logical scalar. If \code{TRUE} (default), the model will use circular b-splines to model a spatially-dependent annual process.  Otherwise, the model will assume there is no seasonal (annual) process.
 #' @param factors Logical scalar. If \code{TRUE} (default), the model will fit a spatio-temporal factor analysis model with temporally-dependent factors and spatially-dependent loadings.
 #' @param n.seasn.knots Numeric scalar indicating the number of knots to use for the seasonal basis components. The default value is \code{min(7, ceiling(length(unique(yday(dates)))/3))}, where 7 will capture approximately 2 peaks during the year.
@@ -117,16 +117,7 @@ BSTFA <- function(ymat, dates, coords,
 
   start <- Sys.time()
 
-  # require(MASS) # mvrnorm only
-  # require(Matrix) # sparse matrices, t() function
-  # require(matrixcalc) # vec function only
-  # require(mgcv) # cSplineDes function only
-  # require(coda) # as.mcmc function only
-  # require(npreg) # basis.tps function only
-
-  #par(mfrow=c(1,1))
-
-  ### Prepare to deal with missing data
+  ### Prepare missing data
   # Make missing values 0 for now, but they will be estimated differently
   y <- c(ymat)
   missing = ifelse(is.na(y), TRUE, FALSE)

@@ -12,7 +12,7 @@ bisquare1d(locs, knots)
 \item{knots}{A vector of the number of knots for each resolution.}
 }
 \description{
-Function to evaluate bisquare bases for 1-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
+Evaluate bisquare bases for 1-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
 }
 \author{
 Candace Berrett and Adam Simpson

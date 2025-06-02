@@ -20,6 +20,18 @@ Type 'q()' to quit R.
 > pkgname <- "BSTFA"
 > source(file.path(R.home("share"), "R", "examples-header.R"))
 > options(warn = 1)
+> base::assign(".ExTimings", "BSTFA-Ex.timings", pos = 'CheckExEnv')
+> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
+> base::assign(".format_ptime",
++ function(x) {
++   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
++   if(!is.na(x[5L])) x[2L] <- x[2L] + x[5L]
++   options(OutDec = '.')
++   format(x[1L:3L], digits = 7L)
++ },
++ pos = 'CheckExEnv')
+> 
+> ### * </HEADER>
 > library('BSTFA')
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
@@ -30,1072 +42,294 @@ Type 'q()' to quit R.
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: BSTFA
 > ### Title: Reduced BSTFA function
 > ### Aliases: BSTFA
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=1000)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 1000 iterations."
-[1] "Finished iteration 100: taken 0.44 minutes."
-[1] "Finished iteration 200: taken 0.89 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 300: taken 1.44 minutes."
-[1] "Finished iteration 400: taken 2.1 minutes."
-[1] "Finished iteration 500: taken 2.76 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 600: taken 3.42 minutes."
-[1] "Finished iteration 700: taken 4.1 minutes."
-[1] "Finished iteration 800: taken 4.77 minutes."
-[1] "Finished iteration 900: taken 5.44 minutes."
-[1] "Finished iteration 1000: taken 6.1 minutes."
-[1] "Finished MCMC Sampling"
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("BSTFA", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("BSTFAfull")
 > ### * BSTFAfull
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: BSTFAfull
 > ### Title: Full BSTFA function
 > ### Aliases: BSTFAfull
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFAfull(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=50)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 50 iterations."
-[1] "Finished iteration 5: taken 0.02 minutes."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Starting FA now!"
-[1] "Finished iteration 15: taken 0.53 minutes."
-[1] "Finished iteration 20: taken 1.4 minutes."
-[1] "Finished iteration 25: taken 2.29 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 30: taken 3.18 minutes."
-[1] "Finished iteration 35: taken 4.08 minutes."
-[1] "Finished iteration 40: taken 4.96 minutes."
-[1] "Finished iteration 45: taken 5.84 minutes."
-[1] "Finished iteration 50: taken 6.73 minutes."
-[1] "Finished MCMC Sampling"
+> ## Not run: 
+> ##D #Example below not run; even the ten iterations will take a minute or two to run.
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFAfull(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=10)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("BSTFAfull", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("computeLogLik")
 > ### * computeLogLik
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: computeLogLik
 > ### Title: Compute log-likelihood
 > ### Aliases: computeLogLik
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 100 iterations."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Finished iteration 20: taken 0.09 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 30: taken 0.15 minutes."
-[1] "Finished iteration 40: taken 0.23 minutes."
-[1] "Finished iteration 50: taken 0.29 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 60: taken 0.36 minutes."
-[1] "Finished iteration 70: taken 0.43 minutes."
-[1] "Finished iteration 80: taken 0.5 minutes."
-[1] "Finished iteration 90: taken 0.56 minutes."
-[1] "Finished iteration 100: taken 0.63 minutes."
-[1] "Finished MCMC Sampling"
-> loglik <- computeLogLik(out, addthin=2)
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+> ##D loglik <- computeLogLik(out, addthin=2)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("computeLogLik", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("compute_summary")
 > ### * compute_summary
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: compute_summary
 > ### Title: Print computation summary
 > ### Aliases: compute_summary
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 100 iterations."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Finished iteration 20: taken 0.09 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 30: taken 0.15 minutes."
-[1] "Finished iteration 40: taken 0.21 minutes."
-[1] "Finished iteration 50: taken 0.28 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 60: taken 0.35 minutes."
-[1] "Finished iteration 70: taken 0.41 minutes."
-[1] "Finished iteration 80: taken 0.48 minutes."
-[1] "Finished iteration 90: taken 0.55 minutes."
-[1] "Finished iteration 100: taken 0.61 minutes."
-[1] "Finished MCMC Sampling"
-> compute_summary(out)
-[1] "Setup Time: 1.053 seconds."
-[1] "PARAMETERS"
-[1] "Beta: 0.003 seconds per iter."
-[1] "Xi: 0.266 seconds per iter."
-[1] "F: 0.072 seconds per iter."
-[1] "Lambda: 0.054 seconds per iter."
-[1] "Sigma2: 0.00199 seconds per iter."
-[1] "OVERALL PER ITERATION"
-[1] "Pre-Factor Analysis: 0.271 seconds."
-[1] "Post-Factor Analysis: 0.397 seconds."
-[1] "TOTAL TIME"
-[1] "Total time: 37.632 seconds (0.627 minutes) for 100 iterations."
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+> ##D compute_summary(out)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("compute_summary", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("convergence_diag")
 > ### * convergence_diag
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: convergence_diag
 > ### Title: Check effective sample size and geweke diagnostic
 > ### Aliases: convergence_diag
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 100 iterations."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Finished iteration 20: taken 0.09 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 30: taken 0.15 minutes."
-[1] "Finished iteration 40: taken 0.21 minutes."
-[1] "Finished iteration 50: taken 0.28 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 60: taken 0.35 minutes."
-[1] "Finished iteration 70: taken 0.42 minutes."
-[1] "Finished iteration 80: taken 0.49 minutes."
-[1] "Finished iteration 90: taken 0.55 minutes."
-[1] "Finished iteration 100: taken 0.62 minutes."
-[1] "Finished MCMC Sampling"
-> convergence_diag(out)
-$beta
-     var1      var2      var3      var4      var5      var6      var7      var8 
- 5.434800  5.345507  2.403782 50.000000  3.323923  2.764289  4.070064 50.000000 
-     var9     var10     var11     var12     var13     var14     var15     var16 
-56.506060  2.909939 50.000000  7.024609  5.393512  3.759134 15.717038  3.749023 
-    var17     var18     var19     var20     var21     var22     var23     var24 
-11.366487  4.715338  1.277666  2.940072  4.280433  3.197265 50.000000  2.764443 
-    var25     var26     var27     var28     var29     var30     var31     var32 
- 9.927838  2.321216  9.008020 63.593513  5.610025  5.655443  6.201630 50.000000 
-    var33     var35     var36     var37     var38     var39     var40     var41 
-15.565432 10.153300 11.239922  5.640753  4.280810  9.764342  9.741993 50.000000 
-    var42     var43     var44     var45     var46     var47     var48     var49 
- 4.139203 12.531984  6.407551  4.052991  1.251920 50.000000  5.917705 38.527717 
-    var50     var51     var52     var53     var54     var55     var56     var57 
-50.000000 10.331030  8.288125  3.835527  8.487643  5.902353  1.302043 50.000000 
-    var58     var59     var60     var61     var62     var63     var64     var65 
-50.000000 12.888020  6.073903  7.249276 50.000000  9.543073 11.921749  2.195147 
-    var66     var67     var68     var69     var70     var71     var72     var73 
-93.560357 10.170325  2.335968  3.867883  6.521604  5.420259 50.000000 50.000000 
-    var74     var75     var76     var77     var78     var79     var80     var81 
- 8.048528 12.666456  7.417531  4.354576 50.000000 23.838665  8.353259 12.373432 
-    var82     var84     var85     var86     var87     var88     var89     var90 
-50.000000 12.986914  5.279410  8.770507  5.378575  9.898717 50.000000  9.195979 
-    var91     var92     var93     var94     var95     var96     var97     var98 
-45.529225 50.000000 50.000000  7.914616 45.365751  9.613104  1.469007  7.478423 
-    var99    var100    var101    var102    var103    var104    var105    var106 
- 3.356607 50.000000  3.882470 13.679252  7.907598  5.924296 14.129183  5.052309 
-   var107    var108    var109    var110    var111    var112    var113    var114 
- 3.675919 35.186101  2.074107  1.756214  5.337291  9.344192  6.664193  9.541077 
-   var115    var116    var117    var118    var119    var120    var121    var122 
-50.000000  9.308268 12.525763  3.523290  7.486417  3.316468 31.301357 50.000000 
-   var123    var124    var125    var126    var127    var128    var129    var130 
-11.230825 27.802805 22.958961  9.621110  5.548458 50.000000 50.000000  3.357808 
-   var131    var132    var133    var134    var135    var137    var138    var139 
-13.130863  4.193203 50.000000 21.352738  7.467223 11.027658 13.843848 50.000000 
-   var140    var141    var142    var143    var144    var145    var146 
- 7.780888 10.659576  7.562998 13.113045 50.000000 50.000000 50.000000 
-
-$alpha.beta
-    var1     var2     var3     var4     var5     var6     var7     var8 
-50.00000 50.00000 50.00000 30.10624 50.00000 50.00000 50.00000 32.47992 
-
-$tau2.beta
-var1 
-  50 
-
-$xi
-     var1      var2      var3      var4      var5      var6      var7      var8 
-19.535722 11.830282 14.207384 16.208742 18.170268 19.032808 17.167675 20.612263 
-     var9     var10     var11     var12     var13     var14     var15     var16 
-24.847335 28.189260 13.819615 13.194802 10.943498 17.302693 15.283170 22.250639 
-    var17     var18     var19     var20     var21     var22     var23     var24 
-20.490959 11.987144 32.036405 22.540715 19.462841 29.975101 50.000000 31.712210 
-    var25     var26     var27     var28     var29     var30     var31     var32 
-32.735728 50.000000 50.000000 50.000000 30.617202 23.254211 22.280428 17.970064 
-    var33     var34     var35     var36     var37     var38     var39     var40 
- 8.941337 17.188814 14.271789 21.823900 20.324046 13.113372 16.308015 47.813122 
-    var41     var43     var45     var46     var47     var48     var49     var50 
- 9.240316 21.947684 15.620370 28.091371 31.089375 16.306507 50.000000 50.000000 
-    var51     var52     var53     var54     var55     var56     var57     var58 
-50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 
-    var59     var60     var61     var62     var63     var64     var65     var66 
-17.454636 50.000000 50.000000 50.000000 50.000000 18.817654 21.123910  8.456049 
-    var67     var68     var69     var70     var71     var72     var73     var74 
- 9.524672 13.586893 17.923262  9.981620 50.000000 50.000000 50.000000 50.000000 
-    var75     var76     var77     var78     var79     var80     var81     var82 
-50.000000 50.000000 50.000000 16.064950  7.222666 20.484719 23.659555 25.437747 
-    var83     var84     var86     var87     var88     var89     var90     var91 
-59.486407 17.646765 18.467914 23.242711 18.808820 21.255341 39.587715 30.664422 
-    var92     var93     var94     var95     var96     var97     var98     var99 
-23.377011 27.183792 29.438373  6.751833 15.518838 10.078667  8.712702 43.757208 
-   var100    var101    var102    var103    var104    var105    var106    var107 
-24.862953 64.812241 34.210190 17.597868 10.854249 15.858356 18.610313 23.934323 
-   var108    var109    var110    var111    var112    var113    var114    var115 
-14.596909 18.141714 16.888601  7.768693 11.161750 21.507161 20.881386 27.498432 
-   var116    var117    var118    var119    var120    var121    var122    var123 
-15.465671 12.765016 14.050437 13.007184 28.643477 21.323344  5.584928 30.579668 
-   var124    var125    var126    var127    var128    var129    var130    var131 
-27.999889 15.581350 18.998323 22.154633 11.843540  4.795596 20.858340  8.201038 
-   var132    var133    var134    var135    var136    var137    var138    var139 
-16.743995  7.651275  8.784718 12.724650 10.824927 17.539472 10.346476 13.020340 
-   var140    var141    var142    var143    var144    var145    var146    var147 
-19.081159 41.500377 26.502583 23.326738 19.084323 11.629255 14.441874 18.272716 
-   var148    var149    var150    var151    var152    var153    var154    var155 
- 8.039366 29.917906 29.018309 50.000000 14.628502 20.278341 69.095256 27.575930 
-   var156    var157    var158    var159    var160    var161    var162    var163 
-50.000000 24.109820 31.778286 50.000000 32.652591 32.068231 15.653623 18.165747 
-   var164    var165    var166    var167    var168    var169    var170    var171 
-12.864060 17.049836  8.725700  9.186263 17.587877 16.447335 11.073750 21.527369 
-   var172    var173    var174    var175    var176    var177    var178    var179 
-22.080159 28.054639  4.582680 32.757885 27.167709 30.438200 21.965303 18.551424 
-   var180    var181    var182    var183    var184    var185    var186    var187 
-17.832141 30.331621 50.000000 50.000000 24.617109 64.750351 21.156109 27.798174 
-   var188    var189    var190    var191    var192    var193    var194    var195 
-27.253761 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 
-   var196    var197    var198    var199    var200    var201    var202    var203 
-50.000000 31.392705 24.519263 50.000000 31.920989 23.248851 23.809503 33.477538 
-   var204    var205    var206    var207    var208    var209    var210    var211 
-50.000000 26.676683 32.519709 47.878890 12.262380 50.000000 20.941581 24.987708 
-   var212    var213    var214    var215    var216    var217    var219    var220 
-31.865204 50.000000 50.000000 50.000000 50.000000 50.000000 32.711349 50.000000 
-   var221    var222    var223    var224    var225    var226    var227    var228 
-50.000000 50.000000 50.000000 50.000000 18.511466 24.515563 30.621828 15.993057 
-   var229    var230    var231    var232    var233    var234    var235    var236 
-17.318166 57.972222 23.803819 47.523246 81.322783 50.000000 50.000000 50.000000 
-   var237    var238    var239    var240    var241    var242    var243    var244 
-50.000000 50.000000 15.907233 33.403353 25.966744 25.186382 18.162566 29.165715 
-   var245    var246    var247    var248    var249    var250    var251    var252 
-17.182582 32.172422 50.000000 50.000000 50.000000 26.474631 50.000000 50.000000 
-   var253    var254    var255    var256    var257    var258    var259    var260 
-21.195375 12.041775 25.268125 18.102275 24.283400 23.788535 41.118065 50.000000 
-   var261    var262    var263    var264    var265    var266    var267    var268 
- 7.698843 23.347100 22.856492 22.707923 30.622729 13.002722 50.000000 50.000000 
-   var269    var270    var271    var272    var273    var274    var275    var276 
-20.989168 19.815425 50.000000 26.252966 20.426463  9.892202 21.399515 22.794276 
-   var277    var278    var279    var280    var281    var282    var283    var284 
-50.000000 25.669039 13.622505 10.889137 16.496084 50.000000 32.585060 50.000000 
-   var285    var286    var287    var288    var289    var290    var291    var292 
-31.178641 50.000000 50.000000  8.497132 12.614859 30.335782 25.710650 57.758863 
-   var293    var294    var295    var296    var297    var298    var299    var300 
-12.122245 18.732839 50.000000 25.690411 27.874731 13.665275 24.176904 14.107713 
-   var301    var302    var303    var304    var305    var306    var307    var308 
-50.000000 32.730299 11.402395 30.072200 23.401622 15.995265 27.929713 21.936950 
-   var309    var310    var311    var312    var313    var314    var316    var317 
- 7.636561 16.651184 12.690489 75.486418 28.972510 38.904132  8.010400  5.770194 
-   var318    var319    var320    var321    var322    var323    var324    var325 
- 3.954063 18.802342  8.937714 20.892044 11.595503 50.000000 50.000000 50.000000 
-   var326    var327    var328    var329    var330    var331    var332    var333 
-28.934066 50.000000 50.000000 50.000000 13.122199 47.869652 20.479789 28.914153 
-   var334    var335    var336    var337    var338    var339    var340    var341 
-20.578956 22.181020 16.398908 22.051177  6.171261 16.807565 28.330548 29.049798 
-   var342    var343    var344    var345    var346    var347    var348    var349 
-38.668123 65.304127 50.000000 50.000000 78.248942 50.000000 50.000000 50.000000 
-   var350    var351    var352    var353    var354    var355    var356    var357 
-50.000000 39.490413 72.289979 28.551720 51.400194 26.226672 25.099296 30.485628 
-   var358    var359    var360    var361    var362    var363    var364    var365 
-24.338634 26.544284 17.342229 12.580327 13.613239  9.489226 10.326919  9.679729 
-   var366    var367    var368    var369    var370    var371    var372    var373 
-11.860213  5.379002 20.315349 19.325942 16.946711 21.298869  8.704605 16.536425 
-   var374    var375    var376    var377    var378    var379    var380    var381 
- 8.506818 11.583266 32.130580  9.174205 17.190240 23.440352 29.828579 41.128875 
-   var382    var383    var384    var385    var386    var387    var388    var389 
-28.634741 50.000000 28.446575 26.859983  9.219364 16.418727  3.325034 24.859948 
-   var390    var391    var392    var393    var394    var395    var396    var397 
- 2.519943 23.055059 14.468966 50.000000 30.674430 50.000000 50.000000 50.000000 
-   var398    var400    var401    var402    var403    var404    var405    var406 
-50.000000 31.692048 28.021148 28.774344 50.000000 50.000000 50.000000 50.000000 
-   var407    var408    var409    var410    var411    var412    var413    var414 
-50.000000 50.000000 27.668425 27.230913 31.934486 30.405106 50.000000 19.723605 
-   var415    var416    var417    var418    var419    var420    var421    var422 
-26.167315 20.266851 20.775169 16.856546 32.407716 50.000000 14.251723 16.341438 
-   var423    var424    var425    var426    var427    var428    var429    var430 
-22.724387 20.796545 19.326279 13.934289 18.582210 50.000000 30.349090 50.000000 
-   var431    var433    var434    var435    var436    var437    var438    var439 
-50.000000 50.000000 79.477027 30.516528 25.205661 31.864155 28.266941 23.782111 
-   var440    var441    var442    var443    var444    var445    var446    var447 
-25.382675 50.000000 19.519436 19.132539 25.993296 29.776068 25.826112 12.146577 
-   var448    var449    var450    var451    var452    var453    var454    var455 
-50.000000 16.565578 17.451024 50.000000  8.239161 22.560050 21.518009 36.674525 
-   var456    var457    var458    var459    var460    var461    var462    var463 
-50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 
-   var464    var465    var466    var467    var468    var469    var470    var471 
-14.941353 13.991865 21.055300 31.943071 11.439685 15.264380 14.424724 11.795162 
-   var472    var473    var474    var475    var476    var477    var478    var479 
-21.745744  9.617522 14.435806 58.074938 21.874814 50.000000 50.000000 50.000000 
-   var480    var481    var482    var483    var484    var485    var486    var487 
-33.412524 24.857462 22.676970 50.000000 17.916204 50.000000 50.000000 24.531089 
-   var488    var489    var490    var491    var492    var493    var494    var495 
-43.997844 23.110145 40.722011 31.062333 50.000000 21.949296 25.216332 11.577849 
-   var496    var497    var498    var499    var500    var501    var502    var503 
-26.749540 20.658751 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 
-   var504    var505    var506    var507    var508    var509    var510    var511 
-50.000000 50.000000 50.000000 89.253762 65.155129 50.000000 50.000000 50.000000 
-   var512    var513    var514    var515    var516    var517    var518    var519 
- 7.732645 16.212825 13.964874 27.043108 23.166570  9.863491 27.900270 50.000000 
-   var520    var521    var522    var523    var524    var525    var526    var527 
-50.000000 53.622480 50.000000 50.000000 32.466432 50.000000 21.050983 20.353166 
-   var528    var529    var530    var531    var532    var533    var534    var535 
-18.586177 21.865054 18.116035 17.074277 20.257682  3.035225 37.901157 23.253111 
-   var536    var537    var538    var539    var540    var541    var542    var543 
-19.896141 56.103910 25.734641 50.000000 50.000000 53.010133 50.000000 74.813235 
-   var544    var545    var546    var547    var548    var549    var550    var551 
-50.000000 50.000000 50.000000 16.293555 25.612507 27.502598 15.106830 11.860381 
-   var552    var553    var554    var555    var556    var557    var558    var559 
-10.948290 11.710368 16.025912 25.530190  6.109946 28.406959 25.585037 11.314031 
-   var560    var561    var562    var563    var564    var565    var566    var567 
-12.272896 25.924757 12.885097 12.819976  9.396785 15.006740 56.707193 17.262204 
-   var568    var569    var570    var571    var572    var573    var574    var575 
-50.000000 50.000000 25.381032 27.367841 50.000000 29.425254 27.401833 50.000000 
-   var576    var577    var578    var579    var580    var581    var582    var584 
-50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 25.104712 84.104202 
-   var585    var586    var587    var589    var590    var591    var592    var593 
-50.000000 27.968587 21.797903 27.396482 50.000000 50.000000 19.105346 58.182769 
-   var594    var595    var596    var597    var598    var599    var600    var601 
-50.000000 32.206422 11.375859 18.024904 22.961620 13.916310 57.078921 36.542457 
-   var602    var603    var604    var605    var606    var607    var608    var609 
-15.574592 69.448700 50.000000 30.745995 17.645995 17.355385 50.000000 50.000000 
-   var610    var611    var612    var613    var614    var615    var616    var617 
-50.000000 50.000000 25.359212 86.955925 31.321510 50.000000 50.000000 50.000000 
-   var618    var619    var620    var621    var622    var623    var624    var625 
-78.427513 50.000000 50.000000 50.000000 50.000000 50.000000 22.196659 20.834604 
-   var626    var627    var628    var629    var630    var631    var632    var633 
-19.645297 14.428122  9.354029 17.294501 51.198973 50.000000 70.360057 50.000000 
-   var634    var635    var636    var637    var638    var639    var640    var641 
-50.000000 50.000000 50.000000 50.000000 28.099252 50.000000 68.549837 50.000000 
-   var642    var643    var644    var645    var646    var647    var648    var649 
-31.881307 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 
-   var650    var651    var652    var653    var654    var655    var656    var657 
-50.000000 50.000000 40.967729 36.321139 55.853882 46.989151 26.953519 24.255755 
-   var658    var659    var660    var661    var662    var663    var664    var666 
-29.228259 50.000000 48.865832 50.000000 68.632818 50.000000 79.023466 16.984645 
-   var667    var668    var669    var670    var671    var672    var673    var674 
-10.737775 19.379622 39.654424 10.385691 26.185253 16.035894  7.422596 14.179817 
-   var675    var676    var677    var678    var679    var680    var681    var682 
- 7.888090 13.647191 24.036800 22.339084 20.135278 28.306877 21.297028 28.935979 
-   var683    var684    var685    var686    var687    var688    var689    var690 
-22.565107 32.262113 29.876802 30.712595 22.999379 19.799242 22.528909 21.270319 
-   var691    var692    var693    var694    var695    var696    var697    var698 
-15.594683  5.709277 19.346946 50.000000 27.834173 50.000000 50.000000 50.000000 
-   var699    var700    var701    var702    var703    var704    var705    var706 
-50.000000 50.000000 27.612892 22.954030 29.522955 21.707197 25.625936 30.158611 
-   var707    var708    var709    var710    var711    var712    var713    var714 
-15.630731 30.774885 32.340324 50.000000 26.804718 50.000000 30.914702 50.000000 
-   var715    var716    var717    var718    var719    var720    var721    var722 
-50.000000 27.150144 45.626310 22.221665 19.362657 21.281254 31.939846 50.000000 
-   var723    var724    var725    var726    var727    var728    var729    var731 
-50.000000 50.000000 28.967647 50.000000 22.780818 50.000000 50.000000 31.868624 
-   var732    var733    var734    var735    var736    var737    var739    var740 
-50.000000 50.000000 50.000000 50.000000 21.071065 19.835092 15.154531 18.525010 
-   var741    var742    var743    var744    var745    var746    var747    var748 
-25.608900 31.965933 13.630003 19.301100 50.000000 29.304391 15.610000 12.031481 
-   var749    var750    var751    var753    var754    var755    var756    var757 
-17.311963 32.760820 37.969285 50.000000 50.000000 50.000000 31.351945  7.578637 
-   var759    var760    var761    var762    var763    var764    var765    var766 
-26.970945 24.040624 18.591127 17.477442 26.466213 22.197822 31.194138  8.853772 
-   var767    var768    var769    var770    var771    var772    var773    var774 
-23.992499 50.000000 19.704131 22.383426 17.105375 24.861245 25.570915 26.399561 
-   var775    var776    var777    var778    var779    var780    var781    var782 
-20.870910 14.551007 12.456809 20.196061 23.556940 20.490833 16.501125 19.112919 
-   var783    var784    var785    var786    var787    var788    var789    var790 
-46.540815 50.000000 12.084745 19.079220 17.895076 20.650594 19.142916 11.727446 
-   var791    var792    var793    var794    var795    var796    var797    var798 
-25.249305 21.090362  7.789513 23.090237 21.397202 22.142872 20.640292 25.891753 
-   var799    var800    var801    var802    var805    var806    var807    var808 
-50.000000 50.000000 50.000000 50.000000 50.000000 29.712346 50.000000 34.311911 
-   var809    var810    var811    var812    var813    var814    var815    var816 
-32.482301 53.368985 20.906311 36.933780 50.000000 32.527338 51.226150 30.742103 
-   var817    var818    var819    var820    var821    var822    var823    var824 
-50.000000 20.462068 32.312382 12.107013 17.950646 21.146314 27.902526 27.918999 
-   var825    var826    var827    var828    var829    var830    var831    var832 
- 5.935266 19.086997 16.929830 43.444897 17.678184 13.841989 15.554077 11.573626 
-   var833    var834    var835    var836    var837    var838    var839    var840 
-39.715176 15.967760 22.107592 50.000000 50.000000 26.589418 16.801968 50.000000 
-   var841    var842    var843    var844    var845    var846    var847    var848 
-50.000000 31.732003 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 
-   var849    var850    var851    var852    var853    var854    var855    var856 
-50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 22.259958 18.119144 
-   var857    var858    var859    var860    var861    var862    var863    var864 
-19.058834 10.498678 17.914373 21.569562 28.614979 27.485997 97.162906 57.006434 
-   var865    var866    var867    var868    var869    var870    var871    var872 
-28.767550 50.000000 27.732480 37.706410 50.000000 50.000000 50.000000 50.000000 
-   var873    var874    var875    var876    var877    var878    var879    var880 
-50.000000 50.000000 50.000000 29.227704 23.729210 12.603471 50.000000 24.859726 
-   var881    var882    var883    var884    var885    var886    var887    var888 
-50.000000 28.473936 24.776360 49.903118 23.815179 19.380068 18.756458 22.528368 
-   var889    var890    var891    var894    var895    var896    var897    var899 
-50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 
-   var900    var901    var902    var903    var904    var905    var906    var907 
-50.000000 50.000000 50.000000 50.000000  6.819077 12.998989  8.459604 20.020728 
-   var908    var909    var910    var911    var912    var913    var914    var915 
-12.761539 17.396245 50.000000 45.350616 28.687896 28.112024 22.105712 24.801224 
-   var916    var917    var918    var919    var920    var921    var922    var923 
-19.510586 21.039311 21.462730 17.876240 50.000000 50.000000 18.134804 50.000000 
-   var924    var925    var926    var927    var928    var929    var930    var931 
-17.884178 50.000000 50.000000 32.208556 29.851783 50.000000 50.000000 50.000000 
-   var932    var933    var934    var935    var936    var937    var938    var939 
-24.961615 19.878808 22.899547 21.609396 13.067212 19.933360 24.776757  9.576632 
-   var940    var941    var942    var943    var944    var945    var946    var947 
-20.224792 25.327482 16.546043 14.459406 17.726799 12.383790 28.874892 50.000000 
-   var948    var949    var950    var951    var952    var953    var954    var955 
-29.246481 42.709042 43.606041 50.000000 30.447418 18.379267 17.934568 30.241754 
-   var956    var957    var958    var959    var960    var961    var962    var963 
-29.985828 32.355604 24.938736 17.782172 20.798876 50.000000 50.000000 50.000000 
-   var964    var965    var966    var967    var968    var969    var970    var971 
-50.000000 50.000000 27.046029 50.000000 50.000000 50.000000 50.000000 30.677949 
-   var972    var973    var974    var975    var976    var977    var978    var979 
-50.000000 71.425951 20.912823 13.189571 19.292499 25.959971 46.452702 24.371013 
-   var980    var981    var982    var983    var984    var985    var986    var987 
- 4.586013 19.168740 16.850211 24.401935 31.270822 50.000000 14.299318 19.688883 
-   var988    var989    var990    var991    var992    var993    var994    var995 
-16.261924 30.943171 22.344720 19.455048 16.723181 29.488701 21.397662 16.499660 
-   var996    var997    var998    var999   var1000   var1001   var1002   var1003 
-21.487090 22.325676 15.988817 11.763464 15.155614 10.882917 75.476212 50.000000 
-  var1004   var1006   var1007   var1008   var1009   var1010   var1011   var1012 
-50.000000 50.000000 50.000000 90.475292 51.773664 50.000000 70.941640 50.000000 
-  var1013   var1014   var1015   var1016   var1017   var1018   var1019   var1020 
-50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 50.000000 
-  var1021   var1022 
-50.000000 50.000000 
-
-$alpha.xi
-    var1     var2     var3     var4     var5     var6     var7     var8 
-50.00000 22.24444 50.00000 50.00000 50.00000 50.00000 18.85912 50.00000 
-    var9    var10    var11    var12    var13    var14    var15    var16 
-23.68494 50.00000 50.00000 49.02806 50.00000 19.21660 50.00000 24.05450 
-   var17    var18    var19    var20    var21    var22    var23    var24 
-50.00000 50.00000 55.65675 50.00000 27.69031 50.00000 50.00000 50.00000 
-   var25    var26    var27    var28    var29    var30    var31    var32 
-50.00000 73.19378 50.00000 18.43092 19.98008 50.00000 50.00000 29.94712 
-   var33    var34    var35    var36    var37    var38    var39    var40 
-50.00000 50.00000 50.00000 50.00000 50.00000 13.23583 50.00000 50.00000 
-   var41    var42    var43    var44    var45    var46    var47    var48 
-50.00000 82.54865 32.72657 50.00000 50.00000 50.00000 50.00000 50.00000 
-   var49    var50    var51    var52    var53    var54    var55    var56 
-50.00000 50.00000 14.62971 30.46084 50.00000 50.00000 50.00000 29.87487 
-
-$tau2.xi
-var1 
-  50 
-
-$alphaT
-     var1      var2      var3      var4      var5      var6      var7      var8 
- 3.733198  4.872834  2.561864  4.434416  6.137059  5.481101  3.509044 22.590064 
-     var9     var10     var11     var12     var13     var14     var15     var16 
-17.419934  3.550835  8.558718 14.521128 12.754871 26.644679 11.584426 13.055330 
-    var17     var18     var19     var20     var21     var22     var23     var24 
-13.045929 10.937822 11.961490  3.606253  7.990909 32.679566  6.899843  9.507005 
-    var25     var26     var27     var28     var29     var30     var31     var32 
-16.257106  7.201857  6.150960  9.573150 18.084784  9.247969  9.697577  9.141374 
-    var33     var34     var35     var36     var37     var38     var39     var40 
-50.000000 13.499846 10.638463 16.283995 50.000000 27.172922 34.013736 21.558176 
-    var41     var42     var43     var44     var45     var46     var47     var48 
-26.734533 12.546499 12.951540 14.715583  6.979726 24.649024 16.911623 30.062094 
-    var49     var50     var51     var52     var53     var54     var55     var56 
-21.554000 11.206709 50.000000 15.782429  8.791328 10.375882  8.295950 31.398163 
-    var57     var58     var59     var60     var61     var62     var63     var64 
- 6.170078 12.337732 16.418963 19.124316 19.419377 16.274289  8.870834  5.239312 
-    var65     var66     var67     var68     var69     var70     var71     var72 
- 1.798096 26.770871  7.936826 19.153101  2.882047 14.528899 12.270325 20.814021 
-    var73     var74     var75     var76     var77     var78     var79     var80 
-12.611005 14.684760 50.000000 21.351346  7.904747 19.179587  7.357783 17.928328 
-    var81     var82     var83     var84     var85     var86     var87     var88 
-12.581226 12.966475 10.112454 10.720600  8.441281 16.663287 25.810566 23.273722 
-    var89     var90     var91     var92     var93     var94     var95     var96 
-25.110548  7.478936 11.639379 31.070516  5.966122 11.432146  9.740023  7.749310 
-    var97     var98     var99    var100    var101    var102    var103    var104 
-29.975091 19.627615 14.552241 16.533180 13.024311  9.658776 20.210284 22.817966 
-   var105    var106    var107    var108    var109    var110    var111    var112 
-11.445741 26.185038 22.808343 10.989695 11.305469 13.408073 13.405912  8.335660 
-   var113    var114    var115    var116    var117    var118    var119    var120 
-16.761214 11.371470 25.345088  8.229459 31.120495  8.333252 59.340601 50.000000 
-   var121    var122    var123    var124    var125    var126    var127    var128 
-11.418014 19.404815 16.022899 10.936344 12.217060  9.056822 13.753639 21.269922 
-   var129    var130    var131    var132    var133    var134    var135    var136 
-11.272908  6.619944 10.378639 16.034819 13.577733  9.715741  8.990176  7.222212 
-   var137    var138    var139    var140    var141    var142    var143    var144 
-14.899922 19.245880 15.120239  8.018120  5.418996 10.673036 12.776437 10.944476 
-   var145    var146    var147    var148    var149    var150    var151    var152 
-18.535166 23.479812 15.953661 15.212789 19.952437 20.812779 12.026031 10.419435 
-   var153    var154    var155    var156    var157    var158    var159    var160 
-23.924002 16.029678 25.292762 24.216876 13.282941 13.566178  8.982788 22.710929 
-   var161    var162    var163    var164    var165    var166    var167    var168 
-25.256423 23.475227 18.186005 25.392353 27.568858  5.419957 50.000000 24.799114 
-   var169    var170    var171    var172    var173    var174    var175    var176 
-19.339713 17.089850 50.000000 19.321233 13.327413 23.287825 23.542655 22.818546 
-   var177    var178    var179    var180    var181    var182    var183    var184 
-50.000000 20.368649 26.970022 15.927939 30.079477 50.000000 17.446420 27.483982 
-   var185    var186    var187    var188    var189    var190    var191    var192 
-16.275939 51.308328  6.657265  5.395034  6.174422 28.508392 23.473346 19.274537 
-   var193    var194    var195    var196    var197    var198    var199    var200 
-17.431635 32.783923 11.712503  5.157525 27.154598 17.962433 29.593473 50.000000 
-   var201    var202    var203    var204    var205    var206    var207    var208 
-24.036977 28.893991 14.570342 23.546505 10.278209 12.751383 19.700024 13.641364 
-   var209    var210    var211    var212    var213    var214    var215    var216 
-17.056753 13.670110 23.175260 50.000000 21.286727 17.743313 24.922717 21.564075 
-   var217    var218    var219    var220    var221    var222    var223    var224 
-26.270001 65.729801 27.441286 50.000000 22.792156 15.492633  5.082606 23.899835 
-   var225    var226    var227    var228    var229    var230    var231    var232 
-14.568640 16.942578 15.133456 50.000000 45.167911 23.319697 26.236791 22.604921 
-   var233    var234    var235    var236    var237    var238    var239    var240 
-20.367485 20.344779 25.112543 25.781905 20.374722 20.039164 19.411864 12.578971 
-   var241    var242    var243    var244    var245    var246    var247    var248 
-50.000000 38.808197 22.804861 14.635480  9.151000 22.159108 29.041228  9.778987 
-   var249    var250    var251    var252    var253    var254    var255    var256 
-12.807930 13.868332 11.063707 18.703828 19.805213 19.469844  9.643853 19.250145 
-   var257    var258    var259    var260    var261    var262    var263    var264 
-27.379068 12.074289 27.611864 18.025243 18.863700 20.589919  4.599295 11.737846 
-   var265    var266    var267    var268    var269    var270    var271    var272 
-20.702139 12.799807 28.255269 22.047186 32.165849 50.000000 12.818535 29.959515 
-   var273    var274    var275    var276    var277    var278    var279    var280 
-50.000000 12.813950 12.942439 16.792059 22.342553 50.000000  9.139214 22.681119 
-   var281    var282    var283    var284    var285    var286    var287    var288 
-20.333449 27.383520  5.645754 50.000000 50.000000 22.762967 40.952397 32.145171 
-   var289    var290    var291    var292    var293    var294    var295    var296 
-23.568923 22.364669 50.000000 20.648277  5.220427 12.735409 50.000000 21.429092 
-   var297    var298    var299    var300    var301    var302    var303    var304 
-17.244702 24.839117 11.480921 25.113689 37.575312 15.983784 24.543518 10.408085 
-   var305    var306    var307    var308    var309    var310    var311    var312 
-20.323480 23.862449 11.584063 25.241996 29.209706 21.335339 16.683350  3.407380 
-   var313    var314    var315    var316    var317    var318    var319    var320 
- 4.424856  5.559654  5.951335 20.100203 47.267466 14.768080 19.610295 20.457506 
-   var321    var322    var323    var324    var325    var326    var327    var328 
-11.709619 15.450565 16.827663 24.823130 20.900377 23.461056 38.348606 31.801665 
-   var329    var330    var331    var332    var333    var334    var335    var336 
-50.000000 11.233443 24.603217 21.322359 50.000000 50.000000 23.002008 21.078179 
-   var337    var338    var339    var340    var341    var342    var343    var344 
-35.269794 16.357468 27.165167 20.808662 18.173477 19.398678 14.261499 31.527339 
-   var345    var346    var347    var348    var349    var350    var351    var352 
-31.727552 13.003186 28.456676 50.000000 16.241784 24.586172 50.000000 50.000000 
-   var353    var354    var355    var356    var357    var358    var359    var360 
-16.153631 42.972518 18.853165 10.655638 17.125642 54.669727 14.775925 30.115211 
-   var361    var362    var363    var364    var365    var366    var367    var368 
-11.863146 13.123199 22.346921 50.000000 13.920148 21.149101 18.822961 19.164994 
-   var369    var370    var371    var372    var373    var374    var375    var376 
-21.290423 50.000000 50.000000 26.893482 23.930645 22.027062 16.726280 29.908684 
-   var377    var378    var379    var380    var381    var382    var383    var384 
-24.772645 14.658351 34.323796 19.230114 21.784857  9.887458 15.753912  3.684730 
-   var385    var386    var387    var388    var389    var390    var391    var392 
-24.713430 16.561038 25.408098 15.300882  4.293748 15.398149 42.677615 26.343301 
-   var393    var394    var395    var396    var397    var398    var399    var400 
-35.950067 18.099800 50.000000 19.654875 25.666712 16.157031 13.531369 12.158874 
-   var401    var402    var403    var404    var405    var406    var407    var408 
- 5.153880 17.844244 18.299932 36.000232  9.564692 14.458414 29.772964 15.279638 
-   var409    var410    var411    var412    var413    var414    var415    var416 
-18.140616 19.650278 10.588916 20.123976 18.933696 26.111676 10.808539 31.914805 
-   var417    var418    var419    var420    var421    var422    var423    var424 
-29.528543  4.444469 13.073532 22.714837 32.095862  5.820690  7.736011 50.000000 
-   var425    var426    var427    var428    var429    var430    var431    var432 
- 9.706135 18.894384  8.508175  4.819876  4.721897 16.310282 19.775528 13.777022 
-   var433    var434    var435    var436    var437    var438    var439    var440 
-16.667478 12.485572  3.512012  3.015859 26.841597 11.490944 17.102212 13.983482 
-   var441    var442    var443    var444    var445    var446    var447    var448 
- 5.217782 10.253553  4.004427 13.835516 21.230479 11.326970 10.213849 26.475906 
-   var449    var450    var451    var452    var453    var454    var455    var456 
-19.191831 10.216998  7.662729 19.203223 13.843059 11.646090 19.261796 43.376665 
-   var457    var458    var459    var460    var461    var462    var463    var464 
-18.104957 14.084920  6.745460 11.145295  5.711098 14.161819 31.696891 21.103022 
-   var465    var466    var467    var468    var469    var470    var471    var472 
-10.567181 11.898817 18.393170 33.191815 20.044804 12.653252 19.384859 28.858949 
-   var473    var474    var475    var476    var477    var478    var479    var480 
-11.485567 25.300677 19.807517 25.727613 26.507889 31.545030 23.951064 17.807278 
-   var481    var482    var483    var484    var485    var486    var487    var488 
- 8.775748 31.338711 22.839665 43.334085 19.436773 22.265589 10.202338 22.173628 
-   var489    var490    var491    var492    var493    var494    var495    var496 
-18.599329  8.352003 19.342838 25.801647 50.000000 17.699413 18.592743  6.752690 
-
-$Lambda
-     var1      var2      var3      var4      var5      var6      var7      var8 
- 6.469699  9.343010  9.279068 10.367568  9.113673 12.442702  9.397568  3.337736 
-     var9     var10     var11     var12     var13     var14     var15     var16 
-10.323784 15.648318  6.017550  5.590005 27.067953 11.252263 28.000412 53.527286 
-    var17     var18     var19     var20     var21     var22     var23     var24 
- 7.884449  3.439050  5.279905 13.342204 11.334495 15.684858 12.740440  8.796891 
-    var25     var26     var27     var28     var29     var30     var31     var32 
-22.491778  2.759253  9.469535 12.893813 16.983835 25.308972 50.000000 59.234651 
-    var33     var34     var35     var36     var37     var38     var39     var40 
- 0.000000  0.000000  0.000000  0.000000  3.045619  9.457504  3.445636  2.902134 
-    var41     var42     var43     var44     var45     var46     var47     var48 
- 7.688073 16.488761 23.768396 16.890116 40.066137 15.584403  9.522436  8.798919 
-    var49     var50     var51     var52     var53     var54     var55     var56 
- 3.308413  7.082470  6.669479  7.628044 28.643956  8.210114 44.272400  2.607604 
-    var57     var58     var59     var60     var61     var62     var63     var64 
- 5.576655 13.459430  4.512838  7.434447  5.051320  6.283867  6.071406  3.661354 
-    var65     var66     var67     var68     var69     var70     var71     var72 
-19.307318 25.059323  7.066720  6.887084  6.027419 17.006348  3.472114  8.117773 
-    var73     var74     var75     var76     var77     var78     var79     var80 
-16.056699  7.274996 12.736584  9.110130 25.959885  7.305565  9.684677  5.482410 
-    var81     var82     var83     var84     var85     var86     var87     var88 
- 7.929466  6.737890 18.062393 12.445962  9.609231 16.243941  9.854054 13.050599 
-    var89     var90     var91     var92     var93     var94     var95     var96 
- 0.000000  0.000000  0.000000  0.000000  8.270014  9.339536 17.574913  4.969405 
-    var97     var98     var99    var100    var101    var102    var103    var104 
- 5.368614 10.722180  6.049878 12.344930  8.053916 18.671285  3.943457 15.264932 
-   var105    var106    var107    var108    var109    var110    var111    var112 
-16.127857  5.471715 10.261237 15.504958 50.000000  8.480050 50.000000 26.214067 
-   var113    var114    var115    var116    var117    var118    var119    var120 
- 8.474771  5.818383  7.529998 10.075409 19.165495 19.057871  6.924688  6.016171 
-   var121    var122    var123    var124    var125    var126    var127    var128 
-17.782598  9.858750 16.966379 17.876577 50.000000 13.713304 15.368005 18.826180 
-   var129    var130    var131    var132    var133    var134    var135    var136 
- 6.474351  9.723706 11.269132  6.710643 50.000000  6.758586 12.430482 27.379567 
-   var137    var138    var139    var140    var141    var142    var143    var144 
-18.243966  8.567254  5.601984  8.297404 13.252225 11.428214  7.951599  4.612732 
-   var145    var146    var147    var148    var149    var150    var151    var152 
- 8.647687  3.156645 50.000000 12.740373  3.527830  9.007224 26.350628 15.404702 
-   var153    var154    var155    var156    var157    var158    var159    var160 
-11.745834 16.870272 13.461548 10.246724  5.772923 17.171558 11.660672  6.797402 
-   var161    var162    var163    var164    var165    var166    var167    var168 
-11.811081 23.447873 12.589837 50.000000 15.177844 19.948144 13.210131 20.921840 
-   var169    var170    var171    var172    var173    var174    var175    var176 
- 7.408018  7.819788  7.054761  6.351023 12.181796 19.978259 50.000000 17.174645 
-   var177    var178    var179    var180    var181    var182    var183    var184 
- 2.768550  6.526545  8.537543  7.212171  8.235812  1.463623  3.665992  1.555752 
-   var185    var186    var187    var188    var189    var190    var191    var192 
- 9.930661 20.922201  5.407112 50.000000  7.966384 11.933084  6.367227  5.416435 
-   var193    var194    var195    var196    var197    var198    var199    var200 
- 7.768072 19.357199  8.792864  6.034031 22.475851 24.681382 23.900854 11.415720 
-   var201    var202    var203    var204    var205    var206    var207    var208 
- 7.079351 18.628163  6.055125 14.664664  9.445473 10.553918 14.564088  7.161697 
-   var209    var210    var211    var212    var213    var214    var215    var216 
- 4.558610  4.751658  6.816299  8.535220 21.882751  6.698266 10.404930 14.733097 
-   var217    var218    var219    var220    var221    var222    var223    var224 
- 6.377050  9.726395 14.831629  6.103450  8.347271 10.231007  7.125117 16.316688 
-   var225    var226    var227    var228    var229    var230    var231    var232 
-24.059812 21.763518 43.115847 15.303072 50.000000 17.665423 22.064877 50.000000 
-   var233    var234    var235    var236    var237    var238    var239    var240 
-11.797485  8.107602 19.482651 20.409627  9.358535  7.097226  6.866983 23.058333 
-   var241    var242    var243    var244    var245    var246    var247    var248 
-11.327602  7.122742 11.823170  6.749371 29.052285 28.569671 50.000000 26.969446 
-   var249    var250    var251    var252    var253    var254    var255    var256 
-13.383247  5.830333 18.093983 12.880348  8.387889  9.179170  5.037169  4.972726 
-   var257    var258    var259    var260    var261    var262    var263    var264 
- 6.410158 10.153232 12.607478 11.509948 19.383601 12.605490 23.548998 13.419981 
-   var265    var266    var267    var268    var269    var270    var271    var272 
- 5.887453 12.523762  4.883964  5.803789 10.273211  7.027034  4.396022 10.014878 
-   var273    var274    var275    var276    var277    var278    var279    var280 
- 9.391217  6.355458 14.057000 16.052025 25.403010 19.550244 50.000000 17.739276 
-   var281    var282    var283    var284    var285    var286    var287    var288 
-16.917241 15.605991 21.137098 14.631147 50.000000 11.294852 50.000000 32.690493 
-   var289    var290    var291    var292    var293    var294    var295    var296 
-10.649478  6.589620 23.166209 27.646906 25.247633  4.411998  9.699619 18.238592 
-   var297    var298    var299    var300    var301    var302    var303    var304 
-14.970864 19.021122  6.470272  8.353640  7.276829  7.537960  6.133377  3.289628 
-   var305    var306    var307    var308    var309    var310    var311    var312 
- 5.209812  3.445034  8.897045  9.494421  7.686181 28.775478 50.000000 13.465771 
-   var313    var314    var315    var316    var317    var318    var319    var320 
- 4.371719 10.618053 21.724748  5.877257 16.551853  8.634246 12.420767 19.613291 
-   var321    var322    var323    var324    var325    var326    var327    var328 
- 8.061630  5.188319 14.958248 35.009801  4.896490  4.800555 18.088692  4.891717 
-   var329    var330    var331    var332    var333    var334    var335    var336 
-14.975209 50.000000 50.000000  7.371448  8.897797 10.535168 10.616055 23.877148 
-   var337    var338    var339    var340    var341    var342    var343    var344 
-50.000000 18.810373 14.147627 20.534188 54.586972  8.360019 50.000000 14.515365 
-   var345    var346    var347    var348    var349    var350    var351    var352 
-21.187621 11.320954  6.291169 23.309044 26.086337 15.931827  8.333806 16.325360 
-   var353    var354    var355    var356    var357    var358    var359    var360 
-31.957963 18.133266 51.985816 14.029819 17.580666  8.892287 10.432890 20.788465 
-   var361    var362    var363    var364    var365    var366    var367    var368 
- 7.042785 24.790921 21.282146 14.336212 50.000000 28.182413 20.879676 25.679201 
-   var369    var370    var371    var372    var373    var374    var375    var376 
-32.572665  7.492027 50.000000 50.000000 18.462381 12.357566 15.054952 19.830161 
-   var377    var378    var379    var380    var381    var382    var383    var384 
-25.761765  3.902012  7.172508 17.939759  7.013625 22.969836 11.279554  7.010160 
-   var385    var386    var387    var388    var389    var390    var391    var392 
- 9.225771 10.828571 15.146269 15.998912  4.810339  8.444811  6.441837 11.083538 
-   var393    var394    var395    var396    var397    var398    var399    var400 
-11.728585 24.929544  4.009277  8.182926 10.193565 50.000000 67.435492 29.654466 
-   var401    var402    var403    var404    var405    var406    var407    var408 
- 5.512045  4.175288 19.087061  8.080004 24.354111 26.583712 14.872712 50.000000 
-   var409    var410    var411    var412    var413    var414    var415    var416 
- 5.438507 33.959724  7.454956  6.101220 11.747031  2.738768  7.698909  6.852802 
-   var417    var418    var419    var420    var421    var422    var423    var424 
-15.594947 22.254919 50.000000 31.452806 17.087514 11.057152 31.729052 34.387016 
-   var425    var426    var427    var428    var429    var430    var431    var432 
- 8.725664  3.635688  5.061788  9.134096 19.810569 25.219640 14.935197 25.824613 
-   var433    var434    var435    var436    var437    var438    var439    var440 
- 7.621507  8.812091  6.513555 14.827471 16.887331  3.842607 11.349444  6.647283 
-   var441    var442    var443    var444    var445    var446    var447    var448 
-14.569654 10.091563 13.863317  4.841604  5.852096  7.776019 13.089461 23.694278 
-   var449    var450    var451    var452    var453    var454    var455    var456 
-14.101182 11.592179 20.660386  4.957914 14.417797  5.723055 14.196130  9.992861 
-   var457    var458    var459    var460    var461    var462    var463    var464 
-25.385388 15.689670 50.000000 50.000000 11.225914 14.905322  3.722908 10.473165 
-   var465    var466    var467    var468    var469    var470    var471    var472 
-50.000000  3.599019 37.611073  6.424594  8.650627  8.277411 15.036001  8.066677 
-   var473    var474    var475    var476    var477    var478    var479    var480 
- 8.435351 10.351521  5.204874  6.422584 12.753248  4.931806 11.156134  5.436855 
-   var481    var482    var483    var484    var485    var486    var487    var488 
- 6.249822 50.000000 28.804439 50.000000 26.172154  7.099149 50.000000 50.000000 
-   var489    var490    var491    var492    var493    var494    var495    var496 
- 7.344428  5.289919  8.519544  9.994085  5.935811 12.208319  6.052236 24.874440 
-   var497    var498    var499    var500    var501    var502    var503    var504 
-32.595333 14.933201 50.000000 27.879123 15.653393  4.040081 11.079748 18.387142 
-   var505    var506    var507    var508    var509    var510    var511    var512 
-18.049641  2.830726  5.549327 13.128060  9.030142 28.129688 50.000000 50.000000 
-   var513    var514    var515    var516    var517    var518    var519    var520 
-14.389172 50.000000 50.000000 50.000000  2.865218  2.132243  6.574566  4.444361 
-   var522    var523    var524    var525    var526    var527    var528    var529 
- 8.519546 14.440133 14.381734 12.451683  5.534250  3.039235  8.463358  6.071778 
-   var530    var531    var532    var533    var534    var535    var536    var537 
-28.902779 14.885172 50.000000  9.557427 10.472281 50.000000  8.067694  7.289997 
-   var538    var539    var540    var541    var542    var543    var544    var545 
- 8.576235  5.051754  3.116474 22.728598 29.825462 36.254463 26.843427  4.513309 
-   var546    var547    var548    var549    var550    var551    var552    var553 
-14.303411 25.988405  7.785715 24.573396  6.697611  8.319675 14.235461  0.000000 
-   var554    var555    var556    var557    var558    var559    var560    var561 
- 0.000000  0.000000  0.000000  6.071080 24.834387  9.051394 24.172179  6.614957 
-   var562    var563    var564    var565    var566    var567    var568    var569 
-11.591422  6.378997  7.471633  7.627116  3.649491  6.558670 10.661844  4.750230 
-   var570    var571    var572    var573    var574    var575    var576    var577 
- 9.988270  7.152322  5.669114  0.000000  0.000000  0.000000  0.000000  6.687968 
-   var578    var579    var580    var581    var582    var583    var584 
- 8.211599 45.576959 31.054763  7.258287 19.221622 30.226743 13.675902 
-
-$alphaS
-     var1      var2      var3      var4      var5      var6      var7      var8 
-28.744773 50.000000 50.000000 24.841087 30.169798 50.000000 50.000000 26.219105 
-     var9     var10     var11     var12     var13     var14     var15     var16 
-32.567731 50.000000 50.000000 30.991983  3.909848  3.687894  6.816785  8.074033 
-    var17     var18     var19     var20     var21     var22     var23     var24 
-13.964647 17.279658 50.000000 50.000000 23.983268 25.937227 50.000000 50.000000 
-
-$tau2.lambda
-    var1 
-7.616535 
-
-$sig2
-   var1 
-24.6287 
-
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+> ##D convergence_diag(out)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("convergence_diag", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("map_spatial_param")
 > ### * map_spatial_param
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: map_spatial_param
 > ### Title: Plot a map of interpolated spatially-dependent parameter values.
 > ### Aliases: map_spatial_param
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 100 iterations."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Finished iteration 20: taken 0.09 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 30: taken 0.15 minutes."
-[1] "Finished iteration 40: taken 0.21 minutes."
-[1] "Finished iteration 50: taken 0.28 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 60: taken 0.35 minutes."
-[1] "Finished iteration 70: taken 0.41 minutes."
-[1] "Finished iteration 80: taken 0.48 minutes."
-[1] "Finished iteration 90: taken 0.55 minutes."
-[1] "Finished iteration 100: taken 0.62 minutes."
-[1] "Finished MCMC Sampling"
-> map_spatial_param(out, parameter="slope", map=TRUE, state=TRUE, location='utah', fine=50)
-Coordinate system already present. Adding new coordinate system, which will
-replace the existing one.
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+> ##D map_spatial_param(out, parameter='slope', map=TRUE, state=TRUE, location='utah', fine=50)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("map_spatial_param", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("plot_annual")
 > ### * plot_annual
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: plot_annual
-> ### Title: Plot annual curve
+> ### Title: Plot annual/seasonal behavior at a specific location.
 > ### Aliases: plot_annual
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 100 iterations."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Finished iteration 20: taken 0.09 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 30: taken 0.15 minutes."
-[1] "Finished iteration 40: taken 0.21 minutes."
-[1] "Finished iteration 50: taken 0.28 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 60: taken 0.35 minutes."
-[1] "Finished iteration 70: taken 0.41 minutes."
-[1] "Finished iteration 80: taken 0.48 minutes."
-[1] "Finished iteration 90: taken 0.55 minutes."
-[1] "Finished iteration 100: taken 0.61 minutes."
-[1] "Finished MCMC Sampling"
-> plot_annual(out, location=1)
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+> ##D plot_annual(out, location=1)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("plot_annual", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("plot_factor")
 > ### * plot_factor
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: plot_factor
-> ### Title: Plot the factors
+> ### Title: Plot the temporally-dependent factors.
 > ### Aliases: plot_factor
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 100 iterations."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Finished iteration 20: taken 0.09 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 30: taken 0.15 minutes."
-[1] "Finished iteration 40: taken 0.21 minutes."
-[1] "Finished iteration 50: taken 0.28 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 60: taken 0.35 minutes."
-[1] "Finished iteration 70: taken 0.42 minutes."
-[1] "Finished iteration 80: taken 0.48 minutes."
-[1] "Finished iteration 90: taken 0.55 minutes."
-[1] "Finished iteration 100: taken 0.62 minutes."
-[1] "Finished MCMC Sampling"
-> plot_factor(out, factor=1:4, together=TRUE)
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+> ##D plot_factor(out, factor=1:4, together=TRUE)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("plot_factor", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("plot_location")
 > ### * plot_location
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: plot_location
-> ### Title: Plot a location's time series of estimated/interpolated values.
+> ### Title: Plot a location's time series of estimated/predicted values.
 > ### Aliases: plot_location
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 100 iterations."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Finished iteration 20: taken 0.09 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 30: taken 0.15 minutes."
-[1] "Finished iteration 40: taken 0.21 minutes."
-[1] "Finished iteration 50: taken 0.28 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 60: taken 0.35 minutes."
-[1] "Finished iteration 70: taken 0.41 minutes."
-[1] "Finished iteration 80: taken 0.48 minutes."
-[1] "Finished iteration 90: taken 0.55 minutes."
-[1] "Finished iteration 100: taken 0.61 minutes."
-[1] "Finished MCMC Sampling"
-> plot_location(out, location=1, pred.int=FALSE)
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+> ##D plot_location(out, location=1, pred.int=FALSE)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("plot_location", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("plot_spatial_param")
 > ### * plot_spatial_param
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: plot_spatial_param
 > ### Title: Plot the spatially-dependent parameter for in-sample locations.
 > ### Aliases: plot_spatial_param
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 100 iterations."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Finished iteration 20: taken 0.09 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 30: taken 0.15 minutes."
-[1] "Finished iteration 40: taken 0.21 minutes."
-[1] "Finished iteration 50: taken 0.28 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 60: taken 0.35 minutes."
-[1] "Finished iteration 70: taken 0.41 minutes."
-[1] "Finished iteration 80: taken 0.48 minutes."
-[1] "Finished iteration 90: taken 0.55 minutes."
-[1] "Finished iteration 100: taken 0.61 minutes."
-[1] "Finished MCMC Sampling"
-> plot_spatial_param(out, parameter="slope")
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+> ##D plot_spatial_param(out, parameter='slope')
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("plot_spatial_param", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("plot_trace")
 > ### * plot_trace
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: plot_trace
 > ### Title: Plot trace plots
 > ### Aliases: plot_trace
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 100 iterations."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Finished iteration 20: taken 0.09 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 30: taken 0.15 minutes."
-[1] "Finished iteration 40: taken 0.21 minutes."
-[1] "Finished iteration 50: taken 0.28 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 60: taken 0.35 minutes."
-[1] "Finished iteration 70: taken 0.42 minutes."
-[1] "Finished iteration 80: taken 0.49 minutes."
-[1] "Finished iteration 90: taken 0.55 minutes."
-[1] "Finished iteration 100: taken 0.62 minutes."
-[1] "Finished MCMC Sampling"
-> plot_trace(out, parameter="beta", param.range=1)
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+> ##D plot_trace(out, parameter='beta', param.range=1)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("plot_trace", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > nameEx("predictBSTFA")
 > ### * predictBSTFA
 > 
 > flush(stderr()); flush(stdout())
 > 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: predictBSTFA
-> ### Title: Prediction
+> ### Title: Estimate/predict values of the time series at a specific
+> ###   location.
 > ### Aliases: predictBSTFA
 > 
 > ### ** Examples
 > 
-> data(utahDataList)
-> attach(utahDataList)
-> out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-[1] "Setup complete! Time taken: 0.02 minutes."
-[1] "Starting MCMC, 100 iterations."
-[1] "Finished iteration 10: taken 0.05 minutes."
-[1] "Finished iteration 20: taken 0.09 minutes."
-[1] "Starting FA now."
-[1] "Finished iteration 30: taken 0.15 minutes."
-[1] "Finished iteration 40: taken 0.21 minutes."
-[1] "Finished iteration 50: taken 0.28 minutes."
-[1] "Burn complete. Saving iterations now."
-[1] "Finished iteration 60: taken 0.35 minutes."
-[1] "Finished iteration 70: taken 0.41 minutes."
-[1] "Finished iteration 80: taken 0.48 minutes."
-[1] "Finished iteration 90: taken 0.55 minutes."
-[1] "Finished iteration 100: taken 0.62 minutes."
-[1] "Finished MCMC Sampling"
-> loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
+> ## Not run: 
+> ##D data(utahDataList)
+> ##D attach(utahDataList)
+> ##D out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+> ##D loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
+> ## End(Not run)
 > 
 > 
 > 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("predictBSTFA", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > ### * <FOOTER>
 > ###
 > cleanEx()
-
-detaching ‘utahDataList’
-
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  998.539 111.822 1162.176 0 0 
+Time elapsed:  1.536 0.065 1.601 0 0 
 > grDevices::dev.off()
 null device 
           1 

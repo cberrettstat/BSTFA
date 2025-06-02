@@ -2,7 +2,7 @@
 % Please edit documentation in R/posterior_inference.R
 \name{plot_annual}
 \alias{plot_annual}
-\title{Plot annual curve}
+\title{Plot annual/seasonal behavior at a specific location.}
 \usage{
 plot_annual(
   out,
@@ -21,7 +21,7 @@ plot_annual(
 
 \item{add}{Logical scalar indicating whether the annual/seasonal process should be added to the existing plot.  Default is \code{FALSE}.}
 
-\item{years}{Either \code{"one"} (indicating to plot just a single year; default) or \code{"all"} (indicating to plot all years in the observed time period).}
+\item{years}{Either \code{'one'} (indicating to plot just a single year; default) or \code{'all'} (indicating to plot all years in the observed time period).}
 
 \item{interval}{Numeric value between 0 and 1 specifying the probability of the credible interval.}
 
@@ -33,7 +33,7 @@ plot_annual(
 A plot of the annual/seasonal process at \code{location}.
 }
 \description{
-Plot annual curve
+Plot annual/seasonal behavior at a specific location.
 }
 \examples{
 \dontrun{
@@ -42,4 +42,7 @@ attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 plot_annual(out, location=1)
 }
+}
+\author{
+Candace Berrett and Adam Simpson
 }

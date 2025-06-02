@@ -27,3 +27,6 @@ out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 loglik <- computeLogLik(out, addthin=2)
 }
 }
+\author{
+Adam Simpson and Candace Berrett
+}

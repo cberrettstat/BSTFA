@@ -54,7 +54,7 @@ BSTFA(
 \arguments{
 \item{ymat}{Data matrix of size \code{n.times} by \code{n.locs}. Any missing data should be marked by \code{NA}.  The model works best if the data are zero-centered for each location.}
 
-\item{dates}{\code{n.times} length vector of class \code{"Date"} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).}
+\item{dates}{\code{n.times} length vector of class \code{'Date'} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).}
 
 \item{coords}{\code{n.locs} by \code{2} matrix or data frame of coordinates for the locations of the observed data. If using longitude and latitude, longitude is assumed to be the first coordinate.}
 
@@ -68,7 +68,7 @@ BSTFA(
 
 \item{mean}{Logical scalar.  If \code{TRUE}, the model will fit a spatially-dependent mean for each location.  Otherwise, the model will assume the means are zero at each location (default).}
 
-\item{linear}{Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or "slope") in time. Otherwise, the model will assume a zero change in slope across time.}
+\item{linear}{Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or slope) in time. Otherwise, the model will assume a zero change in slope across time.}
 
 \item{seasonal}{Logical scalar. If \code{TRUE} (default), the model will use circular b-splines to model a spatially-dependent annual process.  Otherwise, the model will assume there is no seasonal (annual) process.}
 
@@ -174,9 +174,11 @@ A list containing the following elements (any elements that are the same as in t
 This function uses MCMC to draw from posterior distributions of a Bayesian spatio-temporal factor analysis model.  All spatial processes use one of Fourier, thin plate spline, or multiresolution basis functions.  The temporally-dependent factors use Fourier bases.  The default values are chosen to work well for many data sets.  Thus, it is possible to use this function using only three arguments: \code{ymat}, \code{dates}, and \code{coords}.  The default number of MCMC iterations is 10000 (saving 5000); however, depending on the number of observations and processes modeled, it may need more draws than this to ensure the posterior draws are representative of the entire posterior distribution space.
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=1000)
+out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
+}
 }
 \author{
 Adam Simpson and Candace Berrett

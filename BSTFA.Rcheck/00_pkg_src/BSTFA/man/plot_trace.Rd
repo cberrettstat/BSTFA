@@ -30,8 +30,13 @@ A plot containing the trace plot (and density plot when \code{density=TRUE}) of 
 Plot trace plots
 }
 \examples{
+\dontrun{
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-plot_trace(out, parameter="beta", param.range=1)
+plot_trace(out, parameter='beta', param.range=1)
+}
+}
+\author{
+Adam Simpson
 }

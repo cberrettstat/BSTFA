@@ -12,23 +12,18 @@ vignette: >
 bibliography: references.bib
 csl: apa.csl
 cache: true
-abstract: "The BSTFA package for R is a tool for fitting fully Bayesian spatio-temporal
-  factor analysis models with a normal likelihood. The package implements
-  a model using dimension reduction via basis functions to increase computation speed.
-  The package also supports a non-reduced spatio-temporal factor analysis model, albeit with
-  much slower computation. Also included are functions to predict and plot the response
-  variable at missing or observed locations, methods to visualize processes (such as a
-  linear trend across time) on a map, and a function to plot estimated
-  behavior through a given timeframe (such as annual seasonal behavior)."
+abstract: "The BSTFA package provides tools for fitting fully Bayesian spatio-temporal factor analysis models for multivariate data observed over space and time. To improve computational efficiency, the package includes a model that uses dimension reduction via spatial and temporal basis functions. A more computationally intensive model using Gaussian processes is also available. Users can generate posterior predictions, visualize spatio-temporal trends, and explore latent factor behavior through functions for mapping, time series plotting, and interpolation. The package is designed to support both exploratory data analysis and formal inference in applications with spatial and temporal dependence. Functionality is demonstrated using a historical temperature dataset collected from weather stations across Utah, USA."
 ---
-
 
 
 ```{r setup1, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  cache=FALSE
+  cache=FALSE,
+  dev = "ragg_png",
+  dpi=200,
+  fig.width = 8
 )
 ```
 
@@ -201,7 +196,7 @@ The `predictBSTFA` function is also called within the `plot_location` function, 
 
 Below is an example of code used to plot the posterior mean temperature values (black line) at an observed location, "Alpine, Utah," with 95\% posterior predictive bounds (gray bands), and observed measurements (gray circles). Figure \@ref(fig:fig-location) provides the plot.
 
-```{r fig-location, fig.cap="Posterior mean temperature values (black line) at an in-sample location, Alpine, Utah, with 95% posterior predictive bounds (gray bands), and observed temperature measurements (gray circles).", fig.align="center", fig.height=3.5, fig.width=6.5}
+```{r fig-location, fig.cap="Posterior mean temperature values (black line) at an in-sample location, Alpine, Utah, with 95% posterior predictive bounds (gray bands), and observed temperature measurements (gray circles).", fig.align="center", fig.height=3.5, fig.width=6}
 loc = 1 # Alpine, Utah in our data set
 plot_location(bstfa.output,
               location=loc,
@@ -215,7 +210,7 @@ plot_location(bstfa.output,
 
 Below is an example of code used to plot the estimated posterior mean temperature values at an $\textit{unobserved}$ location, "Torrey, Utah". Figure \@ref(fig:fig-prediction) provides the plot where again, the black line represents the posterior mean and the gray bands represent the 95\% posterior predictive intervals.  
 
-```{r fig-prediction, fig.cap="Posterior mean temperature values (black line) at an out-of-sample location, Torrey, Utah, with 95% posterior predictive bounds (gray bands).", fig.align="center",fig.height=4, fig.width=6.5}
+```{r fig-prediction, fig.cap="Posterior mean temperature values (black line) at an out-of-sample location, Torrey, Utah, with 95% posterior predictive bounds (gray bands).", fig.align="center",fig.height=3.5, fig.width=6}
 loc = data.frame('Longitude' = 111.41, 'Latitude' = 38.29) # Torrey, Utah
 plot_location(bstfa.output,
               location=loc,
@@ -266,16 +261,16 @@ plot_annual(bstfa.output,
 
 The `plot_spatial_param` function can plot the posterior mean of the linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year." If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. Figure \@ref(fig:fig-obsslope) provides the corresponding plot, where the color represents the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Note that the output used in this illustration only contains 40 MCMC draws; thus, the interpretation provided here is for illustrative purposes only.  To interpret this plot, we would say that most locations show an average increase in temperature of between 0 and 0.025 degrees Celcius per year over the observed time period of 1912 to 2015.
 
-```{r fig-obsslope, fig.align="center", fig.cap="Posterior mean linear change in time (slope) of temperatures at observed locations.", fig.width=4, fig.height=4}
+```{r fig-obsslope, fig.align="center", fig.cap="Posterior mean linear change in time (slope) of temperatures at observed locations.", fig.width=3.5, fig.height=3.5}
 plot_spatial_param(bstfa.output,
           type='mean',
           parameter='slope',
           yearscale=TRUE)
 ```
 
-Next, we provide example code for plotting a particular loading, in this case, the posterior mean loadings for the first factor. Figure \@ref(fig-obsloading1) provides the corresponding plot showing the posterior mean loading values that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The circled red dot shows the location of the fixed factor; in this case, the first factor is fixed at Wendover, Utah.  This means that the loading corresponding to factor 1 for that location was fixed at 1 (and fixed at 0 for all other factors) and the loadings for other locations are estimated given that value. The model accounts for spatial dependence in the loadings so that locations near to Wendover are modeled to have posterior mean loadings closer to one.
+Next, we provide example code for plotting a particular loading, in this case, the posterior mean loadings for the first factor. Figure \@ref(fig:fig-obsloading1) provides the corresponding plot showing the posterior mean loading values that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The circled red dot shows the location of the fixed factor; in this case, the first factor is fixed at Wendover, Utah.  This means that the loading corresponding to factor 1 for that location was fixed at 1 (and fixed at 0 for all other factors) and the loadings for other locations are estimated given that value. The model accounts for spatial dependence in the loadings so that locations near to Wendover are modeled to have posterior mean loadings closer to one.
 
-```{r fig-obsloading1, fig.cap="Posterior mean estimates of loadings for factor 1 at observed locations.  The circled red dot shows the location of the fixed factor loading.", fig.align="center", fig.width=4.5, fig.height=4}
+```{r fig-obsloading1, fig.cap="Posterior mean estimates of loadings for factor 1 at observed locations.  The circled red dot shows the location of the fixed factor loading.", fig.align="center", fig.width=4, fig.height=3.5}
 plot_spatial_param(bstfa.output,
           type='mean',
           parameter='loading',
@@ -295,7 +290,7 @@ plot_factor(bstfa.output,
 
 To plot the factors together, set `together==TRUE`, as in the example code below. Figure \@ref(fig:fig-factorexample1) provides a plot of all four estimated factors.  These factors capture common behaviors of the temperature measurements across time that weren't explicitly modeled (in contrast to the linear increasing/decreasing and seasonal behaviors that were explicitly modeled).
 
-```{r fig-factorexample1, fig.cap="Posterior mean (solid lines) and 95% credible intervals (light colored bands) for the four estimated factors across the observed time period.", fig.align="center", fig.height=3.5, fig.width=6}
+```{r fig-factorexample1, fig.cap="Posterior mean (solid lines) and 95% credible intervals (light colored bands) for the four estimated factors across the observed time period.", fig.align="center", fig.height=3.75, fig.width=6}
 plot_factor(bstfa.output,
             together=TRUE,
             include.legend=TRUE,
@@ -306,7 +301,7 @@ plot_factor(bstfa.output,
 
 The `map_spatial_param` function is similar to `plot_spatial_param`, but the parameter is plotted on a grid of unobserved locations. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=50` creates a $50 \times 50$ grid of locations to estimate parameter values.  This function is demonstrated below for the estimated linear increase/decrease of temperatures across Utah (once again, setting `yearscale=TRUE` to provide "per year" estimates). Figure \@ref(fig:fig-mapexample1) shows the temperatures tend to be increasing across the state by between $\approx$ 0.01 and 0.02$^{\circ}$ C each year, with locations in the northwest showing a small decrease in temperatures across this time period.
 
-```{r fig-mapexample1, cache=FALSE, warning=FALSE, fig.cap="Posterior mean linear change in temperatures across time for locations across the observed space.", fig.align="center", fig.width=4}
+```{r fig-mapexample1, cache=FALSE, warning=FALSE, fig.cap="Posterior mean linear change in temperatures across time for locations across the observed space.", fig.align="center", fig.width=3.5}
 map_spatial_param(bstfa.output,
          parameter='slope',
          yearscale=TRUE,
@@ -399,12 +394,10 @@ $$
 \boldsymbol{\beta} \sim N(\mathbf{B_\beta} \boldsymbol{\alpha_\beta}, \tau^2_\beta \mathbf{I}), 
 $$
 where $\mathbf{B_\beta}$ is an $n \times b_\beta$ matrix of basis functions evaluated at each location, $\boldsymbol{\alpha}_\beta$ represents the corresponding $b_\beta \times 1$ vector of coefficients, $\tau^2_\beta$ represents the variances, and $\mathbf{I}$ the appropriate identity matrix.  We place conjugate priors on $\boldsymbol{\alpha}_\beta$,
-
 $$
 \boldsymbol{\alpha}_\beta \sim N(0, \mathbf{A}^{-1}) \\
 $$
 where $\mathbf{A}$ is a diagonal precision matrix, and $\tau^2_\beta$,
-
 $$
 \frac{1}{\tau^2_\beta} \sim \mbox{Gamma}(\gamma, \phi),
 $$
@@ -436,11 +429,9 @@ kable(
 ### Seasonal Component
 
 Similarly, the spatially-dependent seasonal periodic process also uses basis functions.  First, we use cubic circular b-splines [@wood2017generalized] in time on the day of the year to model the periodic seasonal component. Let 
-
 $$
 g(\boldsymbol{\xi}(\mathbf{s}), t) = \mathbf{U}(t^*) \boldsymbol{\xi}(\mathbf{s}),
 $$
-
 where $\mathbf{U}(t^*)$ is the $u \times 1$ vector of cubic circular B-splines evaluated at the day of year of time $t$, denoted by $t^*$, and $\boldsymbol{\xi}(\mathbf{s})$ the corresponding $u \times 1$ vector of coefficients.  We then model the coefficients using the same approach used for the linear slopes.  Namely, let $\boldsymbol{\xi}_j = (\boldsymbol{\xi}_j(\mathbf{s}_1), \dots, \boldsymbol{\xi}_j(\mathbf{s}_n))'$ represent the coefficients for the $j$th spline for all locations of interest. Then,
 $$
 \boldsymbol{\xi}_j \sim N(\mathbf{B}_{\xi_j} \boldsymbol{\alpha}_{\xi_j}, \tau^2_{\xi_j} \mathbf{I}), 
@@ -536,7 +527,6 @@ Basis functions are a projection of a process onto a set of linear combinations 
 We use Fourier bases because of their connection to Gaussian processes and their computational flexibility. A Gaussian process can be approximated quite well with orthogonal spectral basis functions [@wikle2002spatial]. One example is to use some number of principal components of the spatial covariance matrix. These spectral basis functions can themselves be represented as a sum of sine and cosine functions [@paciorek2007fourier] reminiscent of a trigonometric Fourier series. Fourier bases, then, can capture the frequencies exhibited in the principal components of the underlying Gaussian process, granting a smooth approximation of the process.
 
 We make use of Fourier basis functions for both spatial and temporal dependence. First, consider the Fourier bases for temporal dependence.  Let $Q^T_r(t)$ and $Q^T_{r+1}(t)$ be the $r^{\text{th}}$ and $(r+1)^{\text{th}}$ columns of the matrix of bases for time $t$ for $r = 1, 3, 5, \dots R_t$.  Then, 
-
 $$
 Q^T_r(t) = \sin\left(2\pi \frac{r+1}{2} \frac{t}{f_t}\right),
 $$
@@ -546,7 +536,6 @@ $$
 where $f_t$ is the frequency of the Fourier function. 
 
 For the spatial basis functions, we must accommodate the two-dimensional nature of space.  Thus, we multiply the sine and cosine functions for each dimension [@paciorek2007fourier]. Let $Q^S_r(\mathbf{s})$ and $Q^S_{r+1}(\mathbf{s})$ be the $r^{\text{th}}$ and $(r+1)^{\text{th}}$ columns of the matrix of bases evaluated at location $\mathbf{s}$ for $r = 1, 3, 5, \dots R_s$.  Then,
-
 $$
     Q^S_r(\mathbf{s}) = \sin\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[1]}}{f_{\mathbf{s}_{[1]}}}\right)  \times \sin\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[2]}}{f_{\mathbf{s}_{[2]}}}\right),
 $$
@@ -557,7 +546,7 @@ where $\mathbf{s}_{[1]}$ represents the first coordinate of $\mathbf{s}$ (e.g., 
 
 The `BSTFA` package contains a helper function to visualize spatial Fourier bases over a given set of coordinates. This can be useful when trying to choose the value of the spatial frequencies, $f_{s_{[1]}}$ and $f_{s_{[2]}}$ (`freq.lon` and `freq.lat`) and number of bases ($R_s$ or `n.load.bases`) to include in the model. This function is demonstrated below using the Utah temperature data and corresponding plots are shown in Figure \@ref(fig:fig-fourierplots).
 
-```{r fig-fourierplots, fig.cap="Fourier bases for the two-dimensional space.  Top row represents the sine bases (r = 1, 3, 5; left, center, right, respectively).  Bottom row represents the corresponding cosine bases.", fig.align='center'}
+```{r fig-fourierplots, fig.width=6, fig.cap="Fourier bases for the two-dimensional space.  Top row represents the sine bases (r = 1, 3, 5; left, center, right, respectively).  Bottom row represents the corresponding cosine bases.", fig.align='center'}
 plot_fourier_bases(utahDataList$Coords,
                    R=6,
                    plot.3d=TRUE,
@@ -628,7 +617,7 @@ Factor analysis allows for interpretability of the factors and/or loadings. Sinc
 
 It's important that the fixed factor locations have a low proportion of missing data. If fixed factor locations are not given, they will be smartly chosen by the function according to distance and proportion of missing data.
 
-```{r dataplotsetup, echo=FALSE, warning=FALSE, include=FALSE}
+```{r dataplotsetup, echo=FALSE, warning=FALSE, include=FALSE, fig.width=3}
 map_data_loc <- ggplot2::map_data('state')[ggplot2::map_data('state')$region == 'utah',]
 full_map <- ggplot2::map_data('state')
 sf_polygon <- sf::st_sfc(sf::st_polygon(list(as.matrix(map_data_loc[,c(1,2)]))), crs=4326)
@@ -659,7 +648,7 @@ m = ggplot() +
   ylab("")
 ```
 
-```{r fig-dataplot, echo=FALSE, fig.cap="Plot of Utah showing locations of fixed factors (in red) and all locations (in black).", fig.align="center", fig.width=4}
+```{r fig-dataplot, echo=FALSE, fig.cap="Plot of Utah showing locations of fixed factors (in red) and all locations (in black).", fig.align="center", fig.width=3}
 m
 ```
 
@@ -674,7 +663,7 @@ plot_factor(bstfa.output,
             type='mean')
 ```
 
-```{r fig-mapexample, cache=FALSE, warning=FALSE, fig.cap="Posterior mean estimates across the state of Utah for the fourth loading.", fig.align="center", fig.width=4}
+```{r fig-mapexample, cache=FALSE, warning=FALSE, fig.cap="Posterior mean estimates across the state of Utah for the fourth loading.", fig.align="center", fig.width=3.5}
 map_spatial_param(bstfa.output,
          parameter='loading',
          loading=4,
@@ -713,7 +702,7 @@ out <- BSTFA(ymat=utahDataList$TemperatureVals,
 
 As described in Table 2.5, multiple arguments to `BSTFA` and `BSTFAfull` are used only for bisquare bases. The argument given to `spatial.style` or `load.style` to use these basis functions is `'grid'`. The `knot.levels` argument indicates how many resolutions of knots to create, where the $r^{th}$ resolution uses $2^{2r}$ bases distributed evenly in a square grid across the coordinates of the data. Setting `plot.knots=TRUE` outputs a plot of knots in all resolutions.  Figure \@ref(fig:fig-plottingknots) shows two resolutions of knots and the data locations for the Utah temperature data.
 
-```{r fig-plottingknots, fig.cap="Location of the observed data (open black circles) and the bisquare bases knots for resolution 1 (red dots) and resolution 2 (green dots) for default knot locations.", fig.width=4.5, fig.height=4.5, fig.align="center"}
+```{r fig-plottingknots, fig.cap="Location of the observed data (open black circles) and the bisquare bases knots for resolution 1 (red dots) and resolution 2 (green dots) for default knot locations.", fig.width=4, fig.height=4, fig.align="center"}
 bstfa.plot_knots = BSTFA(ymat=utahDataList$TemperatureVals,
                          dates=utahDataList$Dates,
                          coords=utahDataList$Coords,
@@ -727,7 +716,7 @@ bstfa.plot_knots = BSTFA(ymat=utahDataList$TemperatureVals,
 
 The user can specify custom knot locations with the `premade.knots` argument. This argument takes a list of coordinates containing pre-specified knots. The number of elements in the list represents the number of resolutions. Each element of the list should have the same number of columns as `coords`. Figure \@ref(fig:fig-customknots) an example where the first resolution matches the default, but the second uses a $3 \times 3$ grid of knots rather than the default $4 \times 4$.
 
-```{r fig-customknots, fig.cap="Location of the observed data (open black circles) and the bisquare bases knots for resolution 1 (red dots) and resolution 2 (green dots) for user-defined knots.", fig.width=4.5, fig.height=4.5, fig.align="center"}
+```{r fig-customknots, fig.cap="Location of the observed data (open black circles) and the bisquare bases knots for resolution 1 (red dots) and resolution 2 (green dots) for user-defined knots.", fig.width=4, fig.height=4, fig.align="center"}
 knots=list()
 max.lon = max(utahDataList$Coords[,1])
 min.lon = min(utahDataList$Coords[,1])

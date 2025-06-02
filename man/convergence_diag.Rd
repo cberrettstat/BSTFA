@@ -27,3 +27,6 @@ out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 convergence_diag(out)
 }
 }
+\author{
+Adam Simpson
+}

@@ -34,6 +34,9 @@ Plot trace plots
 data(utahDataList)
 attach(utahDataList)
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-plot_trace(out, parameter="beta", param.range=1)
+plot_trace(out, parameter='beta', param.range=1)
 }
+}
+\author{
+Adam Simpson
 }

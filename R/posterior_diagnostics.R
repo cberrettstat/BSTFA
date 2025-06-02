@@ -7,12 +7,13 @@
 #' @param par.mfrow Vector of length 2 indicating the number of rows and columns to divide the plotting window.
 #' @param density Logical scalar indicating whether to include the density plot of the posterior draws. Default is \code{TRUE}.
 #' @returns A plot containing the trace plot (and density plot when \code{density=TRUE}) of the listed parameters.
+#' @author Adam Simpson
 #' @examples
 #' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' plot_trace(out, parameter="beta", param.range=1)
+#' plot_trace(out, parameter='beta', param.range=1)
 #' }
 #' @export plot_trace
 plot_trace = function(out, parameter, param.range=NULL,
@@ -38,6 +39,7 @@ plot_trace = function(out, parameter, param.range=NULL,
 #' Print computation summary
 #' @param out Output from BSTFA or BSTFAfull.
 #' @returns Prints the computation time per iteration for each parameter.
+#' @author Adam Simpson
 #' @examples
 #' \dontrun{
 #' data(utahDataList)
@@ -69,6 +71,7 @@ compute_summary = function(out) {
 #' @param type Character specifying which diagnostic to compute.  Options are \code{ess} and \code{geweke}.
 #' @param cutoff Numeric scalar indicating the cutoff value to flag parameters that haven't converged.
 #' @returns A list containing convergence diagnostic for all parameters.
+#' @author Adam Simpson
 #' @examples
 #' \dontrun{
 #' data(utahDataList)
@@ -127,6 +130,7 @@ convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,0.001
 #' @param verbose Logical scalar indicating whether to print status of the log-likelihood computation.  Default is \code{FALSE}.
 #' @param addthin Numeric scalar indicating the number of additional draws to thin by to reduce the computation time.  Default is \code{1} (no additional thinning).
 #' @returns A matrix of size \code{n.times*n.locs} by \code{draws} log-likelihood values for each observation and each posterior draw.
+#' @author Adam Simpson and Candace Berrett
 #' @examples
 #' \dontrun{
 #' data(utahDataList)

@@ -1,8 +1,8 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.13)  28 MAY 2025 14:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.13)  2 JUN 2025 17:26
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**\input ./Rd2.tex \input ./Rd2.tex \input ./Rd2.tex
+**\input ./Rd2.tex \input ./Rd2.tex \input ./Rd2.tex \input ./Rd2.tex
 (./Rd2.tex
 (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/base/book.cls
 Document Class: book 2024/06/29 v1.4n Standard LaTeX document class
@@ -288,7 +288,7 @@ File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count302
 \l__pdf_internal_box=\box59
-) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.aux)
+) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpbcqL6R/Rd2pdf2cf234659904/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -310,7 +310,7 @@ LaTeX Font Info:    ... okay on input line 8.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 8.
 LaTeX Font Info:    ... okay on input line 8.
 Package hyperref Info: Link coloring ON on input line 8.
- (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.out) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.out)
+ (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpbcqL6R/Rd2pdf2cf234659904/Rd2.out) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpbcqL6R/Rd2pdf2cf234659904/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -331,7 +331,7 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 LaTeX Font Info:    Trying to load font information for U+rsfs on input line 36.
  (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
-) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.toc
+) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpbcqL6R/Rd2pdf2cf234659904/Rd2.toc
 
 [1
 
@@ -339,11 +339,6 @@ File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 {/Users/cberrett/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/Users/cberrett/Library/TinyTeX/texmf-dist/fonts/enc/dvips/base/8r.enc}{/Users/cberrett/Library/TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}])
 \tf@toc=\write5
 \openout5 = `Rd2.toc'.
-
-
-Overfull \hbox (9.36694pt too wide) in paragraph at lines 43--44
-[]\T1/ptm/m/n/10 Function to eval-u-ate bisquare bases for 1-dimensional space. Used in-ter-nally in []\T1/zi4/m/n/10 BSTFA []\T1/ptm/m/n/10 and []\T1/zi4/m/n/10 BSTFAfull[]\T1/ptm/m/n/10 . 
- []
 
 
 Overfull \hbox (9.36694pt too wide) in paragraph at lines 66--67
@@ -355,16 +350,17 @@ Overfull \hbox (9.36694pt too wide) in paragraph at lines 66--67
 [2]
 
 [3]
+LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 147.
+ (/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
+File: ts1zi4.fd 2018/01/14 TS1/zi4 (Inconsolata)
+)
+LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
+(Font)              scaled to size 10.0pt on input line 147.
+
 Overfull \hbox (27.45981pt too wide) in paragraph at lines 167--168
 \T1/ptm/m/n/10 po-nents. The de-fault value is []\T1/zi4/m/n/10 min(7, ceiling(length(unique(yday(dates)))/3))[]\T1/ptm/m/n/10 ,
  []
 
-LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 169.
-(/Users/cberrett/Library/TinyTeX/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
-File: ts1zi4.fd 2018/01/14 TS1/zi4 (Inconsolata)
-)
-LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 169.
 
 Overfull \hbox (7.89809pt too wide) in paragraph at lines 171--172
 []\T1/ptm/m/n/10 Numeric scalar in-di-cat-ing the num-ber of spa-tial bases to use when []\T1/zi4/m/n/10 spatial.style
@@ -376,13 +372,13 @@ Overfull \hbox (50.67824pt too wide) in paragraph at lines 173--174
  []
 
 
+
+[4{/Users/cberrett/Library/TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
 Overfull \hbox (0.647pt too wide) in paragraph at lines 175--176
 []\T1/ptm/m/n/10 Numeric scalar in-di-cat-ing the max-i-mum dis-tance at which a ba-sis value is greater
  []
 
 
-
-[4{/Users/cberrett/Library/TinyTeX/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
 Overfull \hbox (24.34853pt too wide) in paragraph at lines 179--180
 []\T1/ptm/m/n/10 Logical scalar in-di-cat-ing whether to plot the knots used when []\T1/zi4/m/n/10 spatial.style=\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 grid\TS1/zi4/m/n/10 '
  []
@@ -438,75 +434,75 @@ LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
 [7]
 
 [8]
-Overfull \hbox (82.45981pt too wide) in paragraph at lines 371--372
+
+[9]
+Overfull \hbox (82.45981pt too wide) in paragraph at lines 374--375
 \T1/ptm/m/n/10 po-nents. The de-fault value is []\T1/zi4/m/n/10 min(7, ceiling(length(unique(lubridate::yday(dates)))/3))[]\T1/ptm/m/n/10 ,
  []
 
 
-
-[9]
-Overfull \hbox (7.89809pt too wide) in paragraph at lines 375--376
+Overfull \hbox (7.89809pt too wide) in paragraph at lines 378--379
 []\T1/ptm/m/n/10 Numeric scalar in-di-cat-ing the num-ber of spa-tial bases to use when []\T1/zi4/m/n/10 spatial.style
  []
 
 
-Overfull \hbox (53.17824pt too wide) in paragraph at lines 377--378
+Overfull \hbox (53.17824pt too wide) in paragraph at lines 380--381
 []\T1/ptm/m/n/10 Numeric scalar in-di-cat-ing the num-ber of res-o-lu-tions to use for when []\T1/zi4/m/n/10 spatial.style=\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 grid\TS1/zi4/m/n/10 '[]\T1/ptm/m/n/10 .
  []
 
 
-Overfull \hbox (0.647pt too wide) in paragraph at lines 379--380
+Overfull \hbox (0.647pt too wide) in paragraph at lines 382--383
 []\T1/ptm/m/n/10 Numeric scalar in-di-cat-ing the max-i-mum dis-tance at which a ba-sis value is greater
  []
 
 
-Overfull \hbox (5.40976pt too wide) in paragraph at lines 379--380
+Overfull \hbox (5.40976pt too wide) in paragraph at lines 382--383
 \T1/ptm/m/n/10 than zero when []\T1/zi4/m/n/10 spatial.style=\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 grid\TS1/zi4/m/n/10 '[]\T1/ptm/m/n/10 . De-fault value is []\T1/zi4/m/n/10 mean(dist(coords))[]\T1/ptm/m/n/10 . 
  []
 
 
-Overfull \hbox (26.84853pt too wide) in paragraph at lines 383--384
+Overfull \hbox (26.84853pt too wide) in paragraph at lines 386--387
 []\T1/ptm/m/n/10 Logical scalar in-di-cat-ing whether to plot the knots used when []\T1/zi4/m/n/10 spatial.style=\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 grid\TS1/zi4/m/n/10 '[]\T1/ptm/m/n/10 .
  []
 
 
-Overfull \hbox (9.23912pt too wide) in paragraph at lines 385--386
+Overfull \hbox (9.23912pt too wide) in paragraph at lines 388--389
 []\T1/ptm/m/n/10 (as-sumed to be lon-gi-tude) for the Fourier bases when []\T1/zi4/m/n/10 spatial.style=\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 fourier\TS1/zi4/m/n/10 '[]\T1/ptm/m/n/10 .
  []
 
 
-Overfull \hbox (1.45895pt too wide) in paragraph at lines 387--388
+Overfull \hbox (1.45895pt too wide) in paragraph at lines 390--391
 []\T1/ptm/m/n/10 (as-sumed to be lat-i-tude) for the Fourier bases when []\T1/zi4/m/n/10 spatial.style=\TS1/zi4/m/n/10 '\T1/zi4/m/n/10 fourier\TS1/zi4/m/n/10 '[]\T1/ptm/m/n/10 .
  []
 
 
 
 [10]
-Overfull \hbox (7.59836pt too wide) in paragraph at lines 441--442
+Overfull \hbox (7.59836pt too wide) in paragraph at lines 444--445
 \T1/ptm/m/n/10 gres-sive cor-re-la-tion ma-trix for the fac-tors. De-fault is []\T1/zi4/m/n/10 matrix(0.001, n.factors,
  []
 
 
 
 [11]
-Overfull \hbox (12.24747pt too wide) in paragraph at lines 466--467
+Overfull \hbox (12.24747pt too wide) in paragraph at lines 469--470
 []\T1/ptm/m/n/10 An mcmc ob-ject of size []\T1/zi4/m/n/10 draws []\T1/ptm/m/n/10 by []\T1/zi4/m/n/10 n.locs []\T1/ptm/m/n/10 con-tain-ing the pos-te-rior draws for the in-crease/decrease
  []
 
 
 
 [12]
-Overfull \hbox (5.67712pt too wide) in paragraph at lines 481--482
+Overfull \hbox (5.67712pt too wide) in paragraph at lines 484--485
 \T1/ptm/m/n/10 of spa-tial ba-sis co-ef-fi-cients for the mean, lin-ear, and sea-sonal pro-cess co-ef-fi-cients. []\T1/zi4/m/n/10 linear.Tsub
  []
 
 
-Overfull \hbox (5.21715pt too wide) in paragraph at lines 481--482
+Overfull \hbox (5.21715pt too wide) in paragraph at lines 484--485
 []\T1/ptm/m/n/10 is the ma-trix used to en-force a lin-ear in-crease/increase (slope) across time. []\T1/zi4/m/n/10 seasonal.bs.basis
  []
 
 
-Overfull \hbox (6.6876pt too wide) in paragraph at lines 481--482
+Overfull \hbox (6.6876pt too wide) in paragraph at lines 484--485
 []\T1/ptm/m/n/10 is the ma-trix con-tain-ing the cir-cu-lar b-splines of the sea-sonal pro-cess. []\T1/zi4/m/n/10 confoundingPmat.prime
  []
 
@@ -517,65 +513,69 @@ Overfull \hbox (6.6876pt too wide) in paragraph at lines 481--482
 [14]
 
 [15]
-Overfull \hbox (33.8784pt too wide) in paragraph at lines 655--656
+
+[16]
+Overfull \hbox (33.8784pt too wide) in paragraph at lines 683--684
 []\T1/ptm/m/n/10 Maximum dis-tance be-tween an ob-ser-va-tion and a knot. De-fault is []\T1/zi4/m/n/10 mean(dist(coords))[]\T1/ptm/m/n/10 . 
  []
 
 
 
-[16]
-Overfull \hbox (24.76044pt too wide) in paragraph at lines 710--710
+[17]
+Overfull \hbox (24.76044pt too wide) in paragraph at lines 738--738
  []  \T1/zi4/m/n/10 color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =[] 
  []
 
 
-
-[17]
-Overfull \hbox (104.41895pt too wide) in paragraph at lines 739--740
+Overfull \hbox (104.41895pt too wide) in paragraph at lines 767--768
 []\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
  []
 
 
-Overfull \hbox (37.80907pt too wide) in paragraph at lines 747--748
+
+[18]
+Overfull \hbox (37.80907pt too wide) in paragraph at lines 775--776
 []\T1/ptm/m/n/10 Name of re-gion to in-clude in the map. Fed to []\T1/zi4/m/n/10 region []\T1/ptm/m/n/10 in the func-tion []\T1/zi4/m/n/10 ggplot2::map_data[]\T1/ptm/m/n/10 . 
  []
 
 LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 9.0pt on input line 762.
+(Font)              scaled to size 9.0pt on input line 795.
 
-
-[18]
 
 [19]
 
 [20]
 
 [21]
-Overfull \hbox (24.76044pt too wide) in paragraph at lines 982--982
+
+[22]
+
+[23]
+Overfull \hbox (24.76044pt too wide) in paragraph at lines 1042--1042
  []  \T1/zi4/m/n/10 color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =[] 
  []
 
 
-
-[22]
-Overfull \hbox (104.41895pt too wide) in paragraph at lines 1002--1003
+Overfull \hbox (104.41895pt too wide) in paragraph at lines 1062--1063
 []\T1/ptm/m/n/10 The color palette to use for the plot. De-fault is []\T1/zi4/m/n/10 colorRampPalette(rev(RColorBrewer::brewer.pal(9,
  []
 
 
 
-[23]
-
-[24] (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.ind
+[24]
 
 [25]
 
+[26] (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpbcqL6R/Rd2pdf2cf234659904/Rd2.ind
+
+[27]
 
 
-[26
+
+[28
 
 
-]) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpPm2lkA/Rd2pdfad8b640c519e/Rd2.aux)
+]) (/private/var/folders/9m/5m_kgz6s43s87jgls3tcc6j40000gp/T/RtmpbcqL6R/Rd2pdf2cf234659904/Rd2.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -584,18 +584,18 @@ Package rerunfilecheck Info: File `Rd2.out' has not changed.
 (rerunfilecheck)             Checksum: BF10395461C6C8D7D639502B1B12CC5C;2295.
  ) 
 Here is how much of TeX's memory you used:
- 10500 strings out of 475111
- 160909 string characters out of 5762982
+ 10513 strings out of 475111
+ 161047 string characters out of 5762982
  553985 words of memory out of 5000000
  33181 multiletter control sequences out of 15000+600000
  592968 words of font info for 80 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 92i,6n,95p,989b,733s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 92i,6n,95p,1006b,735s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/cberrett/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (26 pages, 147895 bytes).
+Output written on Rd2.pdf (28 pages, 151064 bytes).
 PDF statistics:
- 422 PDF objects out of 1000 (max. 8388607)
- 377 compressed objects within 4 object streams
- 157 named destinations out of 1000 (max. 500000)
+ 443 PDF objects out of 1000 (max. 8388607)
+ 396 compressed objects within 4 object streams
+ 170 named destinations out of 1000 (max. 500000)
  161 words of extra memory for PDF output out of 10000 (max. 10000000)
 

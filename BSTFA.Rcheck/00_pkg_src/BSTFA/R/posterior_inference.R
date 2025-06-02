@@ -1,20 +1,23 @@
 ### Functions to perform posterior inference
 
-### Plotting functions for STFA
+### Plotting functions for BSTFA
 
-#' Prediction
+#' Estimate/predict values of the time series at a specific location.
 #' @param out Output from BSTFA or BSTFAfull.
 #' @param location Either a single integer indicating the location in the data set to provide predictions or a vector of length 2 providing the longitude and latitude of the new location. If \code{location=NULL} (default), the function will return predictions for all in-sample locations.
 #' @param type One of \code{all}, \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic of the predicted values to return.
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param new_x If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.
 #' @param pred.int Logical scalar indicating whether to include additional uncertainty for posterior predictive intervals (\code{TRUE}; default) or not (posterior draws from the mean of \code{location}).
-#' @returns A matrix or vector of predicted values for \code{location}.
+#' @returns A matrix or vector of estimated/predicted values for \code{location}.
+#' @author Candace Berrett and Adam Simpson
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
+#' }
 #' @importFrom npreg basis.tps
 #' @export predictBSTFA
 predictBSTFA = function(out, location=NULL, type='mean',
@@ -217,7 +220,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
 }
 
 
-#' Plot a location's time series of estimated/interpolated values.
+#' Plot a location's time series of estimated/predicted values.
 #' @param out Output from BSTFA or BSTFAfull.
 #' @param location Either a single integer indicating the location in the data set to plot or a vector of length 2 providing the longitude and latitude of the new location.
 #' @param new_x If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.
@@ -230,11 +233,14 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' @param truth Logical scalar indicating whether to include the observed measurements (\code{TRUE}) or not (default).  If \code{TRUE}, \code{location} must be an integer corresponding to the column of the data matrix for the in-sample prediction location.
 #' @param ylim Numeric vector of length 2 providing the lower and upper bounds of the y-axis.  If \code{NULL} (default), the y-axis limits are chosen using the range of the predictions.
 #' @returns A plot of predicted values for \code{location}.
+#' @author Candace Berrett and Adam Simpson
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' plot_location(out, location=1, pred.int=FALSE)
+#' }
 #' @export plot_location
 plot_location = function(out, location, new_x=NULL,
                          type='mean', par.mfrow=c(1,1), pred.int=TRUE,
@@ -320,18 +326,21 @@ plot_location = function(out, location, new_x=NULL,
 
 #' Plot the spatially-dependent parameter for in-sample locations.
 #' @param out Output from BSTFA or BSTFAfull.
-#' @param parameter One of \code{"slope"} (default), \code{"loading"}, or \code{"mean"}.
-#' @param loadings If \code{parameter="loading"}, an integer indicating which factor loading to plot.
+#' @param parameter One of \code{'slope'} (default), \code{'loading'}, or \code{'mean'}.
+#' @param loadings If \code{parameter='loading'}, an integer indicating which factor loading to plot.
 #' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.
-#' @param yearscale If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
+#' @param yearscale If \code{parameter='slope'}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param color.gradient The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)}.
 #' @returns A plot of spatially-dependent parameter values for the observed locations.
+#' @author Adam Simpson and Candace Berrett
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' plot_spatial_param(out, parameter="slope")
+#' plot_spatial_param(out, parameter='slope')
+#' }
 #' @import ggplot2
 #' @importFrom RColorBrewer brewer.pal
 #' @export plot_spatial_param
@@ -398,10 +407,10 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
 
 #' Plot a map of interpolated spatially-dependent parameter values.
 #' @param out Output from BSTFA or BSTFAfull.
-#' @param parameter One of \code{"slope"} (default), \code{"loading"}, or \code{"mean"}.
-#' @param loadings If \code{parameter="loading"}, an integer indicating which factor loading to plot.
+#' @param parameter One of \code{'slope'} (default), \code{'loading'}, or \code{'mean'}.
+#' @param loadings If \code{parameter='loading'}, an integer indicating which factor loading to plot.
 #' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic to plot at each location.
-#' @param yearscale If \code{parameter="slope"}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
+#' @param yearscale If \code{parameter='slope'}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
 #' @param new_x If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param fine Integer specifying the number of grid points along both the longitude and latitude directions used to interpolate the parameter. The resulting interpolation grid will contain \code{fine*fine} total locations. If \code{map=TRUE}, \code{state=TRUE}, and \code{location} is specified, the grid will be clipped to the boundaries of the specified state, removing locations outside of it.
@@ -412,11 +421,14 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
 #' @param location Name of region to include in the map.  Fed to \code{region} in the function \code{ggplot2::map_data}.
 #' @param addthin Integer indicating the number of saved draws to thin.  Default is to not thin any \code{addthin=1}.  This can save time when the object is from \code{BSTFAfull} and \code{parameter='loading'}.
 #' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
+#' @author Adam Simpson and Candace Berrett
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
-#' map_spatial_param(out, parameter="slope", map=TRUE, state=TRUE, location='utah', fine=50)
+#' map_spatial_param(out, parameter='slope', map=TRUE, state=TRUE, location='utah', fine=50)
+#' }
 #' @importFrom npreg basis.tps
 #' @importFrom sf st_sfc
 #' @importFrom sf st_polygon
@@ -725,7 +737,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
 }
 
 
-#' Plot the factors
+#' Plot the temporally-dependent factors.
 #' @param out Output from BSTFA or BSTFAfull.
 #' @param factor Integer or vector of integers specifying which factor(s) to plot.
 #' @param together If \code{length(factor)>1}, logical scalar specifying whether to plot all factors on a single plot. Default is \code{FALSE}.
@@ -735,11 +747,14 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
 #' @param ci.level A vector of length 2 specifying the quantiles to use for lower and upper bounds for \code{type='lb'}, \code{type='ub'}, or \code{uncertainty=TRUE}.
 #' @param xrange A date vector of length 2 providing the lower and upper bounds of the dates to include in the plot.
 #' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
+#' @author Candace Berrett and Adam Simpson
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' plot_factor(out, factor=1:4, together=TRUE)
+#' }
 #' @export plot_factor
 plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
                        type='mean', uncertainty=TRUE, ci.level=c(0.025, 0.975),
@@ -796,24 +811,27 @@ plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
 }
 
 
-#' Plot annual curve
+#' Plot annual/seasonal behavior at a specific location.
 #' @param out Output from BSTFA or BSTFAfull.
 #' @param location Either a single integer indicating the location in the data set to plot or a vector of length 2 providing the longitude and latitude of the new location.
 #' @param add Logical scalar indicating whether the annual/seasonal process should be added to the existing plot.  Default is \code{FALSE}.
-#' @param years Either \code{"one"} (indicating to plot just a single year; default) or \code{"all"} (indicating to plot all years in the observed time period).
+#' @param years Either \code{'one'} (indicating to plot just a single year; default) or \code{'all'} (indicating to plot all years in the observed time period).
 #' @param new_x If the original model included covariates \code{x}, include the same covariates for \code{location}.
 #' @param interval Numeric value between 0 and 1 specifying the probability of the credible interval.
 #' @param yrange Numeric vector of length 2 providing the lower and upper bounds of the y-axis.  If \code{NULL} (default), the y-axis limits are chosen using the range of the seasonal process and data.
 #' @returns A plot of the annual/seasonal process at \code{location}.
+#' @author Candace Berrett and Adam Simpson
 #' @examples
+#' \dontrun{
 #' data(utahDataList)
 #' attach(utahDataList)
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
 #' plot_annual(out, location=1)
+#' }
 #' @importFrom mgcv cSplineDes
 #' @export plot_annual
 plot_annual <- function(out, location, add=F,
-                        years="one",
+                        years='one',
                         interval=0.95, yrange=NULL,
                         new_x=NULL){
 
@@ -863,7 +881,7 @@ plot_annual <- function(out, location, add=F,
       if(years=="all"){
         plot(dates.pred, ann.pred.mean, lwd=1.5, type='l', xlab="Date", ylab="Annual Seasonal Cycle", ylim=ylims, main=paste("Location", location))
       }else{
-        plot(doy.pred, ann.pred.mean, lwd=1.5, type='l', xaxt="n", xlab="Date", ylab="Annual Seasonal Cycle", ylim=ylims)
+        plot(doy.pred, ann.pred.mean, lwd=1.5, type='l', xaxt="n", xlab="Date", ylab="Annual Seasonal Cycle", ylim=ylims, main=paste("Seasonal Behavior of Location", location))
         axis(1, at=at.doy.plot, labels=months.plot)
       }
       if(interval>0){

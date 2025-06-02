@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_fourier_bases.R
 \name{plot_fourier_bases}
 \alias{plot_fourier_bases}
-\title{Visualize fourier bases. Used internally.}
+\title{Visualize fourier bases.}
 \usage{
 plot_fourier_bases(
   coords,
@@ -30,5 +30,8 @@ plot_fourier_bases(
 \item{par.mfrow}{If \code{plot.3d=TRUE}, how to divide the plotting window. See \code{help(par)} for more details.}
 }
 \description{
-Visualize fourier bases. Used internally.
+Visualize fourier bases.
+}
+\author{
+Adam Simpson
 }

@@ -64,7 +64,7 @@ BSTFAfull(
 \arguments{
 \item{ymat}{Data matrix of size \code{n.times} by \code{n.locs}. Any missing data should be marked by \code{NA}.  The model works best if the data are zero-centered for each location.}
 
-\item{dates}{\code{n.times} length vector of class \code{"Date"} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).}
+\item{dates}{\code{n.times} length vector of class \code{'Date'} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).}
 
 \item{coords}{\code{n.locs} by \code{2} matrix or data frame of coordinates for the locations of the observed data. If using longitude and latitude, longitude is assumed to be the first coordinate.}
 
@@ -78,7 +78,7 @@ BSTFAfull(
 
 \item{mean}{Logical scalar.  If \code{TRUE}, the model will fit a spatially-dependent mean for each location.  Otherwise, the model will assume the means are zero at each location (default).}
 
-\item{linear}{Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or "slope") in time. Otherwise, the model will assume a zero change in slope across time.}
+\item{linear}{Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or slope) in time. Otherwise, the model will assume a zero change in slope across time.}
 
 \item{seasonal}{Logical scalar. If \code{TRUE} (default), the model will use circular b-splines to model a spatially-dependent annual process.  Otherwise, the model will assume there is no seasonal (annual) process.}
 

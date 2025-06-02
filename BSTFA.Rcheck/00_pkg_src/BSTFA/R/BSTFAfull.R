@@ -4,14 +4,14 @@
 #'
 #' This function uses MCMC to draw from posterior distributions of a Bayesian spatio-temporal factor analysis model.  The spatial processes for the mean, linear, and seasonal behavior use one of Fourier, thin plate spline, or multiresolution basis functions.  The temporal dependence of the factors is modeled using a vector autoregressive model.  The spatially-dependent loadings are modeled using a mean-zero Gaussian process with an exponential covariance structure.  The default values are chosen to work well for many data sets.  Thus, it is possible to use this function using only three arguments: \code{ymat}, \code{dates}, and \code{coords}.  The default number of MCMC iterations is 10000 (saving 5000); however, depending on the number of observations and processes modeled, it may need more draws than this to ensure the posterior draws are representative of the entire posterior distribution space.
 #' @param ymat Data matrix of size \code{n.times} by \code{n.locs}. Any missing data should be marked by \code{NA}.  The model works best if the data are zero-centered for each location.
-#' @param dates \code{n.times} length vector of class \code{"Date"} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).
+#' @param dates \code{n.times} length vector of class \code{'Date'} corresponding to each date of the observed data.  For now, the dates should be regularly spaced (e.g., daily).
 #' @param coords \code{n.locs} by \code{2} matrix or data frame of coordinates for the locations of the observed data. If using longitude and latitude, longitude is assumed to be the first coordinate.
 #' @param iters Number of MCMC iterations to draw.  Default value is \code{10000}.  Function only saves \code{(iters-burn)/thin} drawn values.
 #' @param n.times Number of observations for each location. Default is \code{nrow(ymat)}.
 #' @param n.locs Number of observed locations.  Default is \code{ncol(ymat)}.
 #' @param x Optional \code{n.locs} by \code{p} matrix of covariates for each location.  If there are no covariates, set to \code{NULL} (default).
 #' @param mean Logical scalar.  If \code{TRUE}, the model will fit a spatially-dependent mean for each location.  Otherwise, the model will assume the means are zero at each location (default).
-#' @param linear Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or "slope") in time. Otherwise, the model will assume a zero change in slope across time.
+#' @param linear Logical scalar.  If \code{TRUE} (default), the model will fit a spatially-dependent linear increase/decrease (or slope) in time. Otherwise, the model will assume a zero change in slope across time.
 #' @param seasonal Logical scalar. If \code{TRUE} (default), the model will use circular b-splines to model a spatially-dependent annual process.  Otherwise, the model will assume there is no seasonal (annual) process.
 #' @param factors Logical scalar. If \code{TRUE} (default), the model will fit a spatio-temporal factor analysis model with temporally-dependent factors and spatially-dependent loadings.
 #' @param n.seasn.knots Numeric scalar indicating the number of knots to use for the seasonal basis components. The default value is \code{min(7, ceiling(length(unique(lubridate::yday(dates)))/3))}, where 7 will capture approximately 2 peaks during the year.
@@ -101,9 +101,12 @@
 #' }
 #' @author Candace Berrett and Adam Simpson
 #' @examples
+#' \dontrun{
+#' #Example below not run; even the ten iterations will take a minute or two to run.
 #' data(utahDataList)
 #' attach(utahDataList)
-#' out <- BSTFAfull(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=50)
+#' out <- BSTFAfull(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=10)
+#' }
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                      mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
@@ -779,11 +782,3 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
 
 
-
-### removed
-# mean, linear, seasonal, factors (all boolean)
-# knot.levels, max.knot.dist, premade.knots, plot.knots (make default FALSE?)
-# plot.factors (make default FALSE?), n.temp.bases, n.load.bases, phi.T, phi.S,
-# alpha.prec, tau2.gamma, tau2.phi, sig2.gamma, sig2.phi,
-# sig2, beta, xi, Fmat, Lambda,
-# save.missing, filename

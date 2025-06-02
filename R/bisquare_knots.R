@@ -28,7 +28,7 @@ bisquare2d <- function(locs, knots){ #knots are rows
 
 #' Bisquare bases for 1-dimensional space
 #'
-#' Function to evaluate bisquare bases for 1-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
+#' Evaluate bisquare bases for 1-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
 #' @param locs Matrix of coordinates for observed locations.
 #' @param knots A vector of the number of knots for each resolution.
 #' @importFrom stats dist
@@ -429,16 +429,16 @@ defineRegion <- function(out, location) {
 # #' @param style Character scalar indicating whether to plot the knots for the mean, linear, and seasonal components (\code{"spatial"}; default) or for the factor loadings (\code{"load"}).  If it is an object from \code{BSTFAfull}, only the knots from \code{spatial.style} are relevant.
 # #' @export plot_knots
 # plot_knots <- function(out, style="spatial"){
-	
+
 	# coords <- out$coords
-	
+
 	# if (is.matrix(coords) | is.data.frame(coords)) {
     # if (dim(coords)[2]>1) dist.bisquare='D2'
     # else dist.bisquare='D1'
   # } else {
     # dist.bisquare = 'D1'
   # }
-  
+
   # if(style=="spatial"){
   	# if(out$spatial.style=="grid"){
   		# knots <- out$knots.spatial
@@ -452,7 +452,7 @@ defineRegion <- function(out, location) {
   		# print("Error: Loading bases are not multiresolution bisquare bases.")
   	# }
   # }
-	
+
 	# if(dist.bisquare=="D2"){
       # legend.txt = c()
       # colors=c()

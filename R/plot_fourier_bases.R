@@ -1,6 +1,6 @@
 ### Function to visualize fourier bases
 
-#' Visualize fourier bases. Used internally.
+#' Visualize fourier bases.
 #' @param coords A matrix of coordinates of observed locations.
 #' @param R Integer indicating the number of bases to compute.
 #' @param fine Number of grid points to include on both axes.  Total grid size will be \code{fine^2}.  Default is \code{100}.
@@ -9,6 +9,7 @@
 #' @param freq.lat Numeric value indicating the frequency to use for the Fourier bases in the latitude direction.  Default is \code{4*diff(range(coords[,2]))}.
 #' @param par.mfrow If \code{plot.3d=TRUE}, how to divide the plotting window. See \code{help(par)} for more details.
 #' @import scatterplot3d
+#' @author Adam Simpson
 #' @export plot_fourier_bases
 plot_fourier_bases = function(coords, R, fine=100, plot.3d=FALSE,
                               freq.lon=4*diff(range(coords[,1])),
