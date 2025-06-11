@@ -12,10 +12,11 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
-Depends: R (>= 2.10)
+Depends: 
+    R (>= 3.5)
 LinkingTo: Rcpp, RcppArmadillo
 LazyData: true
+LazyDataCompression: xz
 Imports: 
     MASS, RColorBrewer, ggplot2, ggpubr, mgcv, MCMCpack, coda, npreg, matrixcalc, scatterplot3d, sf, Rcpp, lubridate, Matrix, stats, methods, RcppArmadillo
 Suggests: knitr, rmarkdown, utils, devtools, kableExtra
-

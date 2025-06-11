@@ -89,9 +89,21 @@
 #' }
 #' @author Adam Simpson and Candace Berrett
 #' @examples
-#' \dontrun{
+#' #Very small example to illustrate use and ensure functionality
 #' data(utahDataList)
 #' attach(utahDataList)
+#'
+#' #identify locations with very little missing data just for this example
+#' low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02)
+#'
+#' out <- BSTFA(ymat=TemperatureVals[1:50,low.miss],
+#'   dates=Dates[1:50],
+#'   coords=Coords[low.miss,],
+#'   n.factors=2,
+#'   iters=10)
+#'
+#' #More full example:
+#' \dontrun{
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
 #' }
 #' @export BSTFA
@@ -439,6 +451,9 @@ BSTFA <- function(ymat, dates, coords,
 
     ### Establish fixed factor locations
     if (is.null(factors.fixed)) {
+      if(n.factors==1){
+        factors.fixed <- sample(which(prop.missing==min(prop.missing, na.rm=T)), size=1)
+      }else{
       distmat <- as.matrix(dist(coords))
       far = FALSE
       d = c()
@@ -451,6 +466,7 @@ BSTFA <- function(ymat, dates, coords,
         far = ifelse(min(d) < (max(distmat) / n.factors), FALSE, TRUE)
       }
       factors.fixed = p
+      }
     }
     n.factors=length(factors.fixed)
     Lambda.tilde = Lambda

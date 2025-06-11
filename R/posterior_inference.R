@@ -12,12 +12,9 @@
 #' @returns A matrix or vector of estimated/predicted values for \code{location}.
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' \dontrun{
-#' data(utahDataList)
-#' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' data(out)
+#' attach(out)
 #' loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
-#' }
 #' @importFrom npreg basis.tps
 #' @export predictBSTFA
 predictBSTFA = function(out, location=NULL, type='mean',
@@ -166,20 +163,53 @@ predictBSTFA = function(out, location=NULL, type='mean',
       coords_added = rbind(out$coords,location)
       predQS = matrix(npreg::basis.tps(coords_added, knots=out$knots.load, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.load.bases)
     }
+    if(out$load.style=='full'){
+      predQS = diag(1, dim(location)[1])
+    }
 
     # Lambda (loadings)
     Lam = array(dim=c(nrow(predQS),out$n.factors,out$draws))
-    for (i in 1:out$draws) {
-      Lammean = predQS%*%matrix(out$alphaS[i,],nrow=out$n.load.bases,ncol=out$n.factors,byrow=TRUE)
-      if(pred.int){
-          Lamresid = matrix(rnorm(nrow(location)*out$n.factors,
-                              mean=rep(0,nrow(location)*out$n.factors),
-                              sd=sqrt(rep(c(out$tau2.lambda[i,]),each=out$n.factors))),ncol=out$n.factors,byrow=TRUE)
-          Lam[,,i] = Lammean + Lamresid
+    if(out$load.style=='full'){
+        names(out$coords) <- c("Lon", "Lat")
+        npred <- dim(location)[1]
+        predloc2 <- rbind(out$coords, location)
+        preddist <- as.matrix(dist(predloc2))
+        condinds <- 1:out$n.locs
+        for(thisload in 1:out$n.factors){
+          lammean <- matrix(0, nrow=floor(out$draws), ncol=npred)
+          lamresid <- matrix(0, nrow=floor(out$draws), ncol=npred)
+          mycount <- 0
+          for(d in seq(1, out$draws, by=1)){
+            mycount <- mycount + 1
+            bigmat <- out$tau2.lambda[d,loadings]*exp(-preddist/out$phi.lambda[d,loadings])
+            A <- bigmat[condinds, condinds]
+            B <- bigmat[condinds, -condinds]
+            C <- bigmat[-condinds, -condinds]
+
+            L <- chol(A)
+            LB <- forwardsolve(t(L), B)
+            part1 <- t(backsolve(L, LB))
+
+            #condvar <- C - part1%*%B
+            lammean[mycount,] <- part1%*%out$Lambda.tilde[d, seq(thisload, out$n.factors*out$n.locs, by=out$n.factors)] #((loading-1)*out$n.locs) + (1:out$n.locs)]
+            #cholC <- chol(condvar)
+            #lamresid[mycount,] <- as.numeric(cholC%*%rnorm(npred))
+          }
+        Lam[,thisload,] <- t(lammean)
+        }
       }else{
-          Lam[,,i] = Lammean
+        for (i in 1:out$draws) {
+          Lammean = predQS%*%matrix(out$alphaS[i,],nrow=out$n.load.bases,ncol=out$n.factors,byrow=TRUE)
+          if(pred.int){
+            Lamresid = matrix(rnorm(nrow(location)*out$n.factors,
+                              mean=rep(0,nrow(location)*out$n.factors),
+                              sd=sqrt(rep(c(out$tau2.lambda[i]),each=out$n.factors))),ncol=out$n.factors,byrow=TRUE)
+            Lam[,,i] = Lammean + Lamresid
+          }else{
+            Lam[,,i] = Lammean
+          }
+        }
       }
-    }
 
     # F (factor scores)
     facts = array(dim=c(out$n.times,nrow(location),out$draws))
@@ -235,12 +265,9 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' @returns A plot of predicted values for \code{location}.
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' \dontrun{
-#' data(utahDataList)
-#' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' data(out)
+#' attach(out)
 #' plot_location(out, location=1, pred.int=FALSE)
-#' }
 #' @export plot_location
 plot_location = function(out, location, new_x=NULL,
                          type='mean', par.mfrow=c(1,1), pred.int=TRUE,
@@ -335,12 +362,9 @@ plot_location = function(out, location, new_x=NULL,
 #' @returns A plot of spatially-dependent parameter values for the observed locations.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
-#' \dontrun{
-#' data(utahDataList)
-#' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' data(out)
+#' attach(out)
 #' plot_spatial_param(out, parameter='slope')
-#' }
 #' @import ggplot2
 #' @importFrom RColorBrewer brewer.pal
 #' @export plot_spatial_param
@@ -423,12 +447,9 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
 #' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
-#' \dontrun{
-#' data(utahDataList)
-#' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' data(out)
+#' attach(out)
 #' map_spatial_param(out, parameter='slope', map=TRUE, state=TRUE, location='utah', fine=50)
-#' }
 #' @importFrom npreg basis.tps
 #' @importFrom sf st_sfc
 #' @importFrom sf st_polygon
@@ -537,7 +558,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
     betamean <- predS%*%t(out$alpha.beta[seq(1, out$draws, by=addthin),])
     betaresid <- matrix(rnorm(fine^2*floor(out$draws/addthin),
                              mean=rep(0,fine^2*floor(out$draws/addthin)),
-                             sd=sqrt(rep(c(out$tau2.beta[seq(1, out$draws, by=addthin),]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
+                             sd=sqrt(rep(c(out$tau2.beta[seq(1, out$draws, by=addthin)]),each=fine^2))),ncol=floor(out$draws/addthin),byrow=TRUE)
     # betapred <- betamean + betaresid
     betapred <- betamean
     if (yearscale) {
@@ -749,12 +770,9 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
 #' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' \dontrun{
-#' data(utahDataList)
-#' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' data(out)
+#' attach(out)
 #' plot_factor(out, factor=1:4, together=TRUE)
-#' }
 #' @export plot_factor
 plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
                        type='mean', uncertainty=TRUE, ci.level=c(0.025, 0.975),
@@ -822,12 +840,9 @@ plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
 #' @returns A plot of the annual/seasonal process at \code{location}.
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' \dontrun{
-#' data(utahDataList)
-#' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' data(out)
+#' attach(out)
 #' plot_annual(out, location=1)
-#' }
 #' @importFrom mgcv cSplineDes
 #' @export plot_annual
 plot_annual <- function(out, location, add=F,

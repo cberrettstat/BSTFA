@@ -36,12 +36,9 @@ A plot of the annual/seasonal process at \code{location}.
 Plot annual/seasonal behavior at a specific location.
 }
 \examples{
-\dontrun{
-data(utahDataList)
-attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+data(out)
+attach(out)
 plot_annual(out, location=1)
-}
 }
 \author{
 Candace Berrett and Adam Simpson

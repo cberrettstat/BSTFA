@@ -33,12 +33,9 @@ A matrix or vector of estimated/predicted values for \code{location}.
 Estimate/predict values of the time series at a specific location.
 }
 \examples{
-\dontrun{
-data(utahDataList)
-attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+data(out)
+attach(out)
 loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
-}
 }
 \author{
 Candace Berrett and Adam Simpson

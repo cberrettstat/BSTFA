@@ -58,12 +58,9 @@ A plot of spatially-dependent parameter values for a grid of interpolated locati
 Plot a map of interpolated spatially-dependent parameter values.
 }
 \examples{
-\dontrun{
-data(utahDataList)
-attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+data(out)
+attach(out)
 map_spatial_param(out, parameter='slope', map=TRUE, state=TRUE, location='utah', fine=50)
-}
 }
 \author{
 Adam Simpson and Candace Berrett

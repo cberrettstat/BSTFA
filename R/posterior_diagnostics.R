@@ -9,12 +9,9 @@
 #' @returns A plot containing the trace plot (and density plot when \code{density=TRUE}) of the listed parameters.
 #' @author Adam Simpson
 #' @examples
-#' \dontrun{
-#' data(utahDataList)
-#' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' data(out)
+#' attach(out)
 #' plot_trace(out, parameter='beta', param.range=1)
-#' }
 #' @export plot_trace
 plot_trace = function(out, parameter, param.range=NULL,
                       par.mfrow=c(1,1), density=TRUE) {
@@ -41,12 +38,9 @@ plot_trace = function(out, parameter, param.range=NULL,
 #' @returns Prints the computation time per iteration for each parameter.
 #' @author Adam Simpson
 #' @examples
-#' \dontrun{
-#' data(utahDataList)
-#' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' data(out)
+#' attach(out)
 #' compute_summary(out)
-#' }
 #' @export compute_summary
 compute_summary = function(out) {
   no.fa.iters = which(out$time.data[,3] == 0)
@@ -62,7 +56,7 @@ compute_summary = function(out) {
   print(paste('Pre-Factor Analysis:', round(mean(out$time.data[no.fa.iters,6]),3), 'seconds.'))
   print(paste('Post-Factor Analysis:', round(mean(out$time.data[fa.iters,6]),3), 'seconds.'))
   print('TOTAL TIME')
-  print(paste('Total time: ', round(out$setup.time + apply(out$time.data,2,sum)[6],3), ' seconds (', round((out$setup.time + apply(out$time.data,2,sum)[6])/60,3),' minutes) for ', out$iters, ' iterations.', sep=""))
+  print(paste('Total time: ', round(out$setup.time + apply(out$time.data,2,sum, na.rm=T)[6],3), ' seconds (', round((out$setup.time + apply(out$time.data,2,sum, na.rm=T)[6])/60,3),' minutes) for ', out$iters, ' iterations.', sep=""))
 }
 
 
@@ -70,19 +64,16 @@ compute_summary = function(out) {
 #' @param out Output from BSTFA or BSTFAfull.
 #' @param type Character specifying which diagnostic to compute.  Options are \code{ess} and \code{geweke}.
 #' @param cutoff Numeric scalar indicating the cutoff value to flag parameters that haven't converged.
-#' @returns A list containing convergence diagnostic for all parameters.
+#' @returns A list containing the parameters not meeting the convergence cutoff criteria.
 #' @author Adam Simpson
 #' @examples
-#' \dontrun{
-#' data(utahDataList)
-#' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' data(out)
+#' attach(out)
 #' convergence_diag(out)
-#' }
 #' @importFrom coda effectiveSize
 #' @importFrom coda geweke.diag
 #' @export convergence_diag
-convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,0.001)) {
+convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,1.96)) {
 
   mcmcVals = list()
   if (type=='eSS') {
@@ -132,12 +123,9 @@ convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,0.001
 #' @returns A matrix of size \code{n.times*n.locs} by \code{draws} log-likelihood values for each observation and each posterior draw.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
-#' \dontrun{
-#' data(utahDataList)
-#' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+#' data(out)
+#' attach(out)
 #' loglik <- computeLogLik(out, addthin=2)
-#' }
 #' @export computeLogLik
 computeLogLik <- function(out, verbose=FALSE, addthin=1) {
   y = out$y

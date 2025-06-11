@@ -39,12 +39,9 @@ A plot of spatially-dependent parameter values for a grid of interpolated locati
 Plot the temporally-dependent factors.
 }
 \examples{
-\dontrun{
-data(utahDataList)
-attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+data(out)
+attach(out)
 plot_factor(out, factor=1:4, together=TRUE)
-}
 }
 \author{
 Candace Berrett and Adam Simpson

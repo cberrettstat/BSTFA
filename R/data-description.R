@@ -11,3 +11,27 @@
 #' }
 #' @source \url{https://climate.usu.edu}
 "utahDataList"
+
+
+#' Output of BSTFA evaluated on utahDataList
+#'
+#' List object named \code{out} containing the output from running the BSTFA function provided in the example code below.
+#'
+#' @format See \code{help(BSTFA)} for details of what is included as output from the BSTFA function.
+#' @examples
+#' data(BSTFAoutput)
+#' \dontrun{
+#' #Code used to obtain this output
+#' data("utahDataList")
+#' attach(utahDataList)
+#' out <- BSTFA(ymat=TemperatureVals,
+#'   dates=Dates,
+#'   coords=Coords,
+#'   iters=100000,
+#'   burn=10001,
+#'   thin=300,
+#'   save.missing=F,
+#'   save.output=TRUE,
+#'   factors.fixed=c(144,89,129,78))
+#' }
+"out"

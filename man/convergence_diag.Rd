@@ -4,7 +4,7 @@
 \alias{convergence_diag}
 \title{Check effective sample size and geweke diagnostic}
 \usage{
-convergence_diag(out, type = "eSS", cutoff = ifelse(type == "eSS", 100, 0.001))
+convergence_diag(out, type = "eSS", cutoff = ifelse(type == "eSS", 100, 1.96))
 }
 \arguments{
 \item{out}{Output from BSTFA or BSTFAfull.}
@@ -14,18 +14,15 @@ convergence_diag(out, type = "eSS", cutoff = ifelse(type == "eSS", 100, 0.001))
 \item{cutoff}{Numeric scalar indicating the cutoff value to flag parameters that haven't converged.}
 }
 \value{
-A list containing convergence diagnostic for all parameters.
+A list containing the parameters not meeting the convergence cutoff criteria.
 }
 \description{
 Check effective sample size and geweke diagnostic
 }
 \examples{
-\dontrun{
-data(utahDataList)
-attach(utahDataList)
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=100)
+data(out)
+attach(out)
 convergence_diag(out)
-}
 }
 \author{
 Adam Simpson
