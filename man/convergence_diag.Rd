@@ -20,9 +20,9 @@ A list containing the parameters not meeting the convergence cutoff criteria.
 Check effective sample size and geweke diagnostic
 }
 \examples{
-data(out)
-attach(out)
-convergence_diag(out)
+data(out.sm)
+attach(out.sm)
+convergence_diag(out.sm)
 }
 \author{
 Adam Simpson

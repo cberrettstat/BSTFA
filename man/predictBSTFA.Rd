@@ -33,9 +33,9 @@ A matrix or vector of estimated/predicted values for \code{location}.
 Estimate/predict values of the time series at a specific location.
 }
 \examples{
-data(out)
-attach(out)
-loc1means <- predictBSTFA(out, location=1, pred.int=FALSE)
+data(out.sm)
+attach(out.sm)
+loc1means <- predictBSTFA(out.sm, location=1, pred.int=FALSE)
 }
 \author{
 Candace Berrett and Adam Simpson

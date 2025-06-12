@@ -30,9 +30,9 @@ A plot containing the trace plot (and density plot when \code{density=TRUE}) of 
 Plot trace plots
 }
 \examples{
-data(out)
-attach(out)
-plot_trace(out, parameter='beta', param.range=1)
+data(out.sm)
+attach(out.sm)
+plot_trace(out.sm, parameter='beta', param.range=1)
 }
 \author{
 Adam Simpson

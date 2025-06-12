@@ -37,9 +37,9 @@ A plot of spatially-dependent parameter values for the observed locations.
 Plot the spatially-dependent parameter for in-sample locations.
 }
 \examples{
-data(out)
-attach(out)
-plot_spatial_param(out, parameter='slope')
+data(out.sm)
+attach(out.sm)
+plot_spatial_param(out.sm, parameter='slope')
 }
 \author{
 Adam Simpson and Candace Berrett

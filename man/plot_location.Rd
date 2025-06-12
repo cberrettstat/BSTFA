@@ -48,9 +48,9 @@ A plot of predicted values for \code{location}.
 Plot a location's time series of estimated/predicted values.
 }
 \examples{
-data(out)
-attach(out)
-plot_location(out, location=1, pred.int=FALSE)
+data(out.sm)
+attach(out.sm)
+plot_location(out.sm, location=1, pred.int=FALSE)
 }
 \author{
 Candace Berrett and Adam Simpson

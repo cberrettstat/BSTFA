@@ -726,7 +726,11 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     }
   }
 
-  time.data$full_iter = apply(time.data,1,sum)
+  time.data$full_iter <- apply(time.data,1,sum)
+
+  if(save.time==F){
+    time.data <- NULL
+  }
 
   if (verbose) print('Finished MCMC Sampling')
 
@@ -749,7 +753,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
                 "phi.lambda.accept" = phi.lambda.accept,
                 "sig2" = as.mcmc(t(sig2.save)),
                 "y.missing" = y.save,
-                "time.data" = ifelse(save.time, time.data, NULL),
+                "time.data" = time.data,
                 "setup.time" = setup.time,
                 "model.matrices" = model.matrices,
                 "factors.fixed" = factors.fixed,

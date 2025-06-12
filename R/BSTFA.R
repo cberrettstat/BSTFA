@@ -786,6 +786,10 @@ BSTFA <- function(ymat, dates, coords,
 
   time.data$full_iter = apply(time.data,1,sum)
 
+  if(save.time==F){
+    time.data <- NULL
+  }
+
   if (verbose) print('Finished MCMC Sampling')
 
   output = list("mu" = coda::as.mcmc(t(mu.save)),
@@ -804,7 +808,7 @@ BSTFA <- function(ymat, dates, coords,
                 "tau2.lambda" = coda::as.mcmc(t(tau2.lambda.save)),
                 "sig2" = coda::as.mcmc(t(sig2.save)),
                 "y.missing" = y.save,
-                "time.data" = ifelse(save.time, time.data, NULL),
+                "time.data" = time.data,
                 "setup.time" = setup.time,
                 "model.matrices" = model.matrices,
                 "factors.fixed" = factors.fixed,

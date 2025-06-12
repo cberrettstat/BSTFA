@@ -13,9 +13,9 @@
 "utahDataList"
 
 
-#' Output of BSTFA evaluated on utahDataList
+#' Output of BSTFA evaluated on a subset of utahDataList
 #'
-#' List object named \code{out} containing the output from running the BSTFA function provided in the example code below.
+#' List object named \code{out.sm} containing the output from running the BSTFA function provided in the example code below using a subset of the \code{utahDataList}.
 #'
 #' @format See \code{help(BSTFA)} for details of what is included as output from the BSTFA function.
 #' @examples
@@ -24,14 +24,23 @@
 #' #Code used to obtain this output
 #' data("utahDataList")
 #' attach(utahDataList)
-#' out <- BSTFA(ymat=TemperatureVals,
-#'   dates=Dates,
-#'   coords=Coords,
-#'   iters=100000,
-#'   burn=10001,
-#'   thin=300,
-#'   save.missing=F,
-#'   save.output=TRUE,
-#'   factors.fixed=c(144,89,129,78))
+#' set.seed(466)
+#' dates.ind <- 1191:1251
+#' locs.use <- c(4, 21, 22, 23, 32, 33, 36,
+#'               40, 42, 48, 66, 78, 85, 89,
+#'               94, 96, 114, 118, 124, 144)
+#' temps.sm <- TemperatureVals[dates.ind, locs.use]
+#' coords.sm <- Coords[locs.use,]
+#' dates.sm <- Dates[dates.ind]
+#' locsm.names <- Locations[locs.use]
+#' out.sm <- BSTFA(ymat=temps.sm,
+#'      dates=dates.sm,
+#'      coords=coords.sm,
+#'      iters=200000,
+#'      burn=10001,
+#'      thin=1826,
+#'      save.missing=F,
+#'      save.output=T,
+#'      factors.fixed=c(20, 14, 11, 12))
 #' }
-"out"
+"out.sm"

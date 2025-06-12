@@ -136,8 +136,7 @@ convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,1.96)
 #' loglik <- computeLogLik(out.sm, addthin=2)
 #' \dontrun{
 #' #can use to compute likelihood based model measures such as
-#' library(loo)
-#' waic(loglik)
+#' loo::waic(loglik)
 #' }
 #' @export computeLogLik
 computeLogLik <- function(out, verbose=FALSE, addthin=1) {

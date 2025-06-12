@@ -48,7 +48,8 @@ BSTFA(
   verbose = TRUE,
   filename = "BSTFA.Rdata",
   save.missing = TRUE,
-  save.output = FALSE
+  save.output = FALSE,
+  save.time = FALSE
 )
 }
 \arguments{
@@ -137,6 +138,8 @@ BSTFA(
 \item{save.missing}{Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.}
 
 \item{save.output}{Logical scalar indicating whether to save the output object to filename.  Default value is \code{FALSE}.}
+
+\item{save.time}{Logical scalar indicating whether to save the computation time for each MCMC iteration.  Default value is \code{FALSE}.  When \code{FALSE}, the function \code{compute_summary()} will not be useful.}
 }
 \value{
 A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):

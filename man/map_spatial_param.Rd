@@ -58,9 +58,9 @@ A plot of spatially-dependent parameter values for a grid of interpolated locati
 Plot a map of interpolated spatially-dependent parameter values.
 }
 \examples{
-data(out)
-attach(out)
-map_spatial_param(out, parameter='slope', map=TRUE, state=TRUE, location='utah', fine=50)
+data(out.sm)
+attach(out.sm)
+map_spatial_param(out.sm, parameter='slope', map=TRUE, state=TRUE, location='utah', fine=25)
 }
 \author{
 Adam Simpson and Candace Berrett

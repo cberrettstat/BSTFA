@@ -20,9 +20,14 @@ A matrix of size \code{n.times*n.locs} by \code{draws} log-likelihood values for
 Compute log-likelihood
 }
 \examples{
-data(out)
-attach(out)
-loglik <- computeLogLik(out, addthin=2)
+data(out.sm)
+attach(out.sm)
+loglik <- computeLogLik(out.sm, addthin=2)
+\dontrun{
+#can use to compute likelihood based model measures such as
+library(loo)
+waic(loglik)
+}
 }
 \author{
 Adam Simpson and Candace Berrett
