@@ -12,7 +12,7 @@ vignette: >
 bibliography: references.bib
 csl: apa.csl
 cache: true
-abstract: "The BSTFA package provides tools for fitting fully Bayesian spatio-temporal factor analysis models for multivariate data observed over space and time. To improve computational efficiency, the package includes a model that uses dimension reduction via spatial and temporal basis functions. A more computationally intensive model using Gaussian processes is also available. Users can generate posterior predictions, visualize spatio-temporal trends, and explore latent factor behavior through functions for mapping, time series plotting, and interpolation. The package is designed to support both exploratory data analysis and formal inference in applications with spatial and temporal dependence. Functionality is demonstrated using a historical temperature dataset collected from weather stations across Utah, USA."
+abstract: "An overview of the functions for fitting and understanding Bayesian spatio-temporal factor analysis (BSTFA) models for spatio-temporal data. To improve computational efficiency, the package includes a function for a BSTFA model that uses dimension reduction via basis functions. A more computationally intensive model using Gaussian processes is also available. Users can generate posterior predictions, visualize spatio-temporal trends, and explore latent factor behavior through functions for mapping, time series plotting, and interpolation. The package is designed to support both exploratory data analysis and formal inference in applications with spatial and temporal dependence. Functionality is demonstrated using a historical temperature dataset collected from weather stations across Utah, USA."
 ---
 
 
@@ -37,13 +37,13 @@ library(kableExtra)
 
 ## Intended Audience 
 
-This document is intended to help even novice Bayesian statistics students implement a fully Bayesian spatio-temporal analysis. Every function within the package is designed with this audience in mind. This document is meant to guide any potential user of this package through the basic implementation of the models; in essence, it is an instruction manual. The bulk of this document contains examples of our functions applied on an observed data set.
+This document is intended to help even novice Bayesian statistics students implement a fully Bayesian spatio-temporal analysis. The functions within the package are designed with this audience in mind. This document is meant to guide any potential user of this package through the basic implementation of the model fitting and inferential processes; in essence, it is an instruction manual. The bulk of this document contains examples of our functions applied on an observed data set.
 
-The outline is as follows. First, we introduce the motivation behind the Bayesian spatio-temporal factor analysis models and why simplifying the model for fast computation is important. Section \@ref(sec-implement) outlines the available functions and procedures within the `BSTFA` package along with demonstrations on a real data set. Some basic theory and methodology are contained in Section \@ref(sec-methods), and Section \@ref(sec-features) details specific features of the package. The appendix contains a few helpful additional notes on computation and references.
+The outline is as follows. First, we introduce the motivation behind the BSTFA models and why simplifying the model for fast computation is important. Section \@ref(sec-implement) outlines the available functions and procedures within the `BSTFA` package along with demonstrations on a real data set. Some basic theory and methodology are contained in Section \@ref(sec-methods), and Section \@ref(sec-features) details specific features of the package. The appendix contains a few helpful additional notes on computation and references.
 
 ## Motivation
 
-Consider for example the motivating data for the `BSTFA` package: a collection of temperature measurements across the state of Utah. The data were collected from May 1912 through January 2015 from 146 weather stations across the state. These measurements are 30-day averages of daily minimum observed temperatures in degrees Celcius, with each location's measurements zero-centered. This environmental process exhibits some of the challenges common in environmental modeling; that is, the data show obvious spatial and temporal dependence and not all contributing agents are known or easy to include in a modeling scheme. 
+Consider the motivating data for the `BSTFA` package: a collection of temperature measurements across the state of Utah. The data were collected from May 1912 through January 2015 from 146 weather stations across the state. These measurements are 30-day averages of daily minimum observed temperatures in degrees Celcius, with each location's measurements zero-centered. This environmental process exhibits some of the challenges common in environmental modeling; that is, the data show obvious spatial and temporal dependence and not all contributing agents are known or easy to include in a modeling scheme. 
 
 Take, for example, the observations for three weather stations: Moab, Canyonlands National Park, and Logan. The Moab and Canyonlands stations are near one another (within 50 miles) while the Logan station is far away (300 miles). Figure \@ref(fig:fig-utahTemps) shows these same temperature series zoomed in on the years 1999 through 2001. The difference between low temperatures in winter 2000 and winter 2001 is slight in Moab and the Canyonlands, but in Logan, the low temperature is much lower in winter 2001 than it was in winter 2000.  This anecdote illustrates that locations near each other in space exhibit similar environmental behavior. Spatio-temporal factor analysis accounts for such spatio-temporal dependencies and can provide numerical and visual summaries of that dependence. 
 
@@ -78,7 +78,7 @@ While each of these sections describes some arguments to the functions, the best
 
 ## Model-Fitting Functions {#subsec-modelfit}
 
-The `BSTFA` package contains two model fitting functions: `BSTFA`, the smoother and computationally-efficient spatio-temporal factor analysis model using basis functions for the factor analysis; and `BSTFAfull`, the fine-grain but slower spatio-temporal factor analysis model using Gaussian processes for the factor analysis. Both functions return a $\textit{list}$ object containing all information required to summarize posterior inference, including all posterior draws from each parameter, matrices containing the basis functions, and information about computation time. Each function has only three required arguments, summarized in Table \@ref(tab:tab-required). Other arguments relating to model fitting and prior parameter values will be discussed more fully in Section \@ref(sec-methods).
+The `BSTFA` package contains two model fitting functions: `BSTFA`, the smoother and computationally-efficient spatio-temporal factor analysis model using basis functions for the factor analysis component; and `BSTFAfull`, the fine-grain but computationally-slower spatio-temporal factor analysis model using Gaussian processes for the factor analysis. Both functions return a $\textit{list}$ object containing all information required to summarize posterior inference, including all posterior draws from each parameter, matrices containing the basis functions, and information about computation time. Each function has only three required arguments, summarized in Table \@ref(tab:tab-required). Other arguments relating to model fitting and prior parameter values will be discussed more fully in Section \@ref(sec-methods).
 
 ```{r tab-required, results='asis', label="tab-required", echo=FALSE}
 kable(
@@ -100,7 +100,23 @@ kable(
   column_spec(2, width = "4.5in")
 ```
 
-The `BSTFA` and `BSTFAfull` functions are demonstrated below. Additional Markov-chain Monte Carlo (MCMC) arguments such as `iters`, `thin`, and `burn` have default values, but they can be specified as in any Bayesian model to control the number of posterior draws. Although the `BSTFA` function is much faster than the fully-parameterized `BSTFAfull` function, it is still an MCMC with many parameters and will need many draws to fully represent the posterior distributions.  Except for the model comparison figures (where plots were created outside the vignette), for the sake of keeping the vignette's compile time short, we use output of only 40 saved draws, which is much too few to fully represent the posterior distributions.  Thus, the interpretations provided herein are for illustrative purposes only.  For more information on MCMC and convergence, we refer the reader to other resources, such as @johnson2022bayes for introductory readers or @gelman2013bayesian for more advanced readers.
+The `BSTFA` and `BSTFAfull` functions are demonstrated below. Additional Markov-chain Monte Carlo (MCMC) arguments such as `iters`, `thin`, and `burn` have default values, but they can be specified as in any Bayesian model to control the number of posterior draws. Although the `BSTFA` function is much faster than the fully-parameterized `BSTFAfull` function, it is still an MCMC with many parameters and will need many draws to fully represent the posterior distributions.  Except for the model comparison figures (where plots were created outside the vignette), for the sake of keeping the vignette's compile time short, we use a data set in the package called `out` which is an object fit using the code below.  We encourage the user to read additional resources on MCMC and convergence, such as @johnson2022bayes for introductory readers or @gelman2013bayesian for more advanced readers.
+
+```{r bstfaoutput, eval=F}
+#Code used to create the "out" data object in the BSTFA package. 
+#Note: Not run within this vignette.
+data("utahDataList")
+attach(utahDataList)
+out <- BSTFA(ymat=TemperatureVals,
+   dates=Dates,
+   coords=Coords,
+   iters=100000,
+   burn=10001,
+   thin=300,
+   save.missing=F,
+   save.output=TRUE,
+   factors.fixed=c(144,89,129,78))
+```
 
 The `verbose` argument controls whether or not the function prints status updates during sampling. Although the default value for this is `TRUE`, for the sake of this vignette, `verbose` will always be set to `FALSE`. Also, if desired, the function can save output directly to an `.Rdata` file by setting `save.output == TRUE`. This value is set to `FALSE` by default.
 
@@ -187,7 +203,7 @@ preds_new = predictBSTFA(out,
 
 The `predictBSTFA` function is also called within the `plot_location` function, which takes similar arguments as `predictBSTFA` with the addition of a few extra plotting arguments. `xrange` defines the time points $\{t: t \in \mathcal{T}\}$ at which the posterior estimates are plotted, with default value `NULL` indicating to plot on all of $\mathcal{T}$. `truth` (default value `FALSE`) will plot the observed data along with the estimates if `location` comes from the data set. `uncertainty` (default value `TRUE`) indicates whether to include a posterior predictive interval (`pred.int==TRUE`) or a credible interval (`pred.int==FALSE`).
 
-Below is an example of code used to plot the posterior mean temperature values (black line) at an observed location, "Alpine, Utah," with 95\% posterior predictive bounds (gray bands), and observed measurements (gray circles). Figure \@ref(fig:fig-location) provides the plot.
+Below is an example of code used to plot the posterior mean temperature values (black line) at an observed location, "Alpine, Utah," with 95\% posterior predictive bounds (gray bands), and observed measurements (gray circles). Figure \@ref(fig:fig-location) provides the plot.  Notice that the posterior mean (black line) closely follows the pattern of the observed data, but, as expected due to basis smoothing, is more smooth than the observed data. Increasing the number of bases will decrease the smoothness (but increase computation time).
 
 ```{r fig-location, fig.cap="Posterior mean temperature values (black line) at an in-sample location, Alpine, Utah, with 95% posterior predictive bounds (gray bands), and observed temperature measurements (gray circles).", fig.align="center", fig.height=3.5, fig.width=6}
 loc = 1 # Alpine, Utah in our data set
@@ -252,7 +268,7 @@ plot_annual(out,
             years='one')
 ```
 
-The `plot_spatial_param` function can plot the posterior mean of the linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year." If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. Figure \@ref(fig:fig-obsslope) provides the corresponding plot, where the color represents the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Note that the output used in this illustration only contains 40 MCMC draws; thus, the interpretation provided here is for illustrative purposes only.  To interpret this plot, we would say that most locations show an average increase in temperature of between 0 and 0.025 degrees Celcius per year over the observed time period of 1912 to 2015.
+The `plot_spatial_param` function can plot the posterior mean of the linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year." If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. Figure \@ref(fig:fig-obsslope) provides the corresponding plot, where the color represents the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Notice that most locations show an average increase in temperature of between 0 and approximately 0.04 degrees Celcius per year over the observed time period of 1912 to 2015, with a few locations deviating in both directions.
 
 ```{r fig-obsslope, fig.align="center", fig.cap="Posterior mean linear change in time (slope) of temperatures at observed locations.", fig.width=3.5, fig.height=3.5}
 plot_spatial_param(out,
@@ -261,7 +277,7 @@ plot_spatial_param(out,
           yearscale=TRUE)
 ```
 
-Next, we provide example code for plotting a particular loading, in this case, the posterior mean loadings for the first factor. Figure \@ref(fig:fig-obsloading1) provides the corresponding plot showing the posterior mean loading values that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The circled red dot shows the location of the fixed factor; in this case, the first factor is fixed at Wendover, Utah.  This means that the loading corresponding to factor 1 for that location was fixed at 1 (and fixed at 0 for all other factors) and the loadings for other locations are estimated given that value. The model accounts for spatial dependence in the loadings so that locations near to Wendover are modeled to have posterior mean loadings closer to one.
+Next, we provide example code for plotting a particular loading, in this case, the posterior mean loadings for the first factor. Figure \@ref(fig:fig-obsloading1) provides the corresponding plot showing the posterior mean loading values that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The circled red dot shows the location of the fixed factor; in this case, the first factor is fixed at Wendover, Utah.  This means that the loading corresponding to factor 1 for that location was fixed at a value of 1 (and fixed to be 0 for factors 2, 3, and 4) and the loadings for other locations are estimated given that value. The model accounts for spatial dependence in the loadings so that locations near to Wendover are modeled to have posterior mean loadings closer to one.
 
 ```{r fig-obsloading1, fig.cap="Posterior mean estimates of loadings for factor 1 at observed locations.  The circled red dot shows the location of the fixed factor loading.", fig.align="center", fig.width=4, fig.height=3.5}
 plot_spatial_param(out,
@@ -271,7 +287,7 @@ plot_spatial_param(out,
 ```
 
 
-The `plot_factor` function plots the estimated temporally-dependent factors either together (setting `together=TRUE`) or separate (setting `together=FALSE` and `factor` to the factor number you want to plot). The example code below plots the first factor, corresponding to the loadings shown in the previous example. Figure \@ref(fig:fig-factorexample2) shows the posterior mean (black line) and 95\% credible intervals (gray band) of the first factor across the observed time period. Notice how this first factor in the 1910's and 1920's tends to have lower values (values < 0).  This means that after accounting for the constant increase/decrease in time and the seasonal cycle, this time period saw lower-than-typical temperatures at locations whose loadings weight positively on this factor.  However, from the 1940's-90's, the factor values are at or above 0, indicating that this period saw typical or higher-than-typical temperatures at locations whose loadings weight positively on this factor. 
+The `plot_factor` function plots the estimated temporally-dependent factors either together (setting `together=TRUE`) or separate (setting `together=FALSE` and `factor` to the factor number you want to plot). The example code below plots the first factor, corresponding to the loadings shown in the previous example. Figure \@ref(fig:fig-factorexample2) shows the posterior mean (black line) and 95\% credible intervals (gray band) of the first factor across the observed time period. Notice how this first factor in the 1910's and 1920's tends to have lower values (values < 0).  This means that after accounting for the constant increase/decrease in time and the seasonal cycle, this time period saw lower-than-typical temperatures at locations whose loadings weight positively on this factor.  However, from the 1940's-70's, the factor values are at or above 0, indicating that this period saw typical or higher-than-typical temperatures at locations whose loadings weight positively on this factor. 
 
 ```{r fig-factorexample2, fig.cap="Posterior mean (black line) and 95% credible interval (gray band) of the first factor across the observed time period.", fig.align="center", fig.height=3.5, fig.width=6}
 plot_factor(out,
@@ -281,7 +297,7 @@ plot_factor(out,
             type='mean')
 ```
 
-To plot the factors together, set `together==TRUE`, as in the example code below. Figure \@ref(fig:fig-factorexample1) provides a plot of all four estimated factors.  These factors capture common behaviors of the temperature measurements across time that weren't explicitly modeled (in contrast to the linear increasing/decreasing and seasonal behaviors that were explicitly modeled).
+To plot the factors together, set `together==TRUE`, as in the example code below. Figure \@ref(fig:fig-factorexample1) provides a plot of all four estimated factors.  These factors capture common behaviors of the temperature measurements across time that weren't explicitly modeled (in contrast to the linear increasing/decreasing and seasonal behaviors that were explicitly modeled).  We can think of these as "unknown" environmental behaviors.  
 
 ```{r fig-factorexample1, fig.cap="Posterior mean (solid lines) and 95% credible intervals (light colored bands) for the four estimated factors across the observed time period.", fig.align="center", fig.height=3.75, fig.width=6}
 plot_factor(out,
@@ -292,7 +308,7 @@ plot_factor(out,
 
 
 
-The `map_spatial_param` function is similar to `plot_spatial_param`, but the parameter is plotted on a grid of unobserved locations. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=50` creates a $50 \times 50$ grid of locations to estimate parameter values.  This function is demonstrated below for the estimated linear increase/decrease of temperatures across Utah (once again, setting `yearscale=TRUE` to provide "per year" estimates). Figure \@ref(fig:fig-mapexample1) shows the temperatures tend to be increasing across the state by between $\approx$ 0.01 and 0.02$^{\circ}$ C each year, with locations in the northwest showing a small decrease in temperatures across this time period.
+The `map_spatial_param` function is similar to `plot_spatial_param`, but the parameter is plotted on a grid of unobserved locations. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=50` creates a $50 \times 50$ grid of locations to estimate parameter values.  This function is demonstrated below for the estimated linear increase/decrease of temperatures across Utah (once again, setting `yearscale=TRUE` to provide "per year" estimates). Figure \@ref(fig:fig-mapexample1) shows the temperatures tend to be increasing across the state by between $\approx$ 0.01 and 0.03$^{\circ}$ C each year, with locations in the northwest showing a small decrease in temperatures across this time period.
 
 ```{r fig-mapexample1, cache=FALSE, warning=FALSE, fig.cap="Posterior mean linear change in temperatures across time for locations across the observed space.", fig.align="center", fig.width=3.5}
 map_spatial_param(out,

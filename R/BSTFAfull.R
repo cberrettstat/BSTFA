@@ -57,6 +57,7 @@
 #' @param filename Character scalar indicating the filename to use to save the MCMC output.  Default value is \code{'BSTFA.Rdata'}.
 #' @param save.missing Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.
 #' @param save.output Logical scalar indicating whether to save the output object to filename.  Default value is \code{FALSE}.
+#' @param save.time Logical scalar indicating whether to save the computation time for each MCMC iteration.  Default value is \code{FALSE}.  When \code{FALSE}, the function \code{compute_summary()} will not be useful.
 #' @importFrom matrixcalc vec
 #' @importFrom mgcv cSplineDes
 #' @importFrom MCMCpack rwish
@@ -125,7 +126,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
                      thin=1, burn=floor(iters*0.5),
                      c.omega=matrix(0.001, n.factors, n.factors), c.phi.lambda=rep(0.001, n.factors),
                      adapt.iter=(burn+10), adapt.epsilon=1e-20,
-                     verbose=TRUE, filename='STFA.Rdata', save.missing=TRUE, save.output=FALSE) {
+                     verbose=TRUE, filename='STFA.Rdata', save.missing=TRUE, save.output=FALSE, save.time=FALSE) {
 
 
   start <- Sys.time()
@@ -748,7 +749,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
                 "phi.lambda.accept" = phi.lambda.accept,
                 "sig2" = as.mcmc(t(sig2.save)),
                 "y.missing" = y.save,
-                "time.data" = time.data,
+                "time.data" = ifelse(save.time, time.data, NULL),
                 "setup.time" = setup.time,
                 "model.matrices" = model.matrices,
                 "factors.fixed" = factors.fixed,

@@ -9,9 +9,9 @@
 #' @returns A plot containing the trace plot (and density plot when \code{density=TRUE}) of the listed parameters.
 #' @author Adam Simpson
 #' @examples
-#' data(out)
-#' attach(out)
-#' plot_trace(out, parameter='beta', param.range=1)
+#' data(out.sm)
+#' attach(out.sm)
+#' plot_trace(out.sm, parameter='beta', param.range=1)
 #' @export plot_trace
 plot_trace = function(out, parameter, param.range=NULL,
                       par.mfrow=c(1,1), density=TRUE) {
@@ -38,8 +38,16 @@ plot_trace = function(out, parameter, param.range=NULL,
 #' @returns Prints the computation time per iteration for each parameter.
 #' @author Adam Simpson
 #' @examples
-#' data(out)
-#' attach(out)
+#' #Very small example to illustrate use and ensure functionality
+#' data(utahDataList)
+#' attach(utahDataList)
+#' #identify locations with very little missing data just for this example
+#' low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02)
+#' out <- BSTFA(ymat=TemperatureVals[1:50,low.miss],
+#'   dates=Dates[1:50],
+#'   coords=Coords[low.miss,],
+#'   n.factors=2,
+#'   iters=10)
 #' compute_summary(out)
 #' @export compute_summary
 compute_summary = function(out) {
@@ -67,9 +75,9 @@ compute_summary = function(out) {
 #' @returns A list containing the parameters not meeting the convergence cutoff criteria.
 #' @author Adam Simpson
 #' @examples
-#' data(out)
-#' attach(out)
-#' convergence_diag(out)
+#' data(out.sm)
+#' attach(out.sm)
+#' convergence_diag(out.sm)
 #' @importFrom coda effectiveSize
 #' @importFrom coda geweke.diag
 #' @export convergence_diag
@@ -123,9 +131,14 @@ convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,1.96)
 #' @returns A matrix of size \code{n.times*n.locs} by \code{draws} log-likelihood values for each observation and each posterior draw.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
-#' data(out)
-#' attach(out)
-#' loglik <- computeLogLik(out, addthin=2)
+#' data(out.sm)
+#' attach(out.sm)
+#' loglik <- computeLogLik(out.sm, addthin=2)
+#' \dontrun{
+#' #can use to compute likelihood based model measures such as
+#' library(loo)
+#' waic(loglik)
+#' }
 #' @export computeLogLik
 computeLogLik <- function(out, verbose=FALSE, addthin=1) {
   y = out$y
