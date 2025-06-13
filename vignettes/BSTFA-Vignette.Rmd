@@ -22,8 +22,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   cache=FALSE,
   dev = "ragg_png",
-  dpi=200,
-  fig.width = 8
+  dpi=250
 )
 ```
 
@@ -271,7 +270,7 @@ kable(
   column_spec(2, width = "4.5in")
 ```
 
-For instance, `plot_annual` can plot the estimated annual seasonal behavior at any (observed or unobserved) location. The code for doing this for the observed location, Capitol Reef National Park, is provided below.  Figure \@ref(fig:fig-season) provides the corresponding plot, where the black line is the posterior mean, the gray band is the 95\% credible interval, and the gray dots are the observations plotted on their day of year. This shows the expected seasonal behavior -- that the temperatures tend to increase in the spring/summer months and decrease in the fall/winter months. 
+For instance, `plot_annual` can plot the estimated annual seasonal behavior at any (observed or unobserved) location. The code for doing this for an observed location, Capitol Reef National Park, is provided below.  Figure \@ref(fig:fig-season) provides the corresponding plot, where the black line is the posterior mean, the gray band is the 95\% credible interval, and the gray dots are the observations plotted on their day of year. This shows the expected seasonal behavior -- that the temperatures tend to increase in the spring/summer months and decrease in the fall/winter months. 
 
 ```{r fig-season, fig.cap="Posterior mean annual seasonal behavior (black line) with 95% credible interval (gray band), and observed data (open gray circles) plotted by day of year.", fig.align="center",fig.height=3.5, fig.width=5}
 plot_annual(out.sm,
@@ -279,7 +278,7 @@ plot_annual(out.sm,
             years='one')
 ```
 
-The `plot_spatial_param` function can plot the posterior mean of the linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year." If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. Figure \@ref(fig:fig-obsslope) provides the corresponding plot, where the color represents the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Notice that most locations show an average increase in temperature of between 0 and approximately 0.04 degrees Celcius per year over the observed time period of 1912 to 2015, with a few locations deviating in both directions.
+The `plot_spatial_param` function can plot the posterior mean of the linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year." If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. Figure \@ref(fig:fig-obsslope) provides the corresponding plot, where the color represents the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Notice that most locations show an average increase in temperature of between 0 and approximately 0.5 degrees Celcius per year over the 2010 to 2015 time period.
 
 ```{r fig-obsslope, fig.align="center", fig.cap="Posterior mean linear change in time (slope) of temperatures at observed locations.", fig.width=3.5, fig.height=3.5}
 plot_spatial_param(out.sm,
@@ -288,7 +287,7 @@ plot_spatial_param(out.sm,
           yearscale=TRUE)
 ```
 
-Next, we provide example code for plotting a particular loading, in this case, the posterior mean loadings for the first factor. Figure \@ref(fig:fig-obsloading1) provides the corresponding plot showing the posterior mean loading values that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The circled red dot shows the location of the fixed factor; in this case, the first factor is fixed at Wendover, Utah.  This means that the loading corresponding to factor 1 for that location was fixed at a value of 1 (and fixed to be 0 for factors 2, 3, and 4) and the loadings for other locations are estimated given that value. The model accounts for spatial dependence in the loadings so that locations near to Wendover are modeled to have posterior mean loadings closer to one.
+Next, we provide example code for plotting a particular loading, in this case, the posterior mean loadings for the first factor. Figure \@ref(fig:fig-obsloading1) provides the corresponding plot showing the posterior mean loading values that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The circled dot shows the location of the fixed factor; in this case, the first factor is fixed at Wendover, Utah.  This means that the loading corresponding to factor 1 for that location was fixed at a value of 1 (and fixed to be 0 for factors 2, 3, and 4) and the loadings for other locations are estimated given that value. The model accounts for spatial dependence in the loadings so that locations near to Wendover are modeled to have posterior mean loadings closer to one.
 
 ```{r fig-obsloading1, fig.cap="Posterior mean estimates of loadings for factor 1 at observed locations.  The circled red dot shows the location of the fixed factor loading.", fig.align="center", fig.width=4, fig.height=3.5}
 plot_spatial_param(out.sm,
@@ -298,7 +297,7 @@ plot_spatial_param(out.sm,
 ```
 
 
-The `plot_factor` function plots the estimated temporally-dependent factors either together (setting `together=TRUE`) or separate (setting `together=FALSE` and `factor` to the factor number you want to plot). The example code below plots the first factor, corresponding to the loadings shown in the previous example. Figure \@ref(fig:fig-factorexample2) shows the posterior mean (black line) and 95\% credible intervals (gray band) of the first factor across the observed time period. Notice how this first factor in the 1910's and 1920's tends to have lower values (values < 0).  This means that after accounting for the constant increase/decrease in time and the seasonal cycle, this time period saw lower-than-typical temperatures at locations whose loadings weight positively on this factor.  However, from the 1940's-70's, the factor values are at or above 0, indicating that this period saw typical or higher-than-typical temperatures at locations whose loadings weight positively on this factor. 
+The `plot_factor` function plots the estimated temporally-dependent factors either together (setting `together=TRUE`) or separate (setting `together=FALSE` and `factor` to the factor number you want to plot). The example code below plots the first factor, corresponding to the loadings shown in the previous example. Figure \@ref(fig:fig-factorexample2) shows the posterior mean (black line) and 95\% credible intervals (gray band) of the first factor across the 2010-2015 time period. Notice how this first factor in 2014 tends to have higher values (values > 0).  This means that after accounting for the constant increase/decrease in temperature across time and the seasonal cycle, locations whose loadings weight positively on this factor saw saw higher-than-typical temperatures during this time period.  
 
 ```{r fig-factorexample2, fig.cap="Posterior mean (black line) and 95% credible interval (gray band) of the first factor across the observed time period.", fig.align="center", fig.height=3.5, fig.width=6}
 plot_factor(out.sm,
@@ -308,7 +307,7 @@ plot_factor(out.sm,
             type='mean')
 ```
 
-To plot the factors together, set `together==TRUE`, as in the example code below. Figure \@ref(fig:fig-factorexample1) provides a plot of all four estimated factors.  These factors capture common behaviors of the temperature measurements across time that weren't explicitly modeled (in contrast to the linear increasing/decreasing and seasonal behaviors that were explicitly modeled).  We can think of these as "unknown" environmental behaviors.  
+To plot the factors together, set `together==TRUE`, as in the example code below. Figure \@ref(fig:fig-factorexample1) provides a plot of all four estimated factors.  These factors capture common behaviors of the temperature measurements across time that weren't explicitly modeled (in contrast to the increasing/decreasing temperature and seasonal behaviors that were explicitly modeled).  We can think of the factors as "unknown" environmental behaviors.  
 
 ```{r fig-factorexample1, fig.cap="Posterior mean (solid lines) and 95% credible intervals (light colored bands) for the four estimated factors across the observed time period.", fig.align="center", fig.height=3.75, fig.width=6}
 plot_factor(out.sm,
@@ -319,7 +318,7 @@ plot_factor(out.sm,
 
 
 
-The `map_spatial_param` function is similar to `plot_spatial_param`, but the parameter is plotted on a grid of unobserved locations. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=50` creates a $50 \times 50$ grid of locations to estimate parameter values.  This function is demonstrated below for the estimated linear increase/decrease of temperatures across Utah (once again, setting `yearscale=TRUE` to provide "per year" estimates). Figure \@ref(fig:fig-mapexample1) shows the temperatures tend to be increasing across the state by between $\approx$ 0.01 and 0.03$^{\circ}$ C each year, with locations in the northwest showing a small decrease in temperatures across this time period.
+The `map_spatial_param` function is similar to `plot_spatial_param`, but the parameter is plotted on a grid of unobserved locations. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=25` creates a $25 \times 25$ grid of locations to estimate the parameter values.  This function is demonstrated below for the estimated linear increase/decrease of temperatures across Utah (once again, setting `yearscale=TRUE` to provide "per year" estimates). Figure \@ref(fig:fig-mapexample1) shows the temperatures tend to be increasing across the state by betwee  $\approx$ 0 and 0.5$^{\circ}$ C each year.
 
 ```{r fig-mapexample1, cache=FALSE, warning=FALSE, fig.cap="Posterior mean linear change in temperatures across time for locations across the observed space.", fig.align="center", fig.width=3.5}
 map_spatial_param(out.sm,
@@ -677,7 +676,7 @@ m
 ```
 
 
-Because Logan is the fourth fixed loading location (northern-most red dot in Figure \@ref(fig:fig-dataplot)), the estimates for the fourth loading indicate the strength of the relationship of each location's temperatures to Logan's temperatures, after accounting for linear and seasonal processes. Higher loading values indicate greater similarity. Thus, the next code chunks and Figures \@ref(fig:fig-factorexample) and \@ref(fig:fig-mapexample) show the posterior mean estimate of Factor 4 (the common temperature behavior among those locations that have higher loading values), and a map of the loading values on a grid across Utah. This map shows that locations in the northeast have higher loading values and thus will have temperature measurements that behave similarly to that of the fourth factor.
+Because Logan is the fourth fixed loading location (northern-most red dot in Figure \@ref(fig:fig-dataplot)), the estimates for the fourth loading indicate the strength of the relationship of each location's temperatures to Logan's temperatures, after accounting for linear and seasonal processes. Higher loading values indicate greater similarity. Thus, the next code chunks and Figures \@ref(fig:fig-factorexample) and \@ref(fig:fig-mapexample) show the posterior mean estimate of Factor 4 (the common temperature behavior among those locations that have higher loading values), and a map of the interpolated loading values on a grid across Utah. This map shows that locations in the northeast have higher loading values and thus will have temperature measurements that behave similarly to that of the fourth factor.
 
 ```{r fig-factorexample, fig.cap="Posterior mean (black line) and 95% credible interval (gray band) for the fourth factor.", fig.height=3.5, fig.width=6, fig.align="center"}
 plot_factor(out.sm,
@@ -695,7 +694,7 @@ map_spatial_param(out.sm,
          map=TRUE,
          state=TRUE,
          location='utah',
-         fine=50)
+         fine=25)
 ```
 
 ## Basis Function Details
@@ -706,7 +705,7 @@ The choice of basis functions is assigned using the `spatial.style` and `load.st
 
 When using Fourier bases, the user needs to specify number of bases and the spatial frequency in both the longitude and latitude directions. As demonstrated in Section \@ref(subsec-basis), the function `plot_fourier_bases` can help the user visualize Fourier bases and choose the appropriate amount of bases and frequencies. After exploratory analysis methods (demonstrated in Section \@ref(subsubsec-choose)), it seems that assigning `freq.lon` and `freq.lat` values of 40 and 30 respectively and setting `n.spatial.bases` and `n.load.bases` equal to 8 and 6, respectively, works well for the Utah data set.
 
-The user should also consider the frequency (`freq.temp`) and number of bases (`n.temp.bases`) for the temporal factors, which always use Fourier bases. The default values (see Table @ref(tab:tab-bases)) tend to work well, but increasing the number of bases can create a finer estimate at the cost of reduced computational speed.
+The user should also consider the frequency (`freq.temp`) and number of bases (`n.temp.bases`) for the temporal factors, which always use Fourier bases. The default values (see Table \@ref(tab:tab-bases)) tend to work well, but increasing the number of bases can create a finer estimate at the cost of reduced computational speed.
 
 ```{r, eval=FALSE}
 out <- BSTFA(ymat=utahDataList$TemperatureVals,

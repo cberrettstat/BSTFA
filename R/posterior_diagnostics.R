@@ -47,7 +47,8 @@ plot_trace = function(out, parameter, param.range=NULL,
 #'   dates=Dates[1:50],
 #'   coords=Coords[low.miss,],
 #'   n.factors=2,
-#'   iters=10)
+#'   iters=10,
+#'   save.time=TRUE)
 #' compute_summary(out)
 #' @export compute_summary
 compute_summary = function(out) {

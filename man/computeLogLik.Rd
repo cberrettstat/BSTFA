@@ -25,8 +25,7 @@ attach(out.sm)
 loglik <- computeLogLik(out.sm, addthin=2)
 \dontrun{
 #can use to compute likelihood based model measures such as
-library(loo)
-waic(loglik)
+loo::waic(loglik)
 }
 }
 \author{

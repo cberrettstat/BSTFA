@@ -543,7 +543,7 @@ BSTFA <- function(ymat, dates, coords,
       alpha.mu <- c(MASS::mvrnorm(1,alpha.mean, alpha.var))
       rm(list=c("tau2.shape", "tau2.rate", "alpha.var", "alpha.mean"))
 
-      if (i%%thin == 0 & i > burn) {
+      if ((i-burn)%%thin == 0 & i > burn) {
         mu.save[,(i-burn)/thin] <- mu
         alpha.mu.save[,(i-burn)/thin] <- alpha.mu
         tau2.mu.save[,(i-burn)/thin] <- tau2.mu
@@ -590,7 +590,7 @@ BSTFA <- function(ymat, dates, coords,
       time.data[i,1] = end-start
 
       ### Save beta values
-      if (i%%thin == 0 & i > burn) {
+      if ((i-burn)%%thin == 0 & i > burn) {
         beta.save[,(i-burn)/thin] <- beta
         alpha.beta.save[,(i-burn)/thin] <- alpha.beta
         tau2.beta.save[,(i-burn)/thin] <- tau2.beta
@@ -636,7 +636,7 @@ BSTFA <- function(ymat, dates, coords,
       time.data[i,2] = end-start
 
       ### Save values of xi
-      if (i%%thin == 0 & i > burn) {
+      if ((i-burn)%%thin == 0 & i > burn) {
         xi.save[,(i-burn)/thin] <- xi
         alpha.xi.save[,(i-burn)/thin] <- alpha.xi
         tau2.xi.save[,(i-burn)/thin] <- tau2.xi
@@ -712,7 +712,7 @@ BSTFA <- function(ymat, dates, coords,
       FLambda.long = c(F.tilde%*%t(Lambda.tilde))
 
       ### Save values of FA
-      if (i%%thin == 0 & i > burn) {
+      if ((i-burn)%%thin == 0 & i > burn) {
         alphaT.save[,(i-burn)/thin] <- alphaT
         F.tilde.save[,(i-burn)/thin] <- matrixcalc::vec(F.tilde)
         Lambda.tilde.save[,(i-burn)/thin] <- Lambda.tilde.long
@@ -751,7 +751,7 @@ BSTFA <- function(ymat, dates, coords,
     time.data[i,5] = end-start
 
     ### Save values of sig2
-    if (i%%thin == 0 & i > burn) {
+    if ((i-burn)%%thin == 0 & i > burn) {
       sig2.save[,(i-burn)/thin] <- sig2
     }
 
@@ -767,7 +767,7 @@ BSTFA <- function(ymat, dates, coords,
       Bfullxi.long[missing] + FLambda.long[missing] + rnorm(sum(missing), 0, sqrt(sig2))
 
     if(save.missing==T){
-      if(i%%thin == 0 & i > burn){
+      if((i-burn)%%thin == 0 & i > burn){
         y.save[,(i-burn)/thin] <- y[missing]
       }
     }

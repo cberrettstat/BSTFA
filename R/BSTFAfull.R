@@ -381,7 +381,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       alpha.mu <- c(mvrnorm(1,alpha.mean, alpha.var))
       rm(list=c("tau2.shape", "tau2.rate", "alpha.var", "alpha.mean"))
 
-      if (i%%thin == 0 & i > burn) {
+      if ((i-burn)%%thin == 0 & i > burn) {
         mu.save[,(i-burn)/thin] <- mu
         alpha.mu.save[,(i-burn)/thin] <- alpha.mu
         tau2.mu.save[,(i-burn)/thin] <- tau2.mu
@@ -427,7 +427,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       time.data[i,1] = end-start
 
       ### Save beta values
-      if (i%%thin == 0 & i > burn) {
+      if ((i-burn)%%thin == 0 & i > burn) {
         beta.save[,(i-burn)/thin] <- beta
         alpha.beta.save[,(i-burn)/thin] <- alpha.beta
         tau2.beta.save[,(i-burn)/thin] <- tau2.beta
@@ -473,7 +473,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       time.data[i,2] = end-start
 
       ### Save values of xi
-      if (i%%thin == 0 & i > burn) {
+      if ((i-burn)%%thin == 0 & i > burn) {
         xi.save[,(i-burn)/thin] <- xi
         alpha.xi.save[,(i-burn)/thin] <- alpha.xi
         tau2.xi.save[,(i-burn)/thin] <- tau2.xi
@@ -602,7 +602,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       FLambda.long = c(PFmat%*%t(Lambda))
 
       ### Save values of FA
-      if (i%%thin == 0 & i > burn) {
+      if ((i-burn)%%thin == 0 & i > burn) {
         PFmat.save[,(i-burn)/thin] <- vec(PFmat)
         Omega.save[,(i-burn)/thin] <- vec(Omega)
         Sigma.F.inv.save[,(i-burn)/thin] <- vec(Sigma.F.inv)
@@ -651,7 +651,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     time.data[i,5] = end-start
 
     ### Save values of sig2
-    if (i%%thin == 0 & i > burn) {
+    if ((i-burn)%%thin == 0 & i > burn) {
       sig2.save[,(i-burn)/thin] <- sig2
     }
 
@@ -667,7 +667,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       Bfullxi.long[whichmis] + FLambda.long[whichmis] + rnorm(sum(missing), 0, sqrt(sig2))
 
     if(save.missing==T){
-      if(i%%thin == 0 & i > burn){
+      if((i-burn)%%thin == 0 & i > burn){
         y.save[,(i-burn)/thin] <- y[whichmis]
       }
     }

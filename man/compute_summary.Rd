@@ -25,7 +25,8 @@ out <- BSTFA(ymat=TemperatureVals[1:50,low.miss],
   dates=Dates[1:50],
   coords=Coords[low.miss,],
   n.factors=2,
-  iters=10)
+  iters=10,
+  save.time=TRUE)
 compute_summary(out)
 }
 \author{
