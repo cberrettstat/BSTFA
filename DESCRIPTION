@@ -1,13 +1,13 @@
 Package: BSTFA
 Title: Bayesian Spatio-Temporal Factor Analysis Model
-Description: Implements Bayesian spatio-temporal factor analysis models for multivariate data observed across space and time. The package provides tools for model fitting via MCMC, spatial and temporal interpolation, and visualization of latent factors and loadings to support inference and exploration of underlying spatio-temporal patterns. Designed for use in environmental, ecological, or public health applications, with support for posterior prediction and uncertainty quantification. Includes functions such as BSTFA() for model fitting and plot_factor() to visualize the latent processes.
+Description: Implements Bayesian spatio-temporal factor analysis models for multivariate data observed across space and time. The package provides tools for model fitting via Markov chain Monte Carlo (MCMC), spatial and temporal interpolation, and visualization of latent factors and loadings to support inference and exploration of underlying spatio-temporal patterns. Designed for use in environmental, ecological, or public health applications, with support for posterior prediction and uncertainty quantification. Includes functions such as BSTFA() for model fitting and plot_factor() to visualize the latent processes.
 Version: 0.1.0
 Authors@R: 
     c(
     	person("Adam", "Simpson", , "adamiser810@gmail.com", role = c("aut")),
 	person("Candace", "Berrett", email="cberrett@stat.byu.edu", role=c("aut","cre"), comment=c(ORCID="0000-0003-4721-3065"))
      )
-License: MIT + file LICENSE
+License: GPL (>= 2) | file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -19,4 +19,4 @@ LazyData: true
 LazyDataCompression: xz
 Imports: 
     MASS, RColorBrewer, ggplot2, ggpubr, mgcv, MCMCpack, coda, npreg, matrixcalc, scatterplot3d, sf, Rcpp, lubridate, Matrix, stats, methods, RcppArmadillo
-Suggests: knitr, rmarkdown, utils, devtools, kableExtra
+Suggests: knitr, rmarkdown, utils, devtools, kableExtra, bookdown, magick, maps

@@ -466,6 +466,9 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
                     addthin=1) {
 
   if (map) {
+    if (!requireNamespace("maps", quietly = TRUE)) {
+      stop("Package 'maps' is required by ggplot2::map_data(), but is not installed.")
+    }
     if (!state) {
       map_data_loc <- ggplot2::map_data('world')[ggplot2::map_data('world')$region == location,]
       full_map <- ggplot2::map_data('world')
