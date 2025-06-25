@@ -20,7 +20,7 @@
 #' @format See \code{help(BSTFA)} for details of what is included as output from the BSTFA function.
 #' @examples
 #' data(out.sm)
-#' \donttest{
+#' \dontrun{
 #' #Code used to obtain this output
 #' data("utahDataList")
 #' attach(utahDataList)

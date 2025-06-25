@@ -15,7 +15,7 @@ List object named \code{out.sm} containing the output from running the BSTFA fun
 }
 \examples{
 data(out.sm)
-\donttest{
+\dontrun{
 #Code used to obtain this output
 data("utahDataList")
 attach(utahDataList)

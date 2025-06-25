@@ -101,11 +101,24 @@
 #' }
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' \donttest{
-#' #Example below not run; even the ten iterations will take a minute or two to run.
+#' #Very small example to check functional capability.
+#' 
+#' #load the data
 #' data(utahDataList)
 #' attach(utahDataList)
-#' out <- BSTFAfull(ymat=TemperatureVals, dates=Dates, coords=Coords, iters=10)
+#' 
+#' #identify locations with very little missing data just for this example
+#' low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02) 
+#' 
+#' #fit model to small subset of data
+#' out <- BSTFAfull(ymat=TemperatureVals[1:50,low.miss], 
+#'        dates=Dates[1:50], 
+#'        coords=Coords[low.miss,], 
+#'        n.factors=2, iters=10)
+#'        
+#' \dontrun{
+#' #More full example that will take several hours to run
+#' out <- BSTFAfull(TemperatureVals, Dates, Coords)
 #' }
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
@@ -467,7 +480,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       Mt <- M.mat[,tt.seq] # kronecker(Lambda, Pmat.prime[,1])
       FLambda.long.nott <- (FLambda.long - Mt%*%c(Fmat[1,]))
       tempt <- y - Jfullmu.long - Tfullbeta.long - Bfullxi.long - FLambda.long.nott
-      F.var <- solve((1/sig2)*t(Mt)%*%Mt + Sigma.F.inv + t(Omega)%*%Sigma.F.inv%*%Omega)
+      F.var <- chol2inv(chol((1/sig2)*t(Mt)%*%Mt + Sigma.F.inv + t(Omega)%*%Sigma.F.inv%*%Omega))
       F.mean <- F.var%*%((1/sig2)*t(Mt)%*%tempt + t(Omega)%*%Sigma.F.inv%*%Fmat[2,])
       Fmat[1,] <- my_mvrnorm(F.mean, F.var)
       FLambda.long <- FLambda.long.nott + Mt%*%c(Fmat[1,])
@@ -483,7 +496,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       Mt <- M.mat[,tt.seq] # kronecker(Lambda, Pmat.prime[,n.times])
       FLambda.long.nott <- (FLambda.long - Mt%*%c(Fmat[n.times,]))
       tempt <- y - Jfullmu.long - Tfullbeta.long - Bfullxi.long - FLambda.long.nott
-      F.var <- solve(Sigma.F.inv + (1/sig2)*t(Mt)%*%Mt)
+      F.var <- chol2inv(chol(Sigma.F.inv + (1/sig2)*t(Mt)%*%Mt))
       F.mean <- F.var%*%((1/sig2)*t(Mt)%*%tempt + Sigma.F.inv%*%Omega%*%Fmat[n.times-1,])
       Fmat[n.times,] <- my_mvrnorm(F.mean, F.var)
       FLambda.long <- FLambda.long.nott + Mt%*%c(Fmat[n.times,])
