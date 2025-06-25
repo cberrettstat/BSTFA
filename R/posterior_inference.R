@@ -299,6 +299,10 @@ plot_location = function(out, location, new_x=NULL,
   if (is.null(xrange)) xlims=1:out$n.times
   else xlims=which(out$dates > xrange[1] & out$dates < xrange[2])
 
+  
+  oldpar <- par(no.readonly=TRUE)
+  on.exit(par(oldpar))
+  
   par(mfrow=par.mfrow)
 
   for (i in 1:n.col) {
@@ -396,7 +400,7 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
   min_value = -max_value
 
   if (parameter == 'slope' | parameter == 'mean') {
-    print(ggplot(mapping=aes(x=out$coords[,1], y=out$coords[,2],
+    myp <- ggplot(mapping=aes(x=out$coords[,1], y=out$coords[,2],
                              color=vals)) +
             geom_point() +
             ggtitle(ifelse(parameter=='slope', "Slope", "Mean")) +
@@ -404,7 +408,9 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
             ylab('Latitude') +
             labs(color = ifelse(parameter=='slope', "Slope", "Mean")) +
       scale_colour_gradientn(colors=color.gradient,
-                             name='Slope', limits = c(min_value, max_value)))
+                             name='Slope', limits = c(min_value, max_value))
+    print(myp)
+    invisible(myp)
   }
   if (parameter == 'loading') {
     for (i in loadings) {
@@ -424,6 +430,7 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
         guides(color = guide_colorbar(order = 1),
                shape = guide_legend(order = 2))
       print(mm)
+      invisible(mm)
     }
   }
 }
@@ -650,7 +657,10 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
       scale_fill_gradientn(colours=color.gradient, name=legend.name,
                              limits = c(min_value, max_value)) +
       ggtitle(plot.title) + xlab("Longitude") + ylab("Latitude")
-    if (!with.uncertainty) print(m)
+    if (!with.uncertainty){
+      print(m)
+      invisible(m)
+    }
     if (with.uncertainty) {
       l <- ggplot(data=predloc, aes(x=.data$Lon, y=.data$Lat, fill=.data$predl)) +
         geom_raster(interpolate=TRUE) +
@@ -662,7 +672,9 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
         scale_fill_gradientn(colours=color.gradient, name=legend.name,
                                limits = c(min_value, max_value)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Upper Bound')) + xlab("Longitude") + ylab("Latitude")
-      print(ggpubr::ggarrange(l, m, u, nrow=1, common.legend=TRUE, legend="right"))
+      lmu <- ggpubr::ggarrange(l, m, u, nrow=1, common.legend=TRUE, legend="right")
+      print(lmu)
+      invisible(lmu)
     }
   }
 
@@ -708,7 +720,10 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
                              limits = c(min_value, max_value)) +
       xlab('Longitude') +
       ylab('Latitude')
-    if(!with.uncertainty){print(m)}
+    if(!with.uncertainty){
+      print(m)
+      invisible(m)
+      }
 
 
     if (with.uncertainty) {
@@ -753,8 +768,9 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
                                limits = c(min_value, max_value)) +
         xlab('Longitude') +
         ylab('Latitude')
-
-      print(ggpubr::ggarrange(l, m, u, nrow=1, common.legend=TRUE, legend="right"))
+      lmu <- ggpubr::ggarrange(l, m, u, nrow=1, common.legend=TRUE, legend="right")
+      print(lmu)
+      invisible(lmu)
     }
   }
 
@@ -848,7 +864,7 @@ plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
 #' plot_annual(out.sm, location=1)
 #' @importFrom mgcv cSplineDes
 #' @export plot_annual
-plot_annual <- function(out, location, add=F,
+plot_annual <- function(out, location, add=FALSE,
                         years='one',
                         interval=0.95, yrange=NULL,
                         new_x=NULL){

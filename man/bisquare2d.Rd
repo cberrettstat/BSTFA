@@ -7,12 +7,15 @@
 bisquare2d(locs, knots)
 }
 \arguments{
-\item{locs}{Matrix of coordinates for observed locations.}
+\item{locs}{Matrix of 2-dimensional coordinates for locations of interest.}
 
-\item{knots}{A vector of the number of knots for each resolution.}
+\item{knots}{A matrix of 2-dimensional knot coordinates for a given resolution.}
+}
+\value{
+A matrix containing the bisquare bases for a given resolution evaluated at the input locations.
 }
 \description{
-Function to evaluate bisquare bases for 2-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
+Function to evaluate bisquare bases for 2-dimensional space.  Used internally within \code{makeNewS}.
 }
 \author{
 Candace Berrett and Adam Simpson

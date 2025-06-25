@@ -11,8 +11,11 @@ defineRegion(out, location)
 
 \item{location}{Matrix of coordinates for the new locations.}
 }
+\value{
+A list where each element of the list returns a vector of defining the "region" for each prediction location for the given knot resolution.
+}
 \description{
-Define the region of interest.  Used internally.
+Define the region of interest.  Used internally in the \code{makePredS} function.
 }
 \author{
 Candace Berrett and Adam Simpson

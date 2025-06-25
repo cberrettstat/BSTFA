@@ -2,7 +2,7 @@
 % Please edit documentation in R/bisquare_knots.R
 \name{makeNewS}
 \alias{makeNewS}
-\title{Create a matrix of bisquare bases for a set of observed locations.}
+\title{Create a matrix of bisquare bases for a set of locations.}
 \usage{
 makeNewS(
   coords,
@@ -16,7 +16,7 @@ makeNewS(
 )
 }
 \arguments{
-\item{coords}{Matrix of coordinates for new locations.}
+\item{coords}{Matrix of coordinates for locations of interest.}
 
 \item{n.locations}{Number of observed locations.}
 
@@ -32,8 +32,11 @@ makeNewS(
 
 \item{regions}{Logical scalar indicating if the space should be divided into multiresolution regions. Default is \code{FALSE}.}
 }
+\value{
+A matrix containing all the multiresolution bisquare bases evaluated at the input coordinates.
+}
 \description{
-Create a matrix of bisquare bases for a set of observed locations.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
+Create a matrix of bisquare bases for a set of locations.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
 }
 \author{
 Candace Berrett and Adam Simpson

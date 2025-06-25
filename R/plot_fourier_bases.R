@@ -9,6 +9,7 @@
 #' @param freq.lat Numeric value indicating the frequency to use for the Fourier bases in the latitude direction.  Default is \code{4*diff(range(coords[,2]))}.
 #' @param par.mfrow If \code{plot.3d=TRUE}, how to divide the plotting window. See \code{help(par)} for more details.
 #' @import scatterplot3d
+#' @returns A plot of the Fourier bases for a given frequency.  
 #' @author Adam Simpson
 #' @export plot_fourier_bases
 plot_fourier_bases = function(coords, R, fine=100, plot.3d=FALSE,
@@ -16,8 +17,6 @@ plot_fourier_bases = function(coords, R, fine=100, plot.3d=FALSE,
                               freq.lat=4*diff(range(coords[,2])),
                               par.mfrow=c(2,3)) {
 
-  # print(paste("Freq.lon =", freq.lon))
-  # print(paste("Freq.lat =", freq.lat))
   predgrid <- expand.grid(seq(min(coords[,1]),
                               max(coords[,1]), length=fine),
                           seq(min(coords[,2]),
@@ -35,6 +34,10 @@ plot_fourier_bases = function(coords, R, fine=100, plot.3d=FALSE,
   Slon <- cbind(m.fft.lon[1:nrow(predgrid),], m.fft.lon[(nrow(predgrid)+1):(2*nrow(predgrid)),])
   Slat <- cbind(m.fft.lat[1:nrow(predgrid),], m.fft.lat[(nrow(predgrid)+1):(2*nrow(predgrid)),])
   S = Slon*Slat
+  
+  oldpar <- par(no.readonly=TRUE)
+  on.exit(par(oldpar))
+  
   par(mfrow=par.mfrow)
 
   # ints = rep(seq(1,(R/2)), length.out=R)
@@ -44,22 +47,19 @@ plot_fourier_bases = function(coords, R, fine=100, plot.3d=FALSE,
       m = ifelse(i>(ncol(S)/2),"", paste("r=",ints[i],sep=""))
       tt = ifelse(i > 0.5*ncol(S), "Cosine", "Sine")
       scatterplot3d::scatterplot3d(predgrid[,1], predgrid[,2], S[,i],
-                    #main=paste("Basis", tt, ints[i]),
                     main=m,
                     xlab="", ylab="", zlab="",
                     cex.main=1.5)
-      # mtext("Latitude",
-      #       side = 2,
-      #       line = 3,
-      #       las = 0.5)
     }
   } else {
     for (i in 1:ncol(S)) {
       tt = ifelse(i > 0.5*ncol(S), "cos", "sin")
-      print(ggplot(mapping=aes(x=predgrid[,1], y=predgrid[,2], color=S[,i])) + geom_point() +
+      myp <- ggplot(mapping=aes(x=predgrid[,1], y=predgrid[,2], color=S[,i])) + geom_point() +
               ggtitle(paste("Basis", tt, ints[i])) +
               scale_colour_gradientn(colours=grDevices::colorRampPalette(rev(brewer.pal(9, name='RdBu')))(fine),
-                                     name="Value"))
+                                     name="Value")
+      print(myp)
+      invisible(myp)
     }
   }
 

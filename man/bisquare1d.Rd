@@ -7,12 +7,15 @@
 bisquare1d(locs, knots)
 }
 \arguments{
-\item{locs}{Matrix of coordinates for observed locations.}
+\item{locs}{Matrix of 1-dimensional coordinates for locations of interest.}
 
-\item{knots}{A vector of the number of knots for each resolution.}
+\item{knots}{A vector of 1-dimensional knot coordinates for a given resolution.}
+}
+\value{
+A matrix containing the bisquare bases at a given resolution evaluated at the 1-dimensional input locations.
 }
 \description{
-Evaluate bisquare bases for 1-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
+Evaluate bisquare bases for 1-dimensional space.  Used internally within \code{makeNewS}.
 }
 \author{
 Candace Berrett and Adam Simpson

@@ -11,8 +11,11 @@ makePredS(out, location)
 
 \item{location}{Matrix of coordinates for the new locations.}
 }
+\value{
+A matrix containing the appropriate multiresolution bisquare bases evaluated at the input locations.
+}
 \description{
-Create a matrix of bisquare bases for new locations.  Used internally.
+Create a matrix of bisquare bases for new locations.  Used internally within the \code{predictBSTFA} function.  Currently only implemented for 2-dimensional coordinates.
 }
 \author{
 Candace Berrett and Adam Simpson

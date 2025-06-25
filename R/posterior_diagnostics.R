@@ -54,18 +54,18 @@ plot_trace = function(out, parameter, param.range=NULL,
 compute_summary = function(out) {
   no.fa.iters = which(out$time.data[,3] == 0)
   fa.iters = which(out$time.data[,3] != 0)
-  print(paste('Setup Time:', round(out$setup.time,3), 'seconds.'))
-  print('PARAMETERS')
-  print(paste('Beta:', round(mean(out$time.data[,1]),3), 'seconds per iter.'))
-  print(paste('Xi:', round(mean(out$time.data[,2]),3), 'seconds per iter.'))
-  print(paste('F:', round(mean(out$time.data[fa.iters,3]),3), 'seconds per iter.'))
-  print(paste('Lambda:', round(mean(out$time.data[fa.iters,4]),3), 'seconds per iter.'))
-  print(paste('Sigma2:', round(mean(out$time.data[,5]),5), 'seconds per iter.'))
-  print('OVERALL PER ITERATION')
-  print(paste('Pre-Factor Analysis:', round(mean(out$time.data[no.fa.iters,6]),3), 'seconds.'))
-  print(paste('Post-Factor Analysis:', round(mean(out$time.data[fa.iters,6]),3), 'seconds.'))
-  print('TOTAL TIME')
-  print(paste('Total time: ', round(out$setup.time + apply(out$time.data,2,sum, na.rm=T)[6],3), ' seconds (', round((out$setup.time + apply(out$time.data,2,sum, na.rm=T)[6])/60,3),' minutes) for ', out$iters, ' iterations.', sep=""))
+  cat(paste('Setup Time:', round(out$setup.time,3), 'seconds. \n'))
+  cat('PARAMETERS \n')
+  cat(paste('Beta:', round(mean(out$time.data[,1]),3), 'seconds per iter. \n'))
+  cat(paste('Xi:', round(mean(out$time.data[,2]),3), 'seconds per iter. \n'))
+  cat(paste('F:', round(mean(out$time.data[fa.iters,3]),3), 'seconds per iter. \n'))
+  cat(paste('Lambda:', round(mean(out$time.data[fa.iters,4]),3), 'seconds per iter. \n'))
+  cat(paste('Sigma2:', round(mean(out$time.data[,5]),5), 'seconds per iter. \n'))
+  cat('OVERALL PER ITERATION \n')
+  cat(paste('Pre-Factor Analysis:', round(mean(out$time.data[no.fa.iters,6]),3), 'seconds. \n'))
+  cat(paste('Post-Factor Analysis:', round(mean(out$time.data[fa.iters,6]),3), 'seconds. \n'))
+  cat('TOTAL TIME \n')
+  cat(paste('Total time: ', round(out$setup.time + apply(out$time.data,2,sum, na.rm=T)[6],3), ' seconds (', round((out$setup.time + apply(out$time.data,2,sum, na.rm=T)[6])/60,3),' minutes) for ', out$iters, ' iterations. \n', sep=""))
 }
 
 
@@ -135,9 +135,9 @@ convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,1.96)
 #' data(out.sm)
 #' attach(out.sm)
 #' loglik <- computeLogLik(out.sm, addthin=2)
-#' \dontrun{
-#' #can use to compute likelihood based model measures such as
-#' loo::waic(loglik)
+#' \donttest{
+#' # can use to compute likelihood based model measures such as
+#' outwaic <- loo::waic(loglik)
 #' }
 #' @export computeLogLik
 computeLogLik <- function(out, verbose=FALSE, addthin=1) {
@@ -147,10 +147,10 @@ computeLogLik <- function(out, verbose=FALSE, addthin=1) {
   myseq <- seq(1,out$draws,by=addthin)
   log_lik = matrix(0,nrow=out$n.times*out$n.locs,
                           ncol=length(myseq))
-  if (verbose) print('Starting Log-likelihood calculation')
+  if (verbose) cat('Starting Log-likelihood calculation \n')
   for (d in 1:length(myseq)) {
       log_lik[,d] = dnorm(y,mu[,myseq[d]],sd=out$sig2[myseq[d]],log=TRUE)
-    if (verbose) print(paste('Draw', d))
+    if (verbose & (d %% floor(length(myseq)*.1) == 0)){ cat(paste('Draw', d, '\n')) }
   }
   log_lik
 }

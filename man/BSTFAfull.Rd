@@ -58,7 +58,6 @@ BSTFAfull(
   verbose = TRUE,
   filename = "STFA.Rdata",
   save.missing = TRUE,
-  save.output = FALSE,
   save.time = FALSE
 )
 }
@@ -169,8 +168,6 @@ BSTFAfull(
 
 \item{save.missing}{Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.}
 
-\item{save.output}{Logical scalar indicating whether to save the output object to filename.  Default value is \code{FALSE}.}
-
 \item{save.time}{Logical scalar indicating whether to save the computation time for each MCMC iteration.  Default value is \code{FALSE}.  When \code{FALSE}, the function \code{compute_summary()} will not be useful.}
 }
 \value{
@@ -208,7 +205,7 @@ A list containing the following elements (any elements that are the same as in t
 This function uses MCMC to draw from posterior distributions of a Bayesian spatio-temporal factor analysis model.  The spatial processes for the mean, linear, and seasonal behavior use one of Fourier, thin plate spline, or multiresolution basis functions.  The temporal dependence of the factors is modeled using a vector autoregressive model.  The spatially-dependent loadings are modeled using a mean-zero Gaussian process with an exponential covariance structure.  The default values are chosen to work well for many data sets.  Thus, it is possible to use this function using only three arguments: \code{ymat}, \code{dates}, and \code{coords}.  The default number of MCMC iterations is 10000 (saving 5000); however, depending on the number of observations and processes modeled, it may need more draws than this to ensure the posterior draws are representative of the entire posterior distribution space.
 }
 \examples{
-\dontrun{
+\donttest{
 #Example below not run; even the ten iterations will take a minute or two to run.
 data(utahDataList)
 attach(utahDataList)

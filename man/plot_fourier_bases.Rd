@@ -29,6 +29,9 @@ plot_fourier_bases(
 
 \item{par.mfrow}{If \code{plot.3d=TRUE}, how to divide the plotting window. See \code{help(par)} for more details.}
 }
+\value{
+A plot of the Fourier bases for a given frequency.
+}
 \description{
 Visualize fourier bases.
 }

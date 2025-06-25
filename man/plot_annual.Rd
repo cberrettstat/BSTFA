@@ -7,7 +7,7 @@
 plot_annual(
   out,
   location,
-  add = F,
+  add = FALSE,
   years = "one",
   interval = 0.95,
   yrange = NULL,

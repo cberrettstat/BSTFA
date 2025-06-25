@@ -2,10 +2,11 @@
 
 #' Bisquare bases for 2-dimensional space
 #'
-#' Function to evaluate bisquare bases for 2-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
-#' @param locs Matrix of coordinates for observed locations.
-#' @param knots A vector of the number of knots for each resolution.
+#' Function to evaluate bisquare bases for 2-dimensional space.  Used internally within \code{makeNewS}.
+#' @param locs Matrix of 2-dimensional coordinates for locations of interest.
+#' @param knots A matrix of 2-dimensional knot coordinates for a given resolution.
 #' @importFrom stats dist
+#' @returns A matrix containing the bisquare bases for a given resolution evaluated at the input locations.
 #' @author Candace Berrett and Adam Simpson
 #' @export bisquare2d
 bisquare2d <- function(locs, knots){ #knots are rows
@@ -28,10 +29,11 @@ bisquare2d <- function(locs, knots){ #knots are rows
 
 #' Bisquare bases for 1-dimensional space
 #'
-#' Evaluate bisquare bases for 1-dimensional space.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
-#' @param locs Matrix of coordinates for observed locations.
-#' @param knots A vector of the number of knots for each resolution.
+#' Evaluate bisquare bases for 1-dimensional space.  Used internally within \code{makeNewS}.
+#' @param locs Matrix of 1-dimensional coordinates for locations of interest.
+#' @param knots A vector of 1-dimensional knot coordinates for a given resolution.
 #' @importFrom stats dist
+#' @returns A matrix containing the bisquare bases at a given resolution evaluated at the 1-dimensional input locations.
 #' @author Candace Berrett and Adam Simpson
 #' @export bisquare1d
 bisquare1d <- function(locs, knots){
@@ -45,10 +47,10 @@ bisquare1d <- function(locs, knots){
   return(S)
 } #end 1d bisquare function
 
-#' Create a matrix of bisquare bases for a set of observed locations.
+#' Create a matrix of bisquare bases for a set of locations.
 #'
-#' Create a matrix of bisquare bases for a set of observed locations.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
-#' @param coords Matrix of coordinates for new locations.
+#' Create a matrix of bisquare bases for a set of locations.  Used internally in \code{BSTFA} and \code{BSTFAfull}.
+#' @param coords Matrix of coordinates for locations of interest.
 #' @param n.locations Number of observed locations.
 #' @param knot.levels Number of levels for the knots. Default is 2.
 #' @param max.knot.dist Maximum distance between an observation and a knot.  Default is \code{mean(dist(coords))}.
@@ -57,6 +59,7 @@ bisquare1d <- function(locs, knots){
 #' @param plot.knots Logical scalar indicating whether or not to plot the knots.  Default is \code{TRUE}.
 #' @param regions Logical scalar indicating if the space should be divided into multiresolution regions. Default is \code{FALSE}.
 #' @importFrom stats dist
+#' @returns A matrix containing all the multiresolution bisquare bases evaluated at the input coordinates.
 #' @author Candace Berrett and Adam Simpson
 #' @export makeNewS
 makeNewS <- function(coords, n.locations, knot.levels=2,
@@ -352,9 +355,10 @@ makeNewS <- function(coords, n.locations, knot.levels=2,
 
 #' Create a matrix of bisquare bases for new locations.
 #'
-#' Create a matrix of bisquare bases for new locations.  Used internally.
+#' Create a matrix of bisquare bases for new locations.  Used internally within the \code{predictBSTFA} function.  Currently only implemented for 2-dimensional coordinates.
 #' @param out Output object from \code{BSTFA} or \code{BSTFAfull} functions.
 #' @param location Matrix of coordinates for the new locations.
+#' @returns A matrix containing the appropriate multiresolution bisquare bases evaluated at the input locations.
 #' @author Candace Berrett and Adam Simpson
 #' @export makePredS
 makePredS <- function(out, location) {
@@ -377,9 +381,10 @@ makePredS <- function(out, location) {
 
 #' Define the initial region of interest.
 #'
-#' Define the region of interest.  Used internally.
+#' Define the region of interest.  Used internally in the \code{makePredS} function.
 #' @param out Output object from \code{BSTFA} or \code{BSTFAfull} functions.
 #' @param location Matrix of coordinates for the new locations.
+#' @returns A list where each element of the list returns a vector of defining the "region" for each prediction location for the given knot resolution.
 #' @author Candace Berrett and Adam Simpson
 #' @export defineRegion
 defineRegion <- function(out, location) {
@@ -423,56 +428,3 @@ defineRegion <- function(out, location) {
 }
 
 
-# #' Plot the location of the multiresolution bisquare knots with data locations from model output.
-# #'
-# #' @param out Output object from \code{BSTFA} or \code{BSTFAfull} functions.
-# #' @param style Character scalar indicating whether to plot the knots for the mean, linear, and seasonal components (\code{"spatial"}; default) or for the factor loadings (\code{"load"}).  If it is an object from \code{BSTFAfull}, only the knots from \code{spatial.style} are relevant.
-# #' @export plot_knots
-# plot_knots <- function(out, style="spatial"){
-
-	# coords <- out$coords
-
-	# if (is.matrix(coords) | is.data.frame(coords)) {
-    # if (dim(coords)[2]>1) dist.bisquare='D2'
-    # else dist.bisquare='D1'
-  # } else {
-    # dist.bisquare = 'D1'
-  # }
-
-  # if(style=="spatial"){
-  	# if(out$spatial.style=="grid"){
-  		# knots <- out$knots.spatial
-  	# }else{
-  		# print("Error: Spatial bases are not multiresolution bisquare bases.")
-  	# }
-  # }else{
-  	# if(out$load.style=="grid"){
-  		# knots <- out$knots.load
-  	# }else{
-  		# print("Error: Loading bases are not multiresolution bisquare bases.")
-  	# }
-  # }
-
-	# if(dist.bisquare=="D2"){
-      # legend.txt = c()
-      # colors=c()
-      # plot(x=coords[,1],y=coords[,2],xlab='Longitude',ylab="Latitude",
-           # main = "Knots and Spatial Locations")
-      # for (kkk in 1:knot.levels) {
-        # points(knots.list[[kkk]], col=kkk+1, cex=2, pch=19)
-        # legend.txt[kkk] = paste('Resolution',kkk)
-      # }
-      # legend("topleft",legend=legend.txt,lwd=1,col=seq(2,knot.levels+1),pch=19,lty='blank')
-    # }else{
-    	# legend.txt = c()
-      # colors=c()
-      # plot(x=coords,y=rep(0,length(coords)),xlab='Spatial Location',ylab="",yaxt="n",
-           # main = "Knots and Spatial Locations")
-      # for (kkk in 1:knot.levels) {
-        # points(x=knots.list[[kkk]],y=rep(0,length(knots.list[[kkk]])), col=kkk+1, cex=2, pch=19)
-        # legend.txt[kkk] = paste('Resolution',kkk)
-      # }
-      # legend("topleft",legend=legend.txt,lwd=1,col=seq(2,knot.levels+1),pch=19,lty='blank')
-    # }
-
-# }

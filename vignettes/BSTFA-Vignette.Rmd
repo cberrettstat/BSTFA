@@ -126,14 +126,12 @@ out.sm <- BSTFA(ymat=temps.sm,
 	iters=200000,  
 	thin=913, 
 	save.missing=F, 
-	save.output=T, 
 	factors.fixed=c(34, 22, 15, 20), 
 	n.load.bases=4,
 	n.spatial.bases=4)
-save(out.sm, file="BSTFAsmOutput25.rda")
 ```
 
-The `verbose` argument controls whether or not the function prints status updates during sampling. Although the default value for this is `TRUE`, for the sake of this vignette, `verbose` will always be set to `FALSE`. Also, if desired, the function can save output directly to an `.Rdata` file by setting `save.output == TRUE`. This value is set to `FALSE` by default.
+The `verbose` argument controls whether or not the function prints status updates during sampling. Although the default value for this is `TRUE`, for the sake of this vignette, `verbose` will always be set to `FALSE`. 
 
 The `utahDataList` list object in the `BSTFA` package contains the observed temperature data (`TemperatureVals`), the corresponding dates (`Dates`), the coordinates (`Coords`), and the weather station names (`Locations`).
 

@@ -19,28 +19,31 @@
 #'
 #' @format See \code{help(BSTFA)} for details of what is included as output from the BSTFA function.
 #' @examples
-#' data(BSTFAoutput)
-#' \dontrun{
+#' data(out.sm)
+#' \donttest{
 #' #Code used to obtain this output
 #' data("utahDataList")
 #' attach(utahDataList)
-#' set.seed(466)
 #' dates.ind <- 1191:1251
-#' locs.use <- c(4, 21, 22, 23, 32, 33, 36,
-#'               40, 42, 48, 66, 78, 85, 89,
-#'               94, 96, 114, 118, 124, 144)
+#' locs.use <- c(3, 8, 11, 16, 17,
+#'               20, 23, 29, 30, 46,
+#'               47, 49, 60, 62, 66, 73,
+#'               75, 76, 77, 78, 85, 89, 94,
+#'               96, 98, 100, 109, 112,
+#'               115, 121, 124, 128, 133, 144)
 #' temps.sm <- TemperatureVals[dates.ind, locs.use]
 #' coords.sm <- Coords[locs.use,]
 #' dates.sm <- Dates[dates.ind]
 #' locsm.names <- Locations[locs.use]
-#' out.sm <- BSTFA(ymat=temps.sm,
-#'      dates=dates.sm,
-#'      coords=coords.sm,
-#'      iters=200000,
-#'      burn=10001,
-#'      thin=1826,
-#'      save.missing=F,
-#'      save.output=T,
-#'      factors.fixed=c(20, 14, 11, 12))
+#' set.seed(481)
+#' out.sm <- BSTFA(ymat=temps.sm, 
+#'               dates=dates.sm, 
+#'               coords=coords.sm, 
+#'               iters=200000,  
+#'               thin=913, 
+#'               save.missing=FALSE, 
+#'               factors.fixed=c(34, 22, 15, 20), 
+#'               n.load.bases=4,
+#'               n.spatial.bases=4)
 #' }
 "out.sm"

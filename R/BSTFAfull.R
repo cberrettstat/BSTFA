@@ -56,7 +56,6 @@
 #' @param verbose Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10% of the MCMC process is completed.
 #' @param filename Character scalar indicating the filename to use to save the MCMC output.  Default value is \code{'BSTFA.Rdata'}.
 #' @param save.missing Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.
-#' @param save.output Logical scalar indicating whether to save the output object to filename.  Default value is \code{FALSE}.
 #' @param save.time Logical scalar indicating whether to save the computation time for each MCMC iteration.  Default value is \code{FALSE}.  When \code{FALSE}, the function \code{compute_summary()} will not be useful.
 #' @importFrom matrixcalc vec
 #' @importFrom mgcv cSplineDes
@@ -102,7 +101,7 @@
 #' }
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' #Example below not run; even the ten iterations will take a minute or two to run.
 #' data(utahDataList)
 #' attach(utahDataList)
@@ -126,7 +125,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
                      thin=1, burn=floor(iters*0.5),
                      c.omega=matrix(0.001, n.factors, n.factors), c.phi.lambda=rep(0.001, n.factors),
                      adapt.iter=(burn+10), adapt.epsilon=1e-20,
-                     verbose=TRUE, filename='STFA.Rdata', save.missing=TRUE, save.output=FALSE, save.time=FALSE) {
+                     verbose=TRUE, filename='STFA.Rdata', save.missing=TRUE, save.time=FALSE) {
 
 
   start <- Sys.time()
@@ -155,7 +154,11 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   ### Create newS
   if (spatial.style=='grid') {
     ### using function makeNewS - uses bisquare distance
-    if(plot.knots==TRUE){par(mfrow=c(1,1))}
+    if(plot.knots==TRUE){
+      oldpar <- par(no.readonly=TRUE)
+      on.exit(par(oldpar))
+      par(mfrow=c(1,1))
+      }
     newS.output = makeNewS(coords=coords,n.locations=n.locs,knot.levels=knot.levels,
                            max.knot.dist=max.knot.dist, x=x,
                            plot.knots=plot.knots,
@@ -167,7 +170,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   if (spatial.style=='fourier') {
     if (n.spatial.bases%%2 == 1) {
       n.spatial.bases=n.spatial.bases+1
-      print(paste("n.spatial.bases cannot be odd; changed value to", n.spatial.bases))
+      message(paste("n.spatial.bases cannot be odd; changed value to", n.spatial.bases))
     }
     m.fft.lon <- sapply(1:(n.spatial.bases/2), function(k) {
       sin_term <- sin(2 * pi * k * (coords[,1])/freq.lon)
@@ -354,8 +357,8 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   end <- Sys.time()
   setup.time = end-start
 
-  if (verbose) print(paste("Setup complete! Time taken: ", round(setup.time/60,2), " minutes.", sep=""))
-  if (verbose) print(paste("Starting MCMC, ", iters, " iterations.", sep=""))
+  if (verbose) cat(paste("Setup complete! Time taken: ", round(setup.time/60,2), " minutes. \n", sep=""))
+  if (verbose) cat(paste("Starting MCMC, ", iters, " iterations. \n", sep=""))
 
   ### MCMC ###
   start.time = proc.time()
@@ -387,19 +390,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
         tau2.mu.save[,(i-burn)/thin] <- tau2.mu
       }
 
-      # if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
-      #   eSS = apply(mu.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(mu.save)[1],2)*100
-      #   print(paste(prop.converged,"% of mu parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(alpha.mu.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(alpha.mu.save)[1],2)*100
-      #   print(paste(prop.converged,"% of alpha.mu parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(tau2.mu.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.mu.save)[1],2)*100
-      #   print(paste(prop.converged,"% of tau2.mu parameters have eSS > ",eSS.converged, sep=""))
-      # }
+
     }
 
 
@@ -433,20 +424,6 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
         tau2.beta.save[,(i-burn)/thin] <- tau2.beta
       }
 
-      ### eSS check for beta
-      # if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
-      #   eSS = apply(beta.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(beta.save)[1],2)*100
-      #   print(paste(prop.converged,"% of beta parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(alpha.beta.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(alpha.beta.save)[1],2)*100
-      #   print(paste(prop.converged,"% of alpha.beta parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(tau2.beta.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.beta.save)[1],2)*100
-      #   print(paste(prop.converged,"% of tau2.beta parameters have eSS > ",eSS.converged, sep=""))
-      # }
     }
 
     ### Sample Xi
@@ -479,20 +456,6 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
         tau2.xi.save[,(i-burn)/thin] <- tau2.xi
       }
 
-      ### eSS check for xi
-      # if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
-      #   eSS = apply(xi.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(xi.save)[1],2)*100
-      #   print(paste(prop.converged,"% of xi parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(alpha.xi.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(alpha.xi.save)[1],2)*100
-      #   print(paste(prop.converged,"% of alpha.xi parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(tau2.xi.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.xi.save)[1],2)*100
-      #   print(paste(prop.converged,"% of tau2.xi parameters have eSS > ",eSS.converged, sep=""))
-      # }
     }
 
     # How long to delay FA #
@@ -611,32 +574,6 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
         phi.lambda.save[,(i-burn)/thin] <- phi.lambda
       }
 
-      ### eSS check for FA
-      # if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
-      #   eSS = apply(PFmat.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(PFmat.save)[1],2)*100
-      #   print(paste(prop.converged,"% of PFmat parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(Omega.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(Omega.save)[1],2)*100
-      #   print(paste(prop.converged,"% of Omega parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(Sigma.F.inv.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(Sigma.F.inv.save)[1],2)*100
-      #   print(paste(prop.converged,"% of Sigma.F.inv parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(Lambda.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(Lambda.save)[1],2)*100
-      #   print(paste(prop.converged,"% of Lambda parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(phi.lambda.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(phi.lambda.save)[1],2)*100
-      #   print(paste(prop.converged,"% of phi.lambda parameters have eSS > ",eSS.converged, sep=""))
-      #
-      #   eSS = apply(tau2.lambda.save,1,effectiveSize)
-      #   prop.converged=round(length(which(eSS>eSS.converged))/dim(tau2.lambda.save)[1],2)*100
-      #   print(paste(prop.converged,"% of tau2.lambda parameters have eSS > ",eSS.converged, sep=""))
-      # }
     }
 
 
@@ -655,12 +592,6 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       sig2.save[,(i-burn)/thin] <- sig2
     }
 
-    ### eSS check for sig2
-    # if (((i-burn)/thin)>eSS.converged & i%%eSS.check==0 & verbose) {
-    #   eSS = effectiveSize(t(sig2.save))
-    #   prop.converged=round(length(which(eSS>eSS.converged))/dim(sig2.save)[1],2)*100
-    #   print(paste(prop.converged,"% of sig2 parameters have eSS > ",eSS.converged, sep=""))
-    # }
 
     ### Fill in missing data
     y[whichmis] = Jfullmu.long[whichmis] + Tfullbeta.long[whichmis] +
@@ -716,13 +647,13 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     }#end if adapt.epsilon>0
 
     if (i %% floor(iters*.1) == 0 & verbose) {
-      print(paste("Finished iteration ", i, ": taken ", round((proc.time()[3]-start.time[3])/60,2), " minutes.", sep=""))
+      cat(paste("Finished iteration ", i, ": taken ", round((proc.time()[3]-start.time[3])/60,2), " minutes. \n", sep=""))
     }
     if (i == delayFA & verbose) {
-      print("Starting FA now!")
+      cat("Starting FA now! \n")
     }
     if (i == burn & verbose) {
-      print("Burn complete. Saving iterations now.")
+      cat("Burn complete. Saving iterations now. \n")
     }
   }
 
@@ -732,7 +663,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     time.data <- NULL
   }
 
-  if (verbose) print('Finished MCMC Sampling')
+  if (verbose) cat('Finished MCMC Sampling. \n')
 
   output = list("mu" = as.mcmc(t(mu.save)),
                 "alpha.mu" = as.mcmc(t(alpha.mu.save)),
@@ -777,8 +708,6 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
                 "n.spatial.bases" = n.spatial.bases,
                 "draws" = dim(as.mcmc(t(beta.save)))[1],
                 "load.style" = "full")
-
-  if(save.output){save(output, file=filename)}
 
   output
 
