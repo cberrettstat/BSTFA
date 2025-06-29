@@ -188,7 +188,7 @@ out <- BSTFA(ymat=TemperatureVals[1:50,low.miss],
   iters=10)
 
 #More full example:
-\donttest{
+\dontrun{
 out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
 }
 }

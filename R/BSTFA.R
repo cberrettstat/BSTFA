@@ -103,7 +103,7 @@
 #'   iters=10)
 #'
 #' #More full example:
-#' \donttest{
+#' \dontrun{
 #' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
 #' }
 #' @export BSTFA
@@ -133,8 +133,10 @@ BSTFA <- function(ymat, dates, coords,
   y <- c(ymat)
   missing = ifelse(is.na(y), TRUE, FALSE)
   prop.missing = apply(ymat, 2, function(x) sum(is.na(x)) / n.times)
+  missind <- which(missing)
+  notmissind <- which(!missing)
   y[missing] = 0
-  if (is.null(sig2)) sig2 = var(y)
+  if (is.null(sig2)) sig2 = var(y)/10
 
   if(save.missing==T & sum(missing)!=0){
     y.save <- matrix(0, nrow=sum(missing), ncol=floor((iters-burn)/thin))
@@ -192,14 +194,6 @@ BSTFA <- function(ymat, dates, coords,
     Slon <- cbind(m.fft.lon[1:n.locs,], m.fft.lon[(n.locs+1):(2*n.locs),])
     Slat <- cbind(m.fft.lat[1:n.locs,], m.fft.lat[(n.locs+1):(2*n.locs),])
     newS <- Slat*Slon
-
-    ### Additive Fourier Method
-    # m.fft = sapply(1:(n.spatial.bases/2), function(k) {
-    #   sin_term = sin(2*pi*k*coords[,1]/freq.lon + 2*pi*k*coords[,2]/freq.lat)
-    #   cos_term = cos(2*pi*k*coords[,1]/freq.lon + 2*pi*k*coords[,2]/freq.lat)
-    #   cbind(sin_term, cos_term)
-    # })
-    # newS = cbind(m.fft[1:n.locs,], m.fft[(n.locs+1):(2*n.locs),])
   }
   if (spatial.style=='tps') {
     dd = floor(sqrt(n.spatial.bases))
@@ -222,16 +216,19 @@ BSTFA <- function(ymat, dates, coords,
   ### Set up mean component
   if(mean==TRUE){
     Jfull = kronecker(Matrix::Diagonal(n=n.locs), rep(1, n.times))
-    ItJJ <- methods::as(kronecker(diag(1,n.locs), t(rep(1,n.times))%*%rep(1,n.times)), "sparseMatrix")
-    ItJ <- methods::as(kronecker(diag(1,n.locs), t(rep(1,n.times))), "sparseMatrix")
-    mu.var <- solve(ItJJ)
-    mu.mean <- mu.var%*%ItJ%*%y
-    mu <-  my_mvrnorm(mu.mean, mu.var)
+    Jfullmiss = Jfull[notmissind,,drop=FALSE]
+    tJ <- Matrix::t(Jfullmiss)
+    tJJ <- tJ%*%Jfullmiss
+    #ItJJ <- methods::as(kronecker(diag(1,n.locs), t(rep(1,n.times))%*%rep(1,n.times)), "sparseMatrix")
+    #ItJ <- methods::as(kronecker(diag(1,n.locs), t(rep(1,n.times))), "sparseMatrix")
+    mu.var <- solve(tJJ) #solve(ItJJ)
+    mu.mean <- mu.var%*%tJ%*%y[-missind] #mu.var%*%ItJ%*%y
+    mu <-  my_mvrnorm(mu.mean, 0.001*mu.var)
     mu <- as.matrix(mu)
     Jfullmu.long <- Jfull%*%mu
     rm(list=c("mu.mean", "mu.var"))
     alpha.mu=rep(0, dim(newS)[2])
-    tau2.mu = 1
+    tau2.mu = as.numeric(var(mu))
   } else {
     mu <- rep(0, n.locs)
     Jfullmu.long <- rep(0, n.times*n.locs)
@@ -245,20 +242,23 @@ BSTFA <- function(ymat, dates, coords,
   if (linear == TRUE) {
     Tsub <- -(n.times/2-0.5):(n.times/2-0.5)
     Tfull <- kronecker(Matrix::Diagonal(n=n.locs), Tsub)
-    ItTT <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(Tsub)%*%Tsub), "sparseMatrix")
-    ItT <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(Tsub)), "sparseMatrix")
+    Tfullmiss <- Tfull[notmissind,,drop=FALSE]
+    tT <- Matrix::t(Tfullmiss)
+    tTT <- tT%*%Tfullmiss
+    #ItTT <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(Tsub)%*%Tsub), "sparseMatrix")
+    #ItT <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(Tsub)), "sparseMatrix")
     if(is.null(beta)==T){
-      beta.var <- solve(ItTT)
-      beta.mean <- beta.var%*%ItT%*%y #starting values for beta
-      beta <- my_mvrnorm(beta.mean, beta.var)
+      beta.var <- solve(tTT) #solve(ItTT)
+      beta.mean <- beta.var%*%tT%*%(y[notmissind] - Jfullmu.long[notmissind]) #ItT%*%y #starting values for beta
+      beta <- my_mvrnorm(beta.mean, 0.001*beta.var)
       beta <- as.matrix(beta)
-      beta <- beta + rnorm(length(beta.mean), 0, sd(beta.mean))
+      #beta <- beta + rnorm(length(beta.mean), 0, sd(beta.mean))
       rm(list=c("beta.mean", "beta.var"))
     }
     Tfullbeta.long <- Tfull%*%beta
     model.matrices$linear.Tsub <- Tsub
     alpha.beta <- rep(0, dim(newS)[2])
-    tau2.beta <- 1
+    tau2.beta <- as.numeric(var(beta))
  } else {
     beta <- rep(0, n.locs)
     Tfullbeta.long <- rep(0, n.times*n.locs)
@@ -276,18 +276,21 @@ BSTFA <- function(ymat, dates, coords,
     knots <- seq(1, 366, length=n.seasn.knots+1)
     bs.basis <- mgcv::cSplineDes(doy, knots)
     Bfull <- kronecker(Matrix::Diagonal(n=n.locs), bs.basis)
-    ItBB <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)%*%bs.basis), "sparseMatrix")
-    ItB <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)), "sparseMatrix")
+    Bfullmiss <- Bfull[notmissind,,drop=FALSE]
+    tB <- Matrix::t(Bfullmiss)
+    tBB <- tB%*%Bfullmiss
+    #ItBB <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)%*%bs.basis), "sparseMatrix")
+    #ItB <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)), "sparseMatrix")
     if (is.null(xi)) {
-      xi.var <- solve(ItBB)
-      xi.mean <- xi.var%*%ItB%*%(y - Tfullbeta.long)
-      xi <- my_mvrnorm(xi.mean, xi.var) + rnorm(length(xi.mean), 0, sd(xi.mean)) #starting values for xi
+      xi.var <- solve(tBB) #solve(ItBB)
+      xi.mean <- xi.var%*%tB%*%(y[notmissind]-Jfullmu.long[notmissind]-Tfullbeta.long[notmissind]) #ItB%*%(y - Tfullbeta.long)
+      xi <- my_mvrnorm(xi.mean, 0.001*xi.var) #+ rnorm(length(xi.mean), 0, sd(xi.mean)) #starting values for xi
       rm(list=c("xi.var", "xi.mean"))
     }
     Bfullxi.long <- Bfull%*%xi
     model.matrices$seasonal.bs.basis <- bs.basis
     alpha.xi <- rep(0, dim(newS.xi)[2])
-    tau2.xi <- 1
+    tau2.xi <- as.numeric(var(xi))
   } else {
     xi <- rep(0, n.locs*n.seasn.knots)
     Bfullxi.long <- rep(0, n.locs*n.times)
@@ -342,7 +345,7 @@ BSTFA <- function(ymat, dates, coords,
     ##################################
 
     ### Set up spatial FA
-    tau2.lambda=1
+    tau2.lambda=0.01
 
     ### Eigen Method
     # if (is.null(phi.S)) {
@@ -467,7 +470,6 @@ BSTFA <- function(ymat, dates, coords,
       factors.fixed = p
       }
     }
-    n.factors=length(factors.fixed)
     Lambda.tilde = Lambda
     Lambda.tilde[factors.fixed,] = diag(n.factors)
 
@@ -524,8 +526,8 @@ BSTFA <- function(ymat, dates, coords,
     ### Sample values of mu
     if (mean) {
       temp <- y - Tfullbeta.long - Bfullxi.long - FLambda.long
-      mu.var <- solve((1/sig2)*ItJJ + (1/tau2.mu)*Matrix::Diagonal(n=n.locs))
-      mu.mean <- mu.var%*%((1/sig2)*ItJ%*%temp + (1/tau2.mu)*newS%*%alpha.mu)
+      mu.var <- solve((1/sig2)*tJJ + (1/tau2.mu)*Matrix::Diagonal(n=n.locs)) #ItJJ + (1/tau2.mu)*Matrix::Diagonal(n=n.locs))
+      mu.mean <- mu.var%*%((1/sig2)*tJ%*%temp[notmissind] + (1/tau2.mu)*newS%*%alpha.mu) #ItJ%*%temp + (1/tau2.mu)*newS%*%alpha.mu)
       mu <- as.vector(MASS::mvrnorm(1,mu.mean,mu.var))
       Jfullmu.long <- Jfull%*%mu
       rm(list=c("mu.var", "mu.mean"))
@@ -555,8 +557,8 @@ BSTFA <- function(ymat, dates, coords,
     if (linear) {
       start = Sys.time()
       temp <- y - Jfullmu.long - Bfullxi.long - FLambda.long
-      beta.var <- solve((1/sig2)*ItTT + (1/tau2.beta)*Matrix::Diagonal(n=n.locs))
-      beta.mean <- beta.var%*%((1/sig2)*ItT%*%temp + (1/tau2.beta)*newS%*%alpha.beta)
+      beta.var <- solve((1/sig2)*tTT + (1/tau2.beta)*Matrix::Diagonal(n=n.locs)) #ItTT + (1/tau2.beta)*Matrix::Diagonal(n=n.locs))
+      beta.mean <- beta.var%*%((1/sig2)*tT%*%temp[notmissind] + (1/tau2.beta)*newS%*%alpha.beta)  #ItT%*%temp + (1/tau2.beta)*newS%*%alpha.beta)
       beta <- my_mvrnorm(beta.mean, beta.var)
       Tfullbeta.long <- Tfull%*%beta
       rm(list=c("beta.var", "beta.mean"))
@@ -589,8 +591,8 @@ BSTFA <- function(ymat, dates, coords,
     if (seasonal) {
       start = Sys.time()
       temp <- y - Jfullmu.long - Tfullbeta.long - FLambda.long
-      xi.var <- solve((1/sig2)*ItBB + (1/tau2.xi)*Matrix::Diagonal(n=n.locs*n.seasn.knots))
-      xi.mean <- xi.var%*%((1/sig2)*ItB%*%temp + (1/tau2.xi)*newS.xi%*%alpha.xi)
+      xi.var <- solve((1/sig2)*tBB + (1/tau2.xi)*Matrix::Diagonal(n=n.locs*n.seasn.knots)) #ItBB + (1/tau2.xi)*Matrix::Diagonal(n=n.locs*n.seasn.knots))
+      xi.mean <- xi.var%*%((1/sig2)*tB%*%temp[notmissind] + (1/tau2.xi)*newS.xi%*%alpha.xi) #ItB%*%temp + (1/tau2.xi)*newS.xi%*%alpha.xi)
       xi <- my_mvrnorm(xi.mean,xi.var)
       Bfullxi.long <- Bfull%*%xi
       rm(list=c("xi.var", "xi.mean"))
@@ -624,14 +626,15 @@ BSTFA <- function(ymat, dates, coords,
 
       ### Sample values of alphaT
       temp = y - Jfullmu.long - Tfullbeta.long - Bfullxi.long
-      lamPQTtlamPQT <- kronecker(t(Lambda.tilde)%*%Lambda.tilde, PQTtPQT) # This is much faster than t(kronecker(Lambda.tilde,PQT))%*%kronecker(Lambda.tilde,PQT)
+      #LamPQTmiss <- kronecker(t(Lambda.tilde), t(PQT))[,notmissind,drop=FALSE]
+      lamPQTtlamPQT <- kronecker(t(Lambda.tilde)%*%Lambda.tilde, PQTtPQT) # This is much faster than t(kronecker(Lambda.tilde,PQT))%*%kronecker(Lambda.tilde,PQT)  #LamPQTmiss%*%t(LamPQTmiss) 
       alphaT.var <- solve((1/sig2)*lamPQTtlamPQT + Matrix::Diagonal(x=alpha.prec, n=n.factors*n.temp.bases))
       tempmat = matrix(temp, nrow=n.times, ncol=n.locs)
       alphaT.mean <- (1/sig2)*alphaT.var%*%matrixcalc::vec(t(PQT)%*%tempmat%*%Lambda.tilde) # matrixcalc::vec(t(QT)%*%ymat%*%Lambda.tilde) is a shortcut for t(lamQT)%*%y
       # alphaT <- as.vector(MASS::mvrnorm(1, alphaT.mean, alphaT.var))
       alphaT <- my_mvrnorm(alphaT.mean, alphaT.var)
       rm(list=c("alphaT.var", "alphaT.mean"))
-      Fmat = QT%*%matrix(alphaT, nrow=n.temp.bases, ncol=n.factors, byrow=F)
+      #Fmat = QT%*%matrix(alphaT, nrow=n.temp.bases, ncol=n.factors, byrow=F)
       F.tilde = PQT%*%matrix(alphaT, nrow=n.temp.bases, ncol=n.factors, byrow=F)
       end = Sys.time()
       time.data[i,3] = end-start
@@ -641,9 +644,11 @@ BSTFA <- function(ymat, dates, coords,
 
       temp = y - Jfullmu.long - Tfullbeta.long - Bfullxi.long
       tempmat = matrix(temp, nrow=n.times, ncol=n.locs)
-      IkPFtPF <- methods::as(kronecker(diag(1, n.locs), t(F.tilde)%*%F.tilde), "sparseMatrix")
-      lam.var <- solve((1/sig2)*IkPFtPF + Matrix::Diagonal(x=1/tau2.lambda, n=n.locs*n.factors))
-      lam.mean <- lam.var%*%((1/sig2)*matrixcalc::vec(t(F.tilde)%*%tempmat) + (1/tau2.lambda)*QsI%*%alphaS)
+      PFmiss <- kronecker(Matrix::Diagonal(n=n.locs), F.tilde)[notmissind, ,drop=F]
+      tPFPF <- Matrix::t(PFmiss)%*%PFmiss
+      #IkPFtPF <- methods::as(kronecker(diag(1, n.locs), t(F.tilde)%*%F.tilde), "sparseMatrix")
+      lam.var <- solve((1/sig2)*tPFPF + Matrix::Diagonal(x=1/tau2.lambda, n=n.locs*n.factors)) #IkPFtPF + Matrix::Diagonal(x=1/tau2.lambda, n=n.locs*n.factors))
+      lam.mean <- lam.var%*%((1/sig2)*(Matrix::t(PFmiss))%*%temp[notmissind] + (1/tau2.lambda)*QsI%*%alphaS) #matrixcalc::vec(t(F.tilde)%*%tempmat) + (1/tau2.lambda)*QsI%*%alphaS)
 
       ### which indices are fixed in the long lambda?
       Lam.index <- matrix(1:(n.factors*n.locs), nrow=n.locs, ncol=n.factors, byrow=T)

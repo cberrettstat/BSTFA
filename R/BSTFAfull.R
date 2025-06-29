@@ -529,8 +529,8 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       S.F.prime <- S.F + (t(Fmat[2:n.times,]) - Omega%*%t(Fmat[1:(n.times-1),]))%*%t(t(Fmat[2:n.times,]) - Omega%*%t(Fmat[1:(n.times-1),])) + Fmat[1,]%*%t(Fmat[1,])
       nu.F.prime <- n.times + nu.F
       S.F.prime <- (t(S.F.prime) + S.F.prime)/2
-      Sigma.F.inv <- rwish(nu.F.prime, solve(S.F.prime))
-      Sigma.F <- solve(Sigma.F.inv)
+      Sigma.F.inv <- rwish(nu.F.prime, chol2inv(chol(S.F.prime)))
+      Sigma.F <- chol2inv(chol(Sigma.F.inv))
       rm(list=c("S.F.prime", "nu.F.prime"))
       end = Sys.time()
       time.data[i,3] = end-start
