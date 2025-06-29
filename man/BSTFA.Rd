@@ -46,7 +46,6 @@ BSTFA(
   thin = 1,
   burn = iters * 0.5,
   verbose = TRUE,
-  filename = "BSTFA.Rdata",
   save.missing = TRUE,
   save.time = FALSE
 )
@@ -131,8 +130,6 @@ BSTFA(
 \item{burn}{Numeric scalar indicating how many MCMC iterations to burn before saving.  Default value is one-half of \code{iters}.}
 
 \item{verbose}{Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10\% of the MCMC process is completed.}
-
-\item{filename}{Character scalar indicating the filename to use to save the MCMC output.  Default value is \code{'BSTFA.Rdata'}.}
 
 \item{save.missing}{Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.}
 

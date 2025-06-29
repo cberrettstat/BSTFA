@@ -54,7 +54,6 @@
 #' @param adapt.iter Numeric scalar indicating the number of iterations to start adjusting the proposal standard deviations for the Metropolis random walk algorithms.  Value must be at least 2 larger than \code{burn}. Default value is \code{burn+10}.
 #' @param adapt.epsilon Numeric scalar indicating the small value to add to the proposal standard deviations when using the adaptive Metropolis random walk algorithms.  Default is \code{1e-20}.
 #' @param verbose Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10% of the MCMC process is completed.
-#' @param filename Character scalar indicating the filename to use to save the MCMC output.  Default value is \code{'BSTFA.Rdata'}.
 #' @param save.missing Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.
 #' @param save.time Logical scalar indicating whether to save the computation time for each MCMC iteration.  Default value is \code{FALSE}.  When \code{FALSE}, the function \code{compute_summary()} will not be useful.
 #' @importFrom matrixcalc vec
@@ -138,7 +137,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
                      thin=1, burn=floor(iters*0.5),
                      c.omega=matrix(0.001, n.factors, n.factors), c.phi.lambda=rep(0.001, n.factors),
                      adapt.iter=(burn+10), adapt.epsilon=1e-20,
-                     verbose=TRUE, filename='STFA.Rdata', save.missing=TRUE, save.time=FALSE) {
+                     verbose=TRUE, save.missing=TRUE, save.time=FALSE) {
 
 
   start <- Sys.time()

@@ -43,7 +43,6 @@
 #' @param thin Numeric scalar indicating how many MCMC iterations to thin by.  Default value is 1, indicating no thinning.
 #' @param burn Numeric scalar indicating how many MCMC iterations to burn before saving.  Default value is one-half of \code{iters}.
 #' @param verbose Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10% of the MCMC process is completed.
-#' @param filename Character scalar indicating the filename to use to save the MCMC output.  Default value is \code{'BSTFA.Rdata'}.
 #' @param save.missing Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.
 #' @param save.time Logical scalar indicating whether to save the computation time for each MCMC iteration.  Default value is \code{FALSE}.  When \code{FALSE}, the function \code{compute_summary()} will not be useful.
 #' @importFrom matrixcalc vec
@@ -124,10 +123,11 @@ BSTFA <- function(ymat, dates, coords,
                  alpha.prec=1/100000, tau2.gamma=2, tau2.phi=0.0000001, sig2.gamma=2, sig2.phi=1e-5,
                  sig2=NULL, beta=NULL, xi=NULL,
                  Fmat=matrix(0,nrow=n.times,ncol=n.factors), Lambda=matrix(0,nrow=n.locs, n.factors),
-                 thin=1, burn=iters*0.5, verbose=TRUE, filename='BSTFA.Rdata', save.missing=TRUE, save.time=FALSE) {
+                 thin=1, burn=iters*0.5, verbose=TRUE, save.missing=TRUE, save.time=FALSE) {
 
   start <- Sys.time()
 
+  if(!is.null(factors.fixed)){n.factors<-length(factors.fixed)}
   ### Prepare missing data
   # Make missing values 0 for now, but they will be estimated differently
   y <- c(ymat)
@@ -218,7 +218,7 @@ BSTFA <- function(ymat, dates, coords,
     Jfull = kronecker(Matrix::Diagonal(n=n.locs), rep(1, n.times))
     Jfullmiss = Jfull[notmissind,,drop=FALSE]
     tJ <- Matrix::t(Jfullmiss)
-    tJJ <- tJ%*%Jfullmiss
+    tJJ <- crossprod(Jfullmiss)
     #ItJJ <- methods::as(kronecker(diag(1,n.locs), t(rep(1,n.times))%*%rep(1,n.times)), "sparseMatrix")
     #ItJ <- methods::as(kronecker(diag(1,n.locs), t(rep(1,n.times))), "sparseMatrix")
     mu.var <- solve(tJJ) #solve(ItJJ)
@@ -244,7 +244,7 @@ BSTFA <- function(ymat, dates, coords,
     Tfull <- kronecker(Matrix::Diagonal(n=n.locs), Tsub)
     Tfullmiss <- Tfull[notmissind,,drop=FALSE]
     tT <- Matrix::t(Tfullmiss)
-    tTT <- tT%*%Tfullmiss
+    tTT <- crossprod(Tfullmiss) #tT%*%Tfullmiss
     #ItTT <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(Tsub)%*%Tsub), "sparseMatrix")
     #ItT <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(Tsub)), "sparseMatrix")
     if(is.null(beta)==T){
@@ -278,7 +278,7 @@ BSTFA <- function(ymat, dates, coords,
     Bfull <- kronecker(Matrix::Diagonal(n=n.locs), bs.basis)
     Bfullmiss <- Bfull[notmissind,,drop=FALSE]
     tB <- Matrix::t(Bfullmiss)
-    tBB <- tB%*%Bfullmiss
+    tBB <- crossprod(Bfullmiss) #tB%*%Bfullmiss
     #ItBB <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)%*%bs.basis), "sparseMatrix")
     #ItB <- methods::as(kronecker(Matrix::Diagonal(n=n.locs), t(bs.basis)), "sparseMatrix")
     if (is.null(xi)) {
@@ -306,7 +306,7 @@ BSTFA <- function(ymat, dates, coords,
     if (mean) Cmat <- cbind(Cmat, rep(1,n.times))
     if (linear) Cmat <- cbind(Cmat, Tsub)
     if (seasonal) Cmat <- cbind(Cmat, bs.basis)
-    tCC <- t(Cmat)%*%Cmat
+    tCC <- crossprod(Cmat) 
     tCC <- (t(tCC) + tCC)/2
     if (mean) {
       Pmat <- Cmat%*%MASS::ginv(tCC)%*%t(Cmat)
@@ -626,11 +626,38 @@ BSTFA <- function(ymat, dates, coords,
 
       ### Sample values of alphaT
       temp = y - Jfullmu.long - Tfullbeta.long - Bfullxi.long
-      #LamPQTmiss <- kronecker(t(Lambda.tilde), t(PQT))[,notmissind,drop=FALSE]
-      lamPQTtlamPQT <- kronecker(t(Lambda.tilde)%*%Lambda.tilde, PQTtPQT) # This is much faster than t(kronecker(Lambda.tilde,PQT))%*%kronecker(Lambda.tilde,PQT)  #LamPQTmiss%*%t(LamPQTmiss) 
-      alphaT.var <- solve((1/sig2)*lamPQTtlamPQT + Matrix::Diagonal(x=alpha.prec, n=n.factors*n.temp.bases))
-      tempmat = matrix(temp, nrow=n.times, ncol=n.locs)
-      alphaT.mean <- (1/sig2)*alphaT.var%*%matrixcalc::vec(t(PQT)%*%tempmat%*%Lambda.tilde) # matrixcalc::vec(t(QT)%*%ymat%*%Lambda.tilde) is a shortcut for t(lamQT)%*%y
+      
+      if(mean(missing)>.1){
+        LamPQTmiss <- kronecker(t(Lambda.tilde), t(PQT))[,notmissind,drop=FALSE]
+      
+      # A <- ncol(Lambda.tilde)
+      # C <- ncol(PQT)
+      # R <- nrow(Lambda.tilde)
+      # B <- nrow(PQT)
+      # # Preallocate result matrix: (A*C) rows, length(notmissind) columns
+      # LamPQTmiss <- matrix(0, nrow = A * C, ncol = length(notmissind))
+      # for (j in seq_along(notmissind)) {
+      #   # Global index of column in Kronecker product
+      #   global_col <- notmissind[j]
+      #   
+      #   # Map global column index to (r, b) indices
+      #   b <- (global_col - 1) %% B + 1
+      #   r <- ((global_col - 1) %/% B) + 1
+      #   
+      #   # Compute only that column: kronecker(Lambda.tilde[r, ], PQT[b, ])
+      #   LamPQTmiss[, j] <- as.vector(t(PQT[b, ]) %x% t(Lambda.tilde[r, ]))
+      # }
+      
+        lamPQTtlamPQT <- tcrossprod(LamPQTmiss) #LamPQTmiss%*%t(LamPQTmiss) 
+        alphaT.var <- solve((1/sig2)*lamPQTtlamPQT + Matrix::Diagonal(x=alpha.prec, n=n.factors*n.temp.bases))
+        alphaT.mean <- (1/sig2)*alphaT.var%*%LamPQTmiss%*%temp[notmissind] #matrixcalc::vec(t(PQT)%*%tempmat%*%Lambda.tilde) # matrixcalc::vec(t(QT)%*%ymat%*%Lambda.tilde) is a shortcut for t(lamQT)%*%y
+      }else{
+        lamPQTtlamPQT <- kronecker(t(Lambda.tilde)%*%Lambda.tilde, PQTtPQT) # This is much faster than t(kronecker(Lambda.tilde,PQT))%*%kronecker(Lambda.tilde,PQT)
+        alphaT.var <- solve((1/sig2)*lamPQTtlamPQT + Matrix::Diagonal(x=alpha.prec, n=n.factors*n.temp.bases))
+        alphaT.mean <- (1/sig2)*alphaT.var%*%matrixcalc::vec(t(PQT)%*%tempmat%*%Lambda.tilde) # matrixcalc::vec(t(QT)%*%ymat%*%Lambda.tilde) is a shortcut for t(lamQT)%*%y
+        tempmat = matrix(temp, nrow=n.times, ncol=n.locs)
+      }
+      
       # alphaT <- as.vector(MASS::mvrnorm(1, alphaT.mean, alphaT.var))
       alphaT <- my_mvrnorm(alphaT.mean, alphaT.var)
       rm(list=c("alphaT.var", "alphaT.mean"))
@@ -691,8 +718,8 @@ BSTFA <- function(ymat, dates, coords,
     ### Sample sigma2
     start=Sys.time()
     temp = y - Jfullmu.long - Tfullbeta.long - Bfullxi.long - FLambda.long
-    sig2.shape = sig2.gamma + length(y)/2
-    sig2.rate = sig2.phi + 0.5*Matrix::t(as.matrix(temp))%*%temp
+    sig2.shape = sig2.gamma + length(y[notmissind])/2
+    sig2.rate = sig2.phi + 0.5*Matrix::t(as.matrix(temp[notmissind]))%*%temp[notmissind]
     sig2 = 1/rgamma(1, shape=sig2.shape, rate=as.vector(sig2.rate))
     rm(list=c("sig2.shape", "sig2.rate"))
     end=Sys.time()
@@ -706,12 +733,12 @@ BSTFA <- function(ymat, dates, coords,
 
 
     ### Fill in missing data
-    y[missing] = Jfullmu.long[missing] + Tfullbeta.long[missing] +
-      Bfullxi.long[missing] + FLambda.long[missing] + rnorm(sum(missing), 0, sqrt(sig2))
+    y[missind] = Jfullmu.long[missind] + Tfullbeta.long[missind] +
+      Bfullxi.long[missind] + FLambda.long[missind] + rnorm(sum(missing), 0, sqrt(sig2))
 
     if(save.missing==T){
       if((i-burn)%%thin == 0 & i > burn){
-        y.save[,(i-burn)/thin] <- y[missing]
+        y.save[,(i-burn)/thin] <- y[missind]
       }
     }
 
@@ -729,7 +756,7 @@ BSTFA <- function(ymat, dates, coords,
 
   time.data$full_iter = apply(time.data,1,sum)
 
-  if(save.time==F){
+  if(save.time==FALSE){
     time.data <- NULL
   }
 

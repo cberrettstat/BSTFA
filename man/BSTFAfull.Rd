@@ -56,7 +56,6 @@ BSTFAfull(
   adapt.iter = (burn + 10),
   adapt.epsilon = 1e-20,
   verbose = TRUE,
-  filename = "STFA.Rdata",
   save.missing = TRUE,
   save.time = FALSE
 )
@@ -163,8 +162,6 @@ BSTFAfull(
 \item{adapt.epsilon}{Numeric scalar indicating the small value to add to the proposal standard deviations when using the adaptive Metropolis random walk algorithms.  Default is \code{1e-20}.}
 
 \item{verbose}{Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10\% of the MCMC process is completed.}
-
-\item{filename}{Character scalar indicating the filename to use to save the MCMC output.  Default value is \code{'BSTFA.Rdata'}.}
 
 \item{save.missing}{Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.}
 
