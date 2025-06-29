@@ -8,7 +8,7 @@
 #' @param type One of \code{all}, \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic of the predicted values to return.
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param new_x If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.
-#' @param pred.int Logical scalar indicating whether to include additional uncertainty for posterior predictive intervals (\code{TRUE}; default) or not (posterior draws from the mean of \code{location}).
+#' @param pred.int Logical scalar indicating whether to include additional uncertainty for posterior predictive intervals (\code{TRUE}) or not (\code{FALSE}; default -- intervals represent posterior probabilities around the mean of \code{location}).
 #' @returns A matrix or vector of estimated/predicted values for \code{location}.
 #' @author Candace Berrett and Adam Simpson
 #' @examples
@@ -18,7 +18,7 @@
 #' @importFrom npreg basis.tps
 #' @export predictBSTFA
 predictBSTFA = function(out, location=NULL, type='mean',
-                       ci.level = c(0.025, 0.975), new_x=NULL, pred.int=TRUE) {
+                       ci.level = c(0.025, 0.975), new_x=NULL, pred.int=FALSE) {
 
   if (is.null(location)) { # predict for all observed locations
     facts <- matrix(0, ncol=out$draws, nrow=out$n.times*out$n.locs)

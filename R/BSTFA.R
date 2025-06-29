@@ -26,8 +26,8 @@
 #' @param plot.factors Logical scalar indicating whether to plot the fixed factor locations.  Default is \code{FALSE}.
 #' @param load.style Character scalar indicating the style of spatial bases to use for the spatially-dependent loadings. Options are \code{'fourier'} (default) for the Fourier bases, \code{'tps'} for thin plate splines, and \code{'grid'} for multiresolution bases.  This can be the same as or different than \code{spatial.style}.
 #' @param n.load.bases Numeric scalar indicating the number of bases to use for the spatially-dependent loadings when \code{load.style} is either \code{'fouier'} or \code{'tps'}.  This can be the same as or different than  \code{n.spatial.bases}.  Default is \code{min(6, ceiling(dim(coords)[1]/3))}.
-#' @param freq.lon Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{4*diff(range(coords[,1]))}.
-#' @param freq.lat Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{4*diff(range(coords[,2]))}.
+#' @param freq.lon Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,1]))}.
+#' @param freq.lat Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,2]))}.
 #' @param n.temp.bases Numeric scalar indicating the number of Fourier bases to use for the temporally-dependent factors. The default value is 10% of \code{n.times}.
 #' @param freq.temp Numeric scalar indicating the frequency to use for the Fourier bases of the temporally-dependent factors.  The default value is \code{n.times}.
 #' @param alpha.prec Numeric scalar indicating the prior precision for all model process coefficients. Default value is \code{1/100000}.
@@ -127,6 +127,7 @@ BSTFA <- function(ymat, dates, coords,
 
   start <- Sys.time()
 
+  if(!is.matrix(ymat)){ymat <- as.matrix(ymat)}
   if(!is.null(factors.fixed)){n.factors<-length(factors.fixed)}
   ### Prepare missing data
   # Make missing values 0 for now, but they will be estimated differently
@@ -151,7 +152,7 @@ BSTFA <- function(ymat, dates, coords,
   if (!is.null(x)) x <- as.matrix(x)
 
   ### Change coordinates to a matrix if not
-  if(is.matrix(coords)==F){coords <- as.matrix(coords)}
+  if(!is.matrix(coords)){coords <- as.matrix(coords)}
   ### Create newS
   knots.vec.save.spatial=NULL
   knots.vec.save.load=NULL
@@ -212,6 +213,10 @@ BSTFA <- function(ymat, dates, coords,
 
   model.matrices <- list()
   model.matrices$newS <- newS
+  
+  if (qr(newS)$rank != ncol(newS)) {
+    stop("Collinearity in bases for spatial covariate; adjust Fourier frequencies.")
+  }
 
   ### Set up mean component
   if(mean==TRUE){
@@ -412,6 +417,11 @@ BSTFA <- function(ymat, dates, coords,
       QSlon <- cbind(m.fft.lon[1:n.locs,], m.fft.lon[(n.locs+1):(2*n.locs),])
       QSlat <- cbind(m.fft.lat[1:n.locs,], m.fft.lat[(n.locs+1):(2*n.locs),])
       QS <- QSlat*QSlon
+      
+      if (qr(QS)$rank != ncol(QS)) {
+        stop("Collinearity in bases for spatial loadings; adjust Fourier frequencies.")
+      }
+      
     }
     if (load.style=='tps') {
       dd = floor(sqrt(n.load.bases))
@@ -627,7 +637,7 @@ BSTFA <- function(ymat, dates, coords,
       ### Sample values of alphaT
       temp = y - Jfullmu.long - Tfullbeta.long - Bfullxi.long
       
-      if(mean(missing)>.1){
+      if(mean(missing)>.4){
         LamPQTmiss <- kronecker(t(Lambda.tilde), t(PQT))[,notmissind,drop=FALSE]
       
       # A <- ncol(Lambda.tilde)
@@ -661,8 +671,8 @@ BSTFA <- function(ymat, dates, coords,
       # alphaT <- as.vector(MASS::mvrnorm(1, alphaT.mean, alphaT.var))
       alphaT <- my_mvrnorm(alphaT.mean, alphaT.var)
       rm(list=c("alphaT.var", "alphaT.mean"))
-      #Fmat = QT%*%matrix(alphaT, nrow=n.temp.bases, ncol=n.factors, byrow=F)
-      F.tilde = PQT%*%matrix(alphaT, nrow=n.temp.bases, ncol=n.factors, byrow=F)
+      #Fmat = QT%*%matrix(alphaT, nrow=n.temp.bases, ncol=n.factors, byrow=FALSE)
+      F.tilde = PQT%*%matrix(alphaT, nrow=n.temp.bases, ncol=n.factors, byrow=FALSE)
       end = Sys.time()
       time.data[i,3] = end-start
 
@@ -671,7 +681,7 @@ BSTFA <- function(ymat, dates, coords,
 
       temp = y - Jfullmu.long - Tfullbeta.long - Bfullxi.long
       tempmat = matrix(temp, nrow=n.times, ncol=n.locs)
-      PFmiss <- kronecker(Matrix::Diagonal(n=n.locs), F.tilde)[notmissind, ,drop=F]
+      PFmiss <- kronecker(Matrix::Diagonal(n=n.locs), F.tilde)[notmissind, ,drop=FALSE]
       tPFPF <- Matrix::t(PFmiss)%*%PFmiss
       #IkPFtPF <- methods::as(kronecker(diag(1, n.locs), t(F.tilde)%*%F.tilde), "sparseMatrix")
       lam.var <- solve((1/sig2)*tPFPF + Matrix::Diagonal(x=1/tau2.lambda, n=n.locs*n.factors)) #IkPFtPF + Matrix::Diagonal(x=1/tau2.lambda, n=n.locs*n.factors))

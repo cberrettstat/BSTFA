@@ -10,7 +10,7 @@ predictBSTFA(
   type = "mean",
   ci.level = c(0.025, 0.975),
   new_x = NULL,
-  pred.int = TRUE
+  pred.int = FALSE
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ predictBSTFA(
 
 \item{new_x}{If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.}
 
-\item{pred.int}{Logical scalar indicating whether to include additional uncertainty for posterior predictive intervals (\code{TRUE}; default) or not (posterior draws from the mean of \code{location}).}
+\item{pred.int}{Logical scalar indicating whether to include additional uncertainty for posterior predictive intervals (\code{TRUE}) or not (\code{FALSE}; default -- intervals represent posterior probabilities around the mean of \code{location}).}
 }
 \value{
 A matrix or vector of estimated/predicted values for \code{location}.

@@ -97,9 +97,9 @@ BSTFA(
 
 \item{n.load.bases}{Numeric scalar indicating the number of bases to use for the spatially-dependent loadings when \code{load.style} is either \code{'fouier'} or \code{'tps'}.  This can be the same as or different than  \code{n.spatial.bases}.  Default is \code{min(6, ceiling(dim(coords)[1]/3))}.}
 
-\item{freq.lon}{Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{4*diff(range(coords[,1]))}.}
+\item{freq.lon}{Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,1]))}.}
 
-\item{freq.lat}{Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{4*diff(range(coords[,2]))}.}
+\item{freq.lat}{Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,2]))}.}
 
 \item{n.temp.bases}{Numeric scalar indicating the number of Fourier bases to use for the temporally-dependent factors. The default value is 10\% of \code{n.times}.}
 
