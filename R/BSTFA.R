@@ -664,8 +664,8 @@ BSTFA <- function(ymat, dates, coords,
       }else{
         lamPQTtlamPQT <- kronecker(t(Lambda.tilde)%*%Lambda.tilde, PQTtPQT) # This is much faster than t(kronecker(Lambda.tilde,PQT))%*%kronecker(Lambda.tilde,PQT)
         alphaT.var <- solve((1/sig2)*lamPQTtlamPQT + Matrix::Diagonal(x=alpha.prec, n=n.factors*n.temp.bases))
-        alphaT.mean <- (1/sig2)*alphaT.var%*%matrixcalc::vec(t(PQT)%*%tempmat%*%Lambda.tilde) # matrixcalc::vec(t(QT)%*%ymat%*%Lambda.tilde) is a shortcut for t(lamQT)%*%y
         tempmat = matrix(temp, nrow=n.times, ncol=n.locs)
+        alphaT.mean <- (1/sig2)*alphaT.var%*%matrixcalc::vec(t(PQT)%*%tempmat%*%Lambda.tilde) # matrixcalc::vec(t(QT)%*%ymat%*%Lambda.tilde) is a shortcut for t(lamQT)%*%y
       }
       
       # alphaT <- as.vector(MASS::mvrnorm(1, alphaT.mean, alphaT.var))
@@ -680,7 +680,7 @@ BSTFA <- function(ymat, dates, coords,
       start = Sys.time()
 
       temp = y - Jfullmu.long - Tfullbeta.long - Bfullxi.long
-      tempmat = matrix(temp, nrow=n.times, ncol=n.locs)
+      #tempmat = matrix(temp, nrow=n.times, ncol=n.locs)
       PFmiss <- kronecker(Matrix::Diagonal(n=n.locs), F.tilde)[notmissind, ,drop=FALSE]
       tPFPF <- Matrix::t(PFmiss)%*%PFmiss
       #IkPFtPF <- methods::as(kronecker(diag(1, n.locs), t(F.tilde)%*%F.tilde), "sparseMatrix")
