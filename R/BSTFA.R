@@ -16,7 +16,7 @@
 #' @param factors Logical scalar. If \code{TRUE} (default), the model will fit a spatio-temporal factor analysis model with temporally-dependent factors and spatially-dependent loadings.
 #' @param n.seasn.knots Numeric scalar indicating the number of knots to use for the seasonal basis components. The default value is \code{min(7, ceiling(length(unique(yday(dates)))/3))}, where 7 will capture approximately 2 peaks during the year.
 #' @param spatial.style Character scalar indicating the style of bases to use for the linear and seasonal components.  Style options are \code{'fourier'} (default), \code{'tps'} for thin plate splines, and \code{'grid'} for multiresolution bisquare bases using knots from a grid across the space.
-#' @param n.spatial.bases Numeric scalar indicating the number of spatial bases to use when \code{spatial.style} is either \code{'fourier'} or \code{'tps'}. Default value is \code{min(8, ceiling(n.locs/3))}.
+#' @param n.spatial.bases Numeric scalar indicating the number of spatial bases to use when \code{spatial.style} is either \code{'fourier'} or \code{'tps'}. Default value is \code{min(16, ceiling(n.locs/3))}. When \code{spatial.style} is \code{'fourier'}, this value must be an even square number.
 #' @param knot.levels Numeric scalar indicating the number of resolutions to use for when \code{spatial.style='grid'} and/or \code{load.style='grid'}.  Default is 2.
 #' @param max.knot.dist Numeric scalar indicating the maximum distance at which a basis value is greater than zero when \code{spatial.style='grid'} and/or \code{load.style='grid'}.  Default value is \code{mean(dist(coords))}.
 #' @param premade.knots Optional list of length \code{knot.levels} with each list element containing a matrix of longitude-latitude coordinates of the knots to use for each resolution when \code{spatial.style='grid'} and/or \code{load.style='grid'}.  Otherwise, when \code{premade.knots = NULL} (default), the knots are determined by using the standard multiresolution grids across the space.
@@ -25,7 +25,7 @@
 #' @param factors.fixed Numeric vector of length \code{n.factors} indicating the locations to use for the fixed loadings.  This is needed for model identifiability.  If \code{factors.fixed=NULL} (default), the code will select locations with less than 20% missing data and that are far apart in the space.
 #' @param plot.factors Logical scalar indicating whether to plot the fixed factor locations.  Default is \code{FALSE}.
 #' @param load.style Character scalar indicating the style of spatial bases to use for the spatially-dependent loadings. Options are \code{'fourier'} (default) for the Fourier bases, \code{'tps'} for thin plate splines, and \code{'grid'} for multiresolution bases.  This can be the same as or different than \code{spatial.style}.
-#' @param n.load.bases Numeric scalar indicating the number of bases to use for the spatially-dependent loadings when \code{load.style} is either \code{'fouier'} or \code{'tps'}.  This can be the same as or different than  \code{n.spatial.bases}.  Default is \code{min(6, ceiling(dim(coords)[1]/3))}.
+#' @param n.load.bases Numeric scalar indicating the number of bases to use for the spatially-dependent loadings when \code{load.style} is either \code{'fouier'} or \code{'tps'}.  This can be the same as or different than  \code{n.spatial.bases}.  Default is \code{4}. When \code{load.style='fourier'}, this value must be an even square number.
 #' @param freq.lon Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,1]))}.
 #' @param freq.lat Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,2]))}.
 #' @param n.temp.bases Numeric scalar indicating the number of Fourier bases to use for the temporally-dependent factors. The default value is 10% of \code{n.times}.
@@ -76,7 +76,7 @@
 #'   \item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NULL}. }
 #'   \item{time.data}{A data frame of size \code{iters} by \code{6} containing the time it took to sample each parameter for every iteration.}
 #'   \item{setup.time}{An object containing the time the model setup took.}
-#'   \item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
+#'   \item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the Fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
 #'   \item{factors.fixed}{A vector of length \code{n.factors} giving the location indices of the fixed loadings.}
 #'   \item{iters}{A scalar returning the number of MCMC iterations.}
 #'   \item{y}{An \code{n.times*n.locs} vector of the observations.}
@@ -101,21 +101,19 @@
 #'   n.factors=2,
 #'   iters=10)
 #'
-#' #More full example:
-#' \dontrun{
-#' out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
-#' }
+#' # More full example:
+#' # out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
 #' @export BSTFA
 BSTFA <- function(ymat, dates, coords,
                  iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                  mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
                  n.seasn.knots=min(7, ceiling(length(unique(yday(dates)))/3)),
                  spatial.style='fourier',
-                 n.spatial.bases=min(8, ceiling(n.locs/3)),
+                 n.spatial.bases=min(16, ceiling(n.locs/3)),
                  knot.levels=2, max.knot.dist=mean(dist(coords)), premade.knots=NULL, plot.knots=FALSE,
                  n.factors=min(4,ceiling(n.locs/20)), factors.fixed=NULL, plot.factors=FALSE,
                  load.style='fourier',
-                 n.load.bases=min(6, ceiling(dim(coords)[1]/3)),
+                 n.load.bases=4,
                  freq.lon=diff(range(coords[,1])),
                  freq.lat=diff(range(coords[,2])),
                  n.temp.bases=ifelse(floor(n.times*0.10)%%2==1, floor(n.times*0.10)-1, floor(n.times*0.10)),
@@ -127,8 +125,14 @@ BSTFA <- function(ymat, dates, coords,
 
   start <- Sys.time()
 
+  #Basic checks on inputs
+  if(n.spatial.bases > n.locs){stop("n.spatial.bases must be less than n.locs")}
+  if(n.load.bases > n.locs){stop("n.load.bases must be less than n.locs")}
+  if(n.temp.bases > n.times){stop("n.temp.bases must be less than n.times")}
+  
   if(!is.matrix(ymat)){ymat <- as.matrix(ymat)}
   if(!is.null(factors.fixed)){n.factors<-length(factors.fixed)}
+
   ### Prepare missing data
   # Make missing values 0 for now, but they will be estimated differently
   y <- c(ymat)
@@ -176,25 +180,32 @@ BSTFA <- function(ymat, dates, coords,
     knots.vec.save.spatial = newS.output[[2]]
   }
   if (spatial.style=='fourier') {
-    if (n.spatial.bases%%2 == 1) {
-      n.spatial.bases=n.spatial.bases+1
-      print(paste("n.spatial.bases cannot be odd; changed value to", n.spatial.bases))
+    if (sqrt(n.spatial.bases)%%1 != 0 | n.spatial.bases%%2 != 0) {
+      n.spatial.bases=floor(sqrt(n.spatial.bases))^2
+      if(n.spatial.bases%%2 != 0){n.spatial.bases <- (floor(sqrt(n.spatial.bases))+1)^2}
+      message(paste("n.spatial.bases must be an even square number; changed value to", n.spatial.bases))
     }
     ### Original Fourier Method
-    m.fft.lon <- sapply(1:(n.spatial.bases/2), function(k) {
+    m.fft.lon <- sapply(1:(sqrt(n.spatial.bases)/2), function(k) {
       sin_term <- sin(2 * pi * k * (coords[,1])/freq.lon)
       cos_term <- cos(2 * pi * k * (coords[,1])/freq.lon)
       cbind(sin_term, cos_term)
     })
-    m.fft.lat <- sapply(1:(n.spatial.bases/2), function(k) {
+    m.fft.lat <- sapply(1:(sqrt(n.spatial.bases)/2), function(k) {
       sin_term <- sin(2 * pi * k * (coords[,2])/freq.lat)
       cos_term <- cos(2 * pi * k * (coords[,2])/freq.lat)
       cbind(sin_term, cos_term)
     })
-
     Slon <- cbind(m.fft.lon[1:n.locs,], m.fft.lon[(n.locs+1):(2*n.locs),])
     Slat <- cbind(m.fft.lat[1:n.locs,], m.fft.lat[(n.locs+1):(2*n.locs),])
-    newS <- Slat*Slon
+    newS <- matrix(NA, nrow=n.locs, ncol=n.spatial.bases)
+    col_idx <- 1
+    for (thisi in 1:ncol(Slon)) {
+      for (thisj in 1:ncol(Slat)) {
+        newS[, col_idx] <- Slon[, thisi] * Slat[, thisj]
+        col_idx <- col_idx + 1
+      }
+    }
   }
   if (spatial.style=='tps') {
     dd = floor(sqrt(n.spatial.bases))
@@ -215,7 +226,7 @@ BSTFA <- function(ymat, dates, coords,
   model.matrices$newS <- newS
   
   if (qr(newS)$rank != ncol(newS)) {
-    stop("Collinearity in bases for spatial covariate; adjust Fourier frequencies.")
+    stop("Collinearity in bases for spatial coefficients; adjust Fourier frequencies.")
   }
 
   ### Set up mean component
@@ -399,24 +410,32 @@ BSTFA <- function(ymat, dates, coords,
 
     ### Fourier method
     if (load.style == 'fourier') {
-      if (n.load.bases%%2 == 1) {
-        n.load.bases=n.load.bases+1
-        message(paste("n.load.bases cannot be odd; changed value to", n.load.bases))
+      if (sqrt(n.load.bases)%%1 != 0 | n.load.bases%%2 != 0) {
+        n.load.bases=floor(sqrt(n.load.bases))^2
+        if(n.load.bases%%2 != 0){n.load.bases <- (floor(sqrt(n.load.bases))+1)^2}
+        message(paste("n.load.bases must be an even square number; changed value to", n.load.bases))
       }
-      m.fft.lon <- sapply(1:(n.load.bases/2), function(k) {
+      ### Original Fourier Method
+      m.fft.lon <- sapply(1:(sqrt(n.load.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (coords[,1])/freq.lon)
         cos_term <- cos(2 * pi * k * (coords[,1])/freq.lon)
         cbind(sin_term, cos_term)
       })
-      m.fft.lat <- sapply(1:(n.load.bases/2), function(k) {
+      m.fft.lat <- sapply(1:(sqrt(n.load.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (coords[,2])/freq.lat)
         cos_term <- cos(2 * pi * k * (coords[,2])/freq.lat)
         cbind(sin_term, cos_term)
       })
-
       QSlon <- cbind(m.fft.lon[1:n.locs,], m.fft.lon[(n.locs+1):(2*n.locs),])
       QSlat <- cbind(m.fft.lat[1:n.locs,], m.fft.lat[(n.locs+1):(2*n.locs),])
-      QS <- QSlat*QSlon
+      QS <- matrix(NA, nrow=n.locs, ncol=n.load.bases)
+      col_idx <- 1
+      for (thisi in 1:ncol(QSlon)) {
+        for (thisj in 1:ncol(QSlat)) {
+          QS[, col_idx] <- QSlon[, thisi] * QSlat[, thisj]
+          col_idx <- col_idx + 1
+        }
+      }
       
       if (qr(QS)$rank != ncol(QS)) {
         stop("Collinearity in bases for spatial loadings; adjust Fourier frequencies.")

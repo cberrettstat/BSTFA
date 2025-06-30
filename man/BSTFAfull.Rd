@@ -23,8 +23,8 @@ BSTFAfull(
   max.knot.dist = n.locs * 0.05,
   premade.knots = NULL,
   plot.knots = FALSE,
-  freq.lon = 4 * diff(range(coords[, 1])),
-  freq.lat = 4 * diff(range(coords[, 2])),
+  freq.lon = diff(range(coords[, 1])),
+  freq.lat = diff(range(coords[, 2])),
   n.factors = min(4, ceiling(n.locs/20)),
   factors.fixed = NULL,
   plot.factors = FALSE,
@@ -97,9 +97,9 @@ BSTFAfull(
 
 \item{plot.knots}{Logical scalar indicating whether to plot the knots used when \code{spatial.style='grid'}. Default is \code{FALSE}.}
 
-\item{freq.lon}{Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'}. Default value is \code{4*diff(range(coords[,1]))}.}
+\item{freq.lon}{Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'}. Default value is \code{diff(range(coords[,1]))}.}
 
-\item{freq.lat}{Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'}. Default value is \code{4*diff(range(coords[,2]))}.}
+\item{freq.lat}{Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'}. Default value is \code{diff(range(coords[,2]))}.}
 
 \item{n.factors}{Numeric scalar indicating how many factors to use in the model.  Default is \code{min(4,ceiling(n.locs/20))}.}
 

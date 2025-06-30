@@ -71,19 +71,26 @@ predictBSTFA = function(out, location=NULL, type='mean',
     }
 
     if (out$spatial.style == 'fourier') {
-      m.fft.lon <- sapply(1:(out$n.spatial.bases/2), function(k) {
+      m.fft.lon <- sapply(1:(sqrt(out$n.spatial.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (location[,1])/out$freq.lon)
         cos_term <- cos(2 * pi * k * (location[,1])/out$freq.lon)
         cbind(sin_term, cos_term)
       })
-      m.fft.lat <- sapply(1:(out$n.spatial.bases/2), function(k) {
+      m.fft.lat <- sapply(1:(sqrt(out$n.spatial.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (location[,2])/out$freq.lat)
         cos_term <- cos(2 * pi * k * (location[,2])/out$freq.lat)
         cbind(sin_term, cos_term)
       })
       Slon <- cbind(m.fft.lon[1:nrow(location),], m.fft.lon[(nrow(location)+1):(2*nrow(location)),])
       Slat <- cbind(m.fft.lat[1:nrow(location),], m.fft.lat[(nrow(location)+1):(2*nrow(location)),])
-      predS = matrix(Slat*Slon,ncol=out$n.spatial.bases)
+      predS = matrix(NA, nrow=nrow(location), ncol=out$n.spatial.bases)
+      col_idx <- 1
+      for (thisi in 1:ncol(Slon)) {
+         for (thisj in 1:ncol(Slat)) {
+             predS[, col_idx] <- Slon[, thisi] * Slat[, thisj]
+             col_idx <- col_idx + 1
+          }
+       }
     }
     if (out$spatial.style == 'tps') {
       coords_added = rbind(out$coords,location)
@@ -145,19 +152,26 @@ predictBSTFA = function(out, location=NULL, type='mean',
       }
     }
     if (out$load.style == 'fourier') {
-      m.fft.lon <- sapply(1:(out$n.load.bases/2), function(k) {
+      m.fft.lon <- sapply(1:(sqrt(out$n.load.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (location[,1])/out$freq.lon)
         cos_term <- cos(2 * pi * k * (location[,1])/out$freq.lon)
         cbind(sin_term, cos_term)
       })
-      m.fft.lat <- sapply(1:(out$n.load.bases/2), function(k) {
+      m.fft.lat <- sapply(1:(sqrt(out$n.load.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (location[,2])/out$freq.lat)
         cos_term <- cos(2 * pi * k * (location[,2])/out$freq.lat)
         cbind(sin_term, cos_term)
       })
       Slon <- cbind(m.fft.lon[1:nrow(location),], m.fft.lon[(nrow(location)+1):(2*nrow(location)),])
       Slat <- cbind(m.fft.lat[1:nrow(location),], m.fft.lat[(nrow(location)+1):(2*nrow(location)),])
-      predQS = matrix(Slat*Slon,ncol=out$n.load.bases)
+      predQS = matrix(NA, nrow=nrow(location),ncol=out$n.load.bases)
+      col_idx <- 1
+      for (thisi in 1:ncol(Slon)) {
+        for (thisj in 1:ncol(Slat)) {
+          predQS[, col_idx] <- Slon[, thisi] * Slat[, thisj]
+          col_idx <- col_idx + 1
+        }
+      }
     }
     if (out$load.style == 'tps') {
       coords_added = rbind(out$coords,location)
@@ -256,7 +270,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' @param new_x If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.
 #' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic of the predicted values to return.
 #' @param par.mfrow A vector of length 2 indicating the number of rows and columns to divide the plotting window. Default is \code{c(1,1)}.
-#' @param pred.int Logical scalar indicating whether the interval should be a posterior predictive interval (default; \code{TRUE}) or a posterior credible interval (\code{FALSE}).
+#' @param pred.int Logical scalar indicating whether the interval should be a posterior predictive interval (\code{TRUE}) or a posterior credible interval (\code{FALSE}; default).
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param uncertainty Logical scalar indicating whether to plot the uncertainty bounds (\code{TRUE}; default) or not.
 #' @param xrange A date vector of length 2 providing the lower and upper bounds of the dates to include in the plot.
@@ -270,7 +284,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' plot_location(out.sm, location=1, pred.int=FALSE)
 #' @export plot_location
 plot_location = function(out, location, new_x=NULL,
-                         type='mean', par.mfrow=c(1,1), pred.int=TRUE,
+                         type='mean', par.mfrow=c(1,1), pred.int=FALSE,
                          ci.level = c(0.025, 0.975),
                          uncertainty=TRUE, xrange=NULL, truth=FALSE,
                          ylim=NULL) {
@@ -508,19 +522,26 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
     }
     if (out$load.style=='fourier') {
       ### Original Fourier Method
-      m.fft.lon <- sapply(1:(out$n.load.bases/2), function(k) {
+      m.fft.lon <- sapply(1:(sqrt(out$n.load.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (predloc[,1])/out$freq.lon)
         cos_term <- cos(2 * pi * k * (predloc[,1])/out$freq.lon)
         cbind(sin_term, cos_term)
       })
-      m.fft.lat <- sapply(1:(out$n.load.bases/2), function(k) {
+      m.fft.lat <- sapply(1:(sqrt(out$n.load.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (predloc[,2])/out$freq.lat)
         cos_term <- cos(2 * pi * k * (predloc[,2])/out$freq.lat)
         cbind(sin_term, cos_term)
       })
       Slon <- cbind(m.fft.lon[1:nrow(predloc),], m.fft.lon[(nrow(predloc)+1):(2*nrow(predloc)),])
       Slat <- cbind(m.fft.lat[1:nrow(predloc),], m.fft.lat[(nrow(predloc)+1):(2*nrow(predloc)),])
-      predS = matrix(Slat*Slon,ncol=out$n.load.bases)
+      predS = matrix(NA, nrow=nrow(predloc),ncol=out$n.load.bases)
+      col_idx <- 1
+      for (thisi in 1:ncol(Slon)) {
+        for (thisj in 1:ncol(Slat)) {
+          predS[, col_idx] <- Slon[, thisi] * Slat[, thisj]
+          col_idx <- col_idx + 1
+        }
+      }
     }
     if (out$load.style=='tps') {
       predS = npreg::basis.tps(predloc,knots=out$knots.load,rk=TRUE)[,-(1:2)]
@@ -540,19 +561,26 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
     }
     if (out$spatial.style=='fourier') {
       ### Original Fourier Method
-      m.fft.lon <- sapply(1:(out$n.spatial.bases/2), function(k) {
+      m.fft.lon <- sapply(1:(sqrt(out$n.spatial.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (predloc[,1])/out$freq.lon)
         cos_term <- cos(2 * pi * k * (predloc[,1])/out$freq.lon)
         cbind(sin_term, cos_term)
       })
-      m.fft.lat <- sapply(1:(out$n.spatial.bases/2), function(k) {
+      m.fft.lat <- sapply(1:(sqrt(out$n.spatial.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (predloc[,2])/out$freq.lat)
         cos_term <- cos(2 * pi * k * (predloc[,2])/out$freq.lat)
         cbind(sin_term, cos_term)
       })
       Slon <- cbind(m.fft.lon[1:nrow(predloc),], m.fft.lon[(nrow(predloc)+1):(2*nrow(predloc)),])
       Slat <- cbind(m.fft.lat[1:nrow(predloc),], m.fft.lat[(nrow(predloc)+1):(2*nrow(predloc)),])
-      predS = matrix(Slat*Slon,ncol=out$n.spatial.bases)
+      predS = matrix(NA, nrow=nrow(predloc), ncol=out$n.spatial.bases)
+      col_idx <- 1
+      for (thisi in 1:ncol(Slon)) {
+        for (thisj in 1:ncol(Slat)) {
+          predS[, col_idx] <- Slon[, thisi] * Slat[, thisj]
+          col_idx <- col_idx + 1
+        }
+      }
    }
     if (out$spatial.style=='tps') {
       predS = npreg::basis.tps(predloc,knots=out$knots.spatial,rk=TRUE)[,-(1:2)]
@@ -949,19 +977,26 @@ plot_annual <- function(out, location, add=FALSE,
     }
 
     if (out$spatial.style == 'fourier') {
-      m.fft.lon <- sapply(1:(out$n.spatial.bases/2), function(k) {
+      m.fft.lon <- sapply(1:(sqrt(out$n.spatial.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (location[,1])/out$freq.lon)
         cos_term <- cos(2 * pi * k * (location[,1])/out$freq.lon)
         cbind(sin_term, cos_term)
       })
-      m.fft.lat <- sapply(1:(out$n.spatial.bases/2), function(k) {
+      m.fft.lat <- sapply(1:(sqrt(out$n.spatial.bases)/2), function(k) {
         sin_term <- sin(2 * pi * k * (location[,2])/out$freq.lat)
         cos_term <- cos(2 * pi * k * (location[,2])/out$freq.lat)
         cbind(sin_term, cos_term)
       })
       Slon <- cbind(m.fft.lon[1:nrow(location),], m.fft.lon[(nrow(location)+1):(2*nrow(location)),])
       Slat <- cbind(m.fft.lat[1:nrow(location),], m.fft.lat[(nrow(location)+1):(2*nrow(location)),])
-      predS = matrix(Slat*Slon,ncol=out$n.spatial.bases)
+      predS = matrix(NA, nrow=nrow(location), ncol=out$n.spatial.bases)
+      col_idx <- 1
+      for (thisi in 1:ncol(Slon)) {
+        for (thisj in 1:ncol(Slat)) {
+          predS[, col_idx] <- Slon[, thisi] * Slat[, thisj]
+          col_idx <- col_idx + 1
+        }
+      }
     }
     if (out$spatial.style == 'tps') {
       coords_added = rbind(out$coords,location)

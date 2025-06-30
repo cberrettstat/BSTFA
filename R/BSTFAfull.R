@@ -21,8 +21,8 @@
 #' @param max.knot.dist Numeric scalar indicating the maximum distance at which a basis value is greater than zero when \code{spatial.style='grid'}.  Default value is \code{mean(dist(coords))}.
 #' @param premade.knots Optional list of length \code{knot.levels} with each list element containing a matrix of longitude-latitude coordinates of the knots to use for each resolution when \code{spatial.style='grid'}.  Otherwise, when \code{premade.knots = NULL} (default), the knots are determined by using the standard multiresolution grids across the space.
 #' @param plot.knots Logical scalar indicating whether to plot the knots used when \code{spatial.style='grid'}. Default is \code{FALSE}.
-#' @param freq.lon Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'}. Default value is \code{4*diff(range(coords[,1]))}.
-#' @param freq.lat Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'}. Default value is \code{4*diff(range(coords[,2]))}.
+#' @param freq.lon Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'}. Default value is \code{diff(range(coords[,1]))}.
+#' @param freq.lat Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'}. Default value is \code{diff(range(coords[,2]))}.
 #' @param n.factors Numeric scalar indicating how many factors to use in the model.  Default is \code{min(4,ceiling(n.locs/20))}.
 #' @param factors.fixed Numeric vector of length \code{n.factors} indicating the locations to use for the fixed loadings.  This is needed for model identifiability.  If \code{factors.fixed=NULL} (default), the code will select locations with less than 20% missing data and that are far apart in the space.
 #' @param plot.factors Logical scalar indicating whether to plot the fixed factor locations.  Default is \code{FALSE}.
@@ -125,8 +125,8 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
                      n.seasn.knots=min(7, ceiling(length(unique(yday(dates)))/3)),
                      spatial.style='grid', n.spatial.bases=ceiling(n.locs/2),
                      knot.levels=2, max.knot.dist=n.locs*0.05, premade.knots=NULL, plot.knots=FALSE,
-                     freq.lon=4*diff(range(coords[,1])),
-                     freq.lat=4*diff(range(coords[,2])),
+                     freq.lon=diff(range(coords[,1])),
+                     freq.lat=diff(range(coords[,2])),
                      n.factors=min(4,ceiling(n.locs/20)), factors.fixed=NULL, plot.factors=FALSE,
                      alpha.prec=1/100000, tau2.gamma=2, tau2.phi=1e-7, sig2.gamma=2, sig2.phi=1e-5,
                      omega.ii.mean=1, omega.ii.var=1, omega.ij.mean=0, omega.ij.var=2,
@@ -142,7 +142,12 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
   start <- Sys.time()
 
-
+  #Basic checks on inputs
+  if(n.spatial.bases > n.locs){stop("n.spatial.bases must be less than n.locs")}
+  if(!is.matrix(ymat)){ymat <- as.matrix(ymat)}
+  if(!is.null(factors.fixed)){n.factors<-length(factors.fixed)}
+  
+  
   ### Prepare to deal with missing data
   # Make missing values 0 for now, but they will be estimated differently
   y <- c(ymat)
@@ -180,24 +185,36 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     knots.vec.save = newS.output[[2]]
   }
   if (spatial.style=='fourier') {
-    if (n.spatial.bases%%2 == 1) {
-      n.spatial.bases=n.spatial.bases+1
-      message(paste("n.spatial.bases cannot be odd; changed value to", n.spatial.bases))
+    if (sqrt(n.spatial.bases)%%1 != 0 | n.spatial.bases%%2 != 0) {
+      n.spatial.bases=floor(sqrt(n.spatial.bases))^2
+      if(n.spatial.bases%%2 != 0){n.spatial.bases <- (floor(sqrt(n.spatial.bases))+1)^2}
+      message(paste("n.spatial.bases must be an even square number; changed value to", n.spatial.bases))
     }
-    m.fft.lon <- sapply(1:(n.spatial.bases/2), function(k) {
+    ### Original Fourier Method
+    m.fft.lon <- sapply(1:(sqrt(n.spatial.bases)/2), function(k) {
       sin_term <- sin(2 * pi * k * (coords[,1])/freq.lon)
       cos_term <- cos(2 * pi * k * (coords[,1])/freq.lon)
       cbind(sin_term, cos_term)
     })
-    m.fft.lat <- sapply(1:(n.spatial.bases/2), function(k) {
+    m.fft.lat <- sapply(1:(sqrt(n.spatial.bases)/2), function(k) {
       sin_term <- sin(2 * pi * k * (coords[,2])/freq.lat)
       cos_term <- cos(2 * pi * k * (coords[,2])/freq.lat)
       cbind(sin_term, cos_term)
     })
-
     Slon <- cbind(m.fft.lon[1:n.locs,], m.fft.lon[(n.locs+1):(2*n.locs),])
     Slat <- cbind(m.fft.lat[1:n.locs,], m.fft.lat[(n.locs+1):(2*n.locs),])
-    newS <- Slat*Slon
+    newS <- matrix(NA, nrow=n.locs, ncol=n.spatial.bases)
+    col_idx <- 1
+    for (thisi in 1:ncol(Slon)) {
+      for (thisj in 1:ncol(Slat)) {
+        newS[, col_idx] <- Slon[, thisi] * Slat[, thisj]
+        col_idx <- col_idx + 1
+      }
+    }
+    
+    if (qr(newS)$rank != ncol(newS)) {
+      stop("Collinearity in bases for spatial coefficients; adjust Fourier frequencies.")
+    }
   }
 
   model.matrices <- list()

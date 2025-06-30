@@ -10,7 +10,7 @@ plot_location(
   new_x = NULL,
   type = "mean",
   par.mfrow = c(1, 1),
-  pred.int = TRUE,
+  pred.int = FALSE,
   ci.level = c(0.025, 0.975),
   uncertainty = TRUE,
   xrange = NULL,
@@ -29,7 +29,7 @@ plot_location(
 
 \item{par.mfrow}{A vector of length 2 indicating the number of rows and columns to divide the plotting window. Default is \code{c(1,1)}.}
 
-\item{pred.int}{Logical scalar indicating whether the interval should be a posterior predictive interval (default; \code{TRUE}) or a posterior credible interval (\code{FALSE}).}
+\item{pred.int}{Logical scalar indicating whether the interval should be a posterior predictive interval (\code{TRUE}) or a posterior credible interval (\code{FALSE}; default).}
 
 \item{ci.level}{If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.}
 

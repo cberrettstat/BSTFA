@@ -18,7 +18,7 @@ BSTFA(
   factors = TRUE,
   n.seasn.knots = min(7, ceiling(length(unique(yday(dates)))/3)),
   spatial.style = "fourier",
-  n.spatial.bases = min(8, ceiling(n.locs/3)),
+  n.spatial.bases = min(16, ceiling(n.locs/3)),
   knot.levels = 2,
   max.knot.dist = mean(dist(coords)),
   premade.knots = NULL,
@@ -27,7 +27,7 @@ BSTFA(
   factors.fixed = NULL,
   plot.factors = FALSE,
   load.style = "fourier",
-  n.load.bases = min(6, ceiling(dim(coords)[1]/3)),
+  n.load.bases = 4,
   freq.lon = diff(range(coords[, 1])),
   freq.lat = diff(range(coords[, 2])),
   n.temp.bases = ifelse(floor(n.times * 0.1)\%\%2 == 1, floor(n.times * 0.1) - 1,
@@ -77,7 +77,7 @@ BSTFA(
 
 \item{spatial.style}{Character scalar indicating the style of bases to use for the linear and seasonal components.  Style options are \code{'fourier'} (default), \code{'tps'} for thin plate splines, and \code{'grid'} for multiresolution bisquare bases using knots from a grid across the space.}
 
-\item{n.spatial.bases}{Numeric scalar indicating the number of spatial bases to use when \code{spatial.style} is either \code{'fourier'} or \code{'tps'}. Default value is \code{min(8, ceiling(n.locs/3))}.}
+\item{n.spatial.bases}{Numeric scalar indicating the number of spatial bases to use when \code{spatial.style} is either \code{'fourier'} or \code{'tps'}. Default value is \code{min(16, ceiling(n.locs/3))}. When \code{spatial.style} is \code{'fourier'}, this value must be an even square number.}
 
 \item{knot.levels}{Numeric scalar indicating the number of resolutions to use for when \code{spatial.style='grid'} and/or \code{load.style='grid'}.  Default is 2.}
 
@@ -95,7 +95,7 @@ BSTFA(
 
 \item{load.style}{Character scalar indicating the style of spatial bases to use for the spatially-dependent loadings. Options are \code{'fourier'} (default) for the Fourier bases, \code{'tps'} for thin plate splines, and \code{'grid'} for multiresolution bases.  This can be the same as or different than \code{spatial.style}.}
 
-\item{n.load.bases}{Numeric scalar indicating the number of bases to use for the spatially-dependent loadings when \code{load.style} is either \code{'fouier'} or \code{'tps'}.  This can be the same as or different than  \code{n.spatial.bases}.  Default is \code{min(6, ceiling(dim(coords)[1]/3))}.}
+\item{n.load.bases}{Numeric scalar indicating the number of bases to use for the spatially-dependent loadings when \code{load.style} is either \code{'fouier'} or \code{'tps'}.  This can be the same as or different than  \code{n.spatial.bases}.  Default is \code{4}. When \code{load.style='fourier'}, this value must be an even square number.}
 
 \item{freq.lon}{Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,1]))}.}
 
@@ -156,7 +156,7 @@ A list containing the following elements (any elements that are the same as in t
 \item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NULL}. }
 \item{time.data}{A data frame of size \code{iters} by \code{6} containing the time it took to sample each parameter for every iteration.}
 \item{setup.time}{An object containing the time the model setup took.}
-\item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
+\item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the Fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
 \item{factors.fixed}{A vector of length \code{n.factors} giving the location indices of the fixed loadings.}
 \item{iters}{A scalar returning the number of MCMC iterations.}
 \item{y}{An \code{n.times*n.locs} vector of the observations.}
@@ -184,10 +184,8 @@ out <- BSTFA(ymat=TemperatureVals[1:50,low.miss],
   n.factors=2,
   iters=10)
 
-#More full example:
-\dontrun{
-out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
-}
+# More full example:
+# out <- BSTFA(ymat=TemperatureVals, dates=Dates, coords=Coords)
 }
 \author{
 Adam Simpson and Candace Berrett
