@@ -96,6 +96,12 @@ predictBSTFA = function(out, location=NULL, type='mean',
       coords_added = rbind(out$coords,location)
       predS = matrix(npreg::basis.tps(coords_added, knots=out$knots.spatial, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.spatial.bases)
     }
+    
+    if(out$spatial.style=='eigen'){
+      distmat <- as.matrix(dist(rbind(out$coords, location)))
+      cormat <- exp(-distmat/out$freq.lon)
+      predS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec
+    }
 
     if (!is.null(new_x)) {
       predS <- cbind(predS, new_x)
@@ -176,6 +182,11 @@ predictBSTFA = function(out, location=NULL, type='mean',
     if (out$load.style == 'tps') {
       coords_added = rbind(out$coords,location)
       predQS = matrix(npreg::basis.tps(coords_added, knots=out$knots.load, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.load.bases)
+    }
+    if(out$load.style=='eigen'){
+      distmat <- as.matrix(dist(rbind(out$coords, location)))
+      cormat <- exp(-distmat/out$freq.lon)
+      predQS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$QS%*%out$model.matrices$A.lambda.prec
     }
     if(out$load.style=='full'){
       predQS = diag(1, dim(location)[1])
@@ -546,6 +557,11 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
     if (out$load.style=='tps') {
       predS = npreg::basis.tps(predloc,knots=out$knots.load,rk=TRUE)[,-(1:2)]
     }
+    if(out$load.style=='eigen'){
+      distmat <- as.matrix(dist(rbind(out$coords, predloc)))
+      cormat <- exp(-distmat/out$freq.lon)
+      predS <- cormat[out$n.locs + (1:nrow(predloc)),-(out$n.locs + (1:nrow(predloc)))]%*%out$model.matrices$QS%*%out$model.matrices$A.lambda.prec
+    }
     if(out$load.style=='full'){
       predS = diag(1, dim(predloc)[1])
     }
@@ -584,6 +600,11 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
    }
     if (out$spatial.style=='tps') {
       predS = npreg::basis.tps(predloc,knots=out$knots.spatial,rk=TRUE)[,-(1:2)]
+    }
+    if(out$spatial.style=='eigen'){
+      distmat <- as.matrix(dist(rbind(out$coords, predloc)))
+      cormat <- exp(-distmat/out$freq.lon)
+      predS <- cormat[out$n.locs + (1:nrow(predloc)),-(out$n.locs + (1:nrow(predloc)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec
     }
   }
 

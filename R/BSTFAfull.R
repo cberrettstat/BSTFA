@@ -115,10 +115,8 @@
 #'        coords=Coords[low.miss,], 
 #'        n.factors=2, iters=10)
 #'        
-#' \dontrun{
-#' #More full example that will take several hours to run
-#' out <- BSTFAfull(TemperatureVals, Dates, Coords)
-#' }
+#' # More full example that will take several hours to run
+#' # out <- BSTFAfull(TemperatureVals, Dates, Coords)
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                      mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
@@ -215,10 +213,30 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     if (qr(newS)$rank != ncol(newS)) {
       stop("Collinearity in bases for spatial coefficients; adjust Fourier frequencies.")
     }
+    
+    if (!is.null(x)){newS <- cbind(newS, x)}
+  }
+  if(spatial.style=='eigen'){
+    distmat <- as.matrix(dist(coords))
+    cormat <- exp(-distmat/freq.lon)
+    eigs <- eigen(cormat)
+    newS <- eigs$vectors[,1:n.spatial.bases]
+    if (!is.null(x)){
+      newS <- cbind(newS, x)
+      A.prec <- diag(c(1/eigs$values[1:n.spatial.bases], rep(alpha.prec, dim(x)[2])))
+    }else{
+      A.prec <- solve(diag(eigs$values[1:n.spatial.bases]))
+    }
+  }
+  
+  if(spatial.style!='eigen'){
+    A.prec = diag(alpha.prec, dim(newS)[2])
   }
 
   model.matrices <- list()
   model.matrices$newS <- newS
+  model.matrices$A.prec <- A.prec
+  
 
   ### Set up mean component
   if(mean==TRUE){
@@ -372,7 +390,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   sig2.save <- matrix(0, nrow=1, ncol=floor((iters-burn)/thin))
 
   ### Useful one-time calculations
-  if (mean | linear | seasonal) A.prec = diag(alpha.prec, dim(newS)[2])
+  #if (mean | linear | seasonal) A.prec = diag(alpha.prec, dim(newS)[2])
   if (seasonal) StSI <- methods::as(Matrix::kronecker(t(newS)%*%newS, Matrix::Diagonal(n=n.seasn.knots)), "sparseMatrix")
 
   ### Set up effective sample size calculations
@@ -471,7 +489,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       tau2.xi <- 1/rgamma(1, shape=tau2.shape, rate=as.vector(tau2.rate)) #scale of IG corresponds to rate of Gamma
 
       ### Sample alpha.xi
-      alpha.var <- solve((1/tau2.xi)*StSI + Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
+      alpha.var <- solve((1/tau2.xi)*StSI + kronecker(A.prec, Matrix::Diagonal(x=1, n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
       alpha.mean <- alpha.var%*%((1/tau2.xi)*(Matrix::t(newS.xi))%*%xi)
       alpha.xi <- as.vector(mvrnorm(1,alpha.mean,alpha.var))
       rm(list=c("tau2.shape", "tau2.rate", "alpha.var", "alpha.mean"))

@@ -50,12 +50,12 @@ plot_fourier_bases = function(coords, R=6, fine=100, plot.3d=FALSE,
   par(mfrow=par.mfrow)
 
   # ints = rep(seq(1,(R/2)), length.out=R)
-  ints = c(seq(1,R,by=2),seq(2,R,by=2))
+  ints = c(seq(1,Ruse,by=2),seq(2,Ruse,by=2))
   if (plot.3d==TRUE) {
     for (i in 1:R) {
-      m = ifelse(i>(R/2),"", paste("r=",ints[i],sep=""))
+      #m = ifelse(i>(R/2),"", paste("r=",ints[i],sep=""))
       scatterplot3d::scatterplot3d(predgrid[,1], predgrid[,2], S[,i],
-                    main=m,
+                    main=paste("r=",ints[i],sep=""),
                     xlab="", ylab="", zlab="",
                     cex.main=1.5)
     }

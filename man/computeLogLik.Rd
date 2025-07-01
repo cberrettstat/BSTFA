@@ -23,10 +23,7 @@ Compute log-likelihood
 data(out.sm)
 attach(out.sm)
 loglik <- computeLogLik(out.sm, addthin=2)
-\donttest{
-# can use to compute likelihood based model measures such as
-outwaic <- loo::waic(loglik)
-}
+#can then use to compute likelihood-based model measures such as looic and waic
 }
 \author{
 Adam Simpson and Candace Berrett

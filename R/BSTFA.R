@@ -108,11 +108,11 @@ BSTFA <- function(ymat, dates, coords,
                  iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                  mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
                  n.seasn.knots=min(7, ceiling(length(unique(yday(dates)))/3)),
-                 spatial.style='fourier',
-                 n.spatial.bases=min(16, ceiling(n.locs/3)),
+                 spatial.style='eigen',
+                 n.spatial.bases=min(10, ceiling(n.locs/3)),
                  knot.levels=2, max.knot.dist=mean(dist(coords)), premade.knots=NULL, plot.knots=FALSE,
                  n.factors=min(4,ceiling(n.locs/20)), factors.fixed=NULL, plot.factors=FALSE,
-                 load.style='fourier',
+                 load.style='eigen',
                  n.load.bases=4,
                  freq.lon=diff(range(coords[,1])),
                  freq.lat=diff(range(coords[,2])),
@@ -206,7 +206,29 @@ BSTFA <- function(ymat, dates, coords,
         col_idx <- col_idx + 1
       }
     }
+    
+    if(!is.null(x)){
+      newS <- cbind(newS, x)
+    }
+    if (qr(newS)$rank != ncol(newS)) {
+      stop("Collinearity in bases for spatial coefficients; adjust Fourier frequencies.")
+    }
+    
   }
+  
+  if(spatial.style=='eigen'){
+    distmat <- as.matrix(dist(coords))
+    cormat <- exp(-distmat/freq.lon)
+    eigs <- eigen(cormat)
+    newS <- eigs$vectors[,1:n.spatial.bases]
+    if (!is.null(x)){
+      newS <- cbind(newS, x)
+      A.prec <- diag(c(1/eigs$values[1:n.spatial.bases], rep(alpha.prec, dim(x)[2])))
+    }else{
+      A.prec <- solve(diag(eigs$values[1:n.spatial.bases]))
+    }
+  }
+  
   if (spatial.style=='tps') {
     dd = floor(sqrt(n.spatial.bases))
     xxx = yyy = seq(1/(dd*2), (dd*2-1)/(dd*2), by=1/dd)
@@ -220,15 +242,17 @@ BSTFA <- function(ymat, dates, coords,
                      knots=knots.spatial,
                      rk=FALSE)[,-(1:2)]
     n.spatial.bases = dd^2
+    if(!is.null(x)){newS <- cbind(newS,x)}
+  }
+  
+  if(spatial.style!='eigen'){
+    A.prec = diag(alpha.prec, dim(newS)[2])
   }
 
   model.matrices <- list()
   model.matrices$newS <- newS
+  model.matrices$A.prec <- A.prec
   
-  if (qr(newS)$rank != ncol(newS)) {
-    stop("Collinearity in bases for spatial coefficients; adjust Fourier frequencies.")
-  }
-
   ### Set up mean component
   if(mean==TRUE){
     Jfull = kronecker(Matrix::Diagonal(n=n.locs), rep(1, n.times))
@@ -337,6 +361,7 @@ BSTFA <- function(ymat, dates, coords,
 
 
   ### Set up Factor Analysis
+  
   if (factors) {
     ### Set up temporal FA
 
@@ -400,7 +425,7 @@ BSTFA <- function(ymat, dates, coords,
       }
       else {
         newS.output = makeNewS(coords=coords,n.locations=n.locs,knot.levels=knot.levels,
-                               max.knot.dist=max.knot.dist, x=x,
+                               max.knot.dist=max.knot.dist, x=NULL,
                                plot.knots=plot.knots,
                                premade.knots=premade.knots)
         QS = newS.output[[1]]
@@ -442,6 +467,15 @@ BSTFA <- function(ymat, dates, coords,
       }
       
     }
+    
+    if(load.style=='eigen'){
+      distmat <- as.matrix(dist(coords))
+      cormat <- exp(-distmat/freq.lon)
+      eigs <- eigen(cormat)
+      QS <- eigs$vectors[,1:n.load.bases]
+      A.lambda.prec <- solve(diag(eigs$values[1:n.load.bases]))
+    }
+    
     if (load.style=='tps') {
       dd = floor(sqrt(n.load.bases))
       xxx = yyy = seq(1/(dd*2), (dd*2-1)/(dd*2), by=1/dd)
@@ -456,6 +490,12 @@ BSTFA <- function(ymat, dates, coords,
                      rk=FALSE)[,-(1:2)]
       n.load.bases = dd^2
     }
+    
+    if(load.style!='eigen'){
+      A.lambda.prec = diag(alpha.prec, dim(QS)[2])
+    }
+    
+    model.matrices$A.lambda.prec <- A.lambda.prec
 
     ### Gaussian Method
 
@@ -523,7 +563,7 @@ BSTFA <- function(ymat, dates, coords,
   sig2.save <- matrix(0, nrow=1, ncol=floor((iters-burn)/thin))
 
   ### Useful one-time calculations
-  A.prec = diag(alpha.prec, dim(newS)[2])
+  
   if (seasonal) StSI <- methods::as(kronecker(t(newS)%*%newS, Matrix::Diagonal(n=n.seasn.knots)), "sparseMatrix")
   if (factors) {
     PQT <- Pmat.prime%*%QT
@@ -632,7 +672,7 @@ BSTFA <- function(ymat, dates, coords,
       tau2.xi <- 1/rgamma(1, shape=tau2.shape, rate=as.vector(tau2.rate)) #scale of IG corresponds to rate of Gamma
 
       ### Sample alpha.xi
-      alpha.var <- solve((1/tau2.xi)*StSI + Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
+      alpha.var <- solve((1/tau2.xi)*StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
       alpha.mean <- alpha.var%*%((1/tau2.xi)*Matrix::t(newS.xi)%*%xi)
       alpha.xi <- as.vector(MASS::mvrnorm(1,alpha.mean,alpha.var))
       rm(list=c("tau2.shape", "tau2.rate", "alpha.var", "alpha.mean"))
@@ -658,25 +698,6 @@ BSTFA <- function(ymat, dates, coords,
       
       if(mean(missing)>.4){
         LamPQTmiss <- kronecker(t(Lambda.tilde), t(PQT))[,notmissind,drop=FALSE]
-      
-      # A <- ncol(Lambda.tilde)
-      # C <- ncol(PQT)
-      # R <- nrow(Lambda.tilde)
-      # B <- nrow(PQT)
-      # # Preallocate result matrix: (A*C) rows, length(notmissind) columns
-      # LamPQTmiss <- matrix(0, nrow = A * C, ncol = length(notmissind))
-      # for (j in seq_along(notmissind)) {
-      #   # Global index of column in Kronecker product
-      #   global_col <- notmissind[j]
-      #   
-      #   # Map global column index to (r, b) indices
-      #   b <- (global_col - 1) %% B + 1
-      #   r <- ((global_col - 1) %/% B) + 1
-      #   
-      #   # Compute only that column: kronecker(Lambda.tilde[r, ], PQT[b, ])
-      #   LamPQTmiss[, j] <- as.vector(t(PQT[b, ]) %x% t(Lambda.tilde[r, ]))
-      # }
-      
         lamPQTtlamPQT <- tcrossprod(LamPQTmiss) #LamPQTmiss%*%t(LamPQTmiss) 
         alphaT.var <- solve((1/sig2)*lamPQTtlamPQT + Matrix::Diagonal(x=alpha.prec, n=n.factors*n.temp.bases))
         alphaT.mean <- (1/sig2)*alphaT.var%*%LamPQTmiss%*%temp[notmissind] #matrixcalc::vec(t(PQT)%*%tempmat%*%Lambda.tilde) # matrixcalc::vec(t(QT)%*%ymat%*%Lambda.tilde) is a shortcut for t(lamQT)%*%y
@@ -718,7 +739,7 @@ BSTFA <- function(ymat, dates, coords,
       Lambda.tilde <- matrix(Lambda.tilde.long, nrow=n.locs, ncol=n.factors, byrow=T)
 
       ### Sample values of alpha.S
-      alphaS.var <- solve((1/tau2.lambda)*QstQsI + Matrix::Diagonal(x=alpha.prec, n=n.factors*n.load.bases))
+      alphaS.var <- solve((1/tau2.lambda)*QstQsI + kronecker(Matrix::Diagonal(x=1, n=n.factors), A.lambda.prec)) #Matrix::Diagonal(x=alpha.prec, n=n.factors*n.load.bases))
       alphaS.mean <- alphaS.var%*%((1/tau2.lambda)*matrixcalc::vec(t(Lambda.tilde)%*%QS))
       alphaS <- my_mvrnorm(alphaS.mean, alphaS.var)
 

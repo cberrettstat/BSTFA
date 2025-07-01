@@ -217,10 +217,8 @@ out <- BSTFAfull(ymat=TemperatureVals[1:50,low.miss],
        coords=Coords[low.miss,], 
        n.factors=2, iters=10)
        
-\dontrun{
-#More full example that will take several hours to run
-out <- BSTFAfull(TemperatureVals, Dates, Coords)
-}
+# More full example that will take several hours to run
+# out <- BSTFAfull(TemperatureVals, Dates, Coords)
 }
 \author{
 Candace Berrett and Adam Simpson

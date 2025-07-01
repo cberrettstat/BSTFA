@@ -135,15 +135,12 @@ convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,1.96)
 #' data(out.sm)
 #' attach(out.sm)
 #' loglik <- computeLogLik(out.sm, addthin=2)
-#' \donttest{
-#' # can use to compute likelihood based model measures such as
-#' outwaic <- loo::waic(loglik)
-#' }
+#' #can then use to compute likelihood-based model measures such as looic and waic
 #' @export computeLogLik
 computeLogLik <- function(out, verbose=FALSE, addthin=1) {
   y = out$y
   mu = predictBSTFA(out=out,
-                    type='all')
+                    type='all', pred.int=FALSE)
   myseq <- seq(1,out$draws,by=addthin)
   log_lik = matrix(0,nrow=out$n.times*out$n.locs,
                           ncol=length(myseq))
