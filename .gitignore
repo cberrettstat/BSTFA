@@ -4,5 +4,5 @@ inst/doc
 /Meta/
 *.tar.gz
 *.Rcheck
-*.o
+
 *.Rproj
