@@ -93,12 +93,12 @@ predictBSTFA = function(out, location=NULL, type='mean',
        }
     }
     if (out$spatial.style == 'tps') {
-      coords_added = rbind(out$coords,location)
+      coords_added = rbind(out$coords,as.matrix(location))
       predS = matrix(npreg::basis.tps(coords_added, knots=out$knots.spatial, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.spatial.bases)
     }
     
     if(out$spatial.style=='eigen'){
-      distmat <- as.matrix(dist(rbind(out$coords, location)))
+      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
       cormat <- exp(-distmat/out$freq.lon)
       predS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec
     }
@@ -180,11 +180,11 @@ predictBSTFA = function(out, location=NULL, type='mean',
       }
     }
     if (out$load.style == 'tps') {
-      coords_added = rbind(out$coords,location)
+      coords_added = rbind(out$coords,as.matrix(location))
       predQS = matrix(npreg::basis.tps(coords_added, knots=out$knots.load, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.load.bases)
     }
     if(out$load.style=='eigen'){
-      distmat <- as.matrix(dist(rbind(out$coords, location)))
+      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
       cormat <- exp(-distmat/out$freq.lon)
       predQS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$QS%*%out$model.matrices$A.lambda.prec
     }
@@ -197,7 +197,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
     if(out$load.style=='full'){
         names(out$coords) <- c("Lon", "Lat")
         npred <- dim(location)[1]
-        predloc2 <- rbind(out$coords, location)
+        predloc2 <- rbind(out$coords, as.matrix(location))
         preddist <- as.matrix(dist(predloc2))
         condinds <- 1:out$n.locs
         for(thisload in 1:out$n.factors){
@@ -558,7 +558,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
       predS = npreg::basis.tps(predloc,knots=out$knots.load,rk=TRUE)[,-(1:2)]
     }
     if(out$load.style=='eigen'){
-      distmat <- as.matrix(dist(rbind(out$coords, predloc)))
+      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(predloc))))
       cormat <- exp(-distmat/out$freq.lon)
       predS <- cormat[out$n.locs + (1:nrow(predloc)),-(out$n.locs + (1:nrow(predloc)))]%*%out$model.matrices$QS%*%out$model.matrices$A.lambda.prec
     }
@@ -602,13 +602,15 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
       predS = npreg::basis.tps(predloc,knots=out$knots.spatial,rk=TRUE)[,-(1:2)]
     }
     if(out$spatial.style=='eigen'){
-      distmat <- as.matrix(dist(rbind(out$coords, predloc)))
+      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(predloc))))
       cormat <- exp(-distmat/out$freq.lon)
       predS <- cormat[out$n.locs + (1:nrow(predloc)),-(out$n.locs + (1:nrow(predloc)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec
     }
+    
+    if (!is.null(new_x)) predS <- cbind(predS, new_x)
   }
 
-  if (!is.null(new_x)) predS <- cbind(predS, new_x)
+  
   predloc <- predloc[complete.cases(predS),]
   predS <- predS[complete.cases(predS),]
 
@@ -641,7 +643,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
     if(out$load.style=="full"){
         names(out$coords) <- c("Lon", "Lat")
         npred <- dim(predloc)[1]
-        predloc2 <- rbind(out$coords, predloc)
+        predloc2 <- rbind(out$coords, as.matrix(predloc))
         preddist <- as.matrix(dist(predloc2))
         condinds <- 1:out$n.locs
         lammean <- matrix(0, nrow=floor(out$draws/addthin), ncol=npred)
@@ -758,7 +760,6 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
       geom_polygon(data = map_data_loc,
                    aes(x=.data$long, y=.data$lat, group = .data$group),
                    color = '#9c9c9c', fill='#f3f3f3') +
-      coord_map() +
       coord_fixed(1.3,
                   xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                   ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
@@ -785,7 +786,6 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
         geom_polygon(data = map_data_loc,
                      aes(x=.data$long, y=.data$lat, group = .data$group),
                      color = 'gray', fill='gray') +
-        coord_map() +
         coord_fixed(1.3,
                     xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                     ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
@@ -806,7 +806,6 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
         geom_polygon(data = map_data_loc,
                      aes(x=.data$long, y=.data$lat, group = .data$group),
                      color = 'gray', fill='gray') +
-        coord_map() +
         coord_fixed(1.3,
                     xlim = c(min(out$coords[,1])-1, max(out$coords[,1])+1),
                     ylim = c(min(out$coords[,2])-1, max(out$coords[,2])+1)) +
@@ -1020,7 +1019,7 @@ plot_annual <- function(out, location, add=FALSE,
       }
     }
     if (out$spatial.style == 'tps') {
-      coords_added = rbind(out$coords,location)
+      coords_added = rbind(out$coords,as.matrix(location))
       predS = matrix(npreg::basis.tps(coords_added, knots=out$knots.spatial, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.spatial.bases)
     }
 
