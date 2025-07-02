@@ -1022,6 +1022,11 @@ plot_annual <- function(out, location, add=FALSE,
       coords_added = rbind(out$coords,as.matrix(location))
       predS = matrix(npreg::basis.tps(coords_added, knots=out$knots.spatial, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.spatial.bases)
     }
+    if(out$spatial.style=='eigen'){
+      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(predloc))))
+      cormat <- exp(-distmat/out$freq.lon)
+      predS <- cormat[out$n.locs + (1:nrow(predloc)),-(out$n.locs + (1:nrow(predloc)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec
+    }
 
     if (!is.null(new_x)) {
       predS <- cbind(predS, new_x)

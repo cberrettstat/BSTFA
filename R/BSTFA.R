@@ -66,7 +66,7 @@
 #'   \item{tau2.beta}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the slopes.}
 #'   \item{xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots*n.locs} containing posterior draws for the coefficients of the seasonal process.}
 #'   \item{alpha.xi}{An mcmc object of size \code{draws} by \code{(n.spatial.bases + p)*n.seasn.knots} containing posterior draws for the coefficients modeling each coefficient of the seasonal process.}
-#'   \item{tau2.xi}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the coefficients of the seasonal process.}
+#'   \item{tau2.xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots} containing posterior draws of the variance of the coefficients of the seasonal process.}
 #'   \item{F.tilde}{An mcmc object of size \code{draws} by \code{n.times*n.factors} containing posterior draws of the residual factors.}
 #'   \item{alphaT}{An mcmc object of size \code{draws} by \code{n.factors*n.temp.bases} containing posterior draws of the coefficients for the factor temporally-dependent process.}
 #'   \item{Lambda.tilde}{An mcmc object of size \code{draws} by \code{n.factors*n.locs} containing posterior draws of the loadings for each location.}
@@ -332,14 +332,14 @@ BSTFA <- function(ymat, dates, coords,
     Bfullxi.long <- Bfull%*%xi
     model.matrices$seasonal.bs.basis <- bs.basis
     alpha.xi <- rep(0, dim(newS.xi)[2])
-    tau2.xi <- as.numeric(var(xi))
+    tau2.xi <- rep(0.01, n.seasn.knots) #as.numeric(var(xi))
   } else {
     xi <- rep(0, n.locs*n.seasn.knots)
     Bfullxi.long <- rep(0, n.locs*n.times)
   }
   xi.save <- matrix(0, nrow=n.locs*n.seasn.knots, ncol=floor((iters-burn)/thin))
   alpha.xi.save <- matrix(0, nrow=n.seasn.knots*dim(newS)[2], ncol=floor((iters-burn)/thin))
-  tau2.xi.save <- matrix(0, nrow=1, ncol=floor((iters-burn)/thin))
+  tau2.xi.save <- matrix(0, nrow=n.seasn.knots, ncol=floor((iters-burn)/thin))
 
 
   ### Deal with confounding
@@ -680,8 +680,8 @@ BSTFA <- function(ymat, dates, coords,
     if (seasonal) {
       start = Sys.time()
       temp <- y - Jfullmu.long - Tfullbeta.long - FLambda.long
-      xi.var <- solve((1/sig2)*tBB + (1/tau2.xi)*Matrix::Diagonal(n=n.locs*n.seasn.knots)) #ItBB + (1/tau2.xi)*Matrix::Diagonal(n=n.locs*n.seasn.knots))
-      xi.mean <- xi.var%*%((1/sig2)*tB%*%temp[notmissind] + (1/tau2.xi)*newS.xi%*%alpha.xi) #ItB%*%temp + (1/tau2.xi)*newS.xi%*%alpha.xi)
+      xi.var <- solve((1/sig2)*tBB + Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))) #ItBB + (1/tau2.xi)*Matrix::Diagonal(n=n.locs*n.seasn.knots))
+      xi.mean <- xi.var%*%((1/sig2)*tB%*%temp[notmissind] + Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))%*%newS.xi%*%alpha.xi) #ItB%*%temp + (1/tau2.xi)*newS.xi%*%alpha.xi)
       xi <- my_mvrnorm(xi.mean,xi.var)
       Bfullxi.long <- Bfull%*%xi
       rm(list=c("xi.var", "xi.mean"))
@@ -689,8 +689,8 @@ BSTFA <- function(ymat, dates, coords,
       if(marginalize){
         #bs.basis <- mgcv::cSplineDes(doy, knots)
         #Bfull <- kronecker(Matrix::Diagonal(n=n.locs), bs.basis)
-        
-        precision <- kronecker(Matrix::Diagonal(n=n.locs), solve(tau2.xi*bs.basis%*%t(bs.basis) + diag(sig2, nrow(bs.basis))))
+        #newS.xi <- methods::as(base::kronecker(newS, diag(n.seasn.knots)), "sparseMatrix")
+        precision <- kronecker(Matrix::Diagonal(n=n.locs), solve(bs.basis%*%diag(tau2.xi)%*%t(bs.basis) + diag(sig2, nrow(bs.basis))))
         #precision <- solve(tau2.xi*BtB + Matrix::Diagonal(x=sig2, n=dim(BtB)[1]))
         alpha.var <- solve((Matrix::t(newS.xi))%*%Matrix::t(Bfull)%*%precision%*%Bfull%*%newS.xi + methods::as(kronecker(A.prec, diag(n.seasn.knots)), "sparseMatrix"))
         alpha.mean <- alpha.var%*%(Matrix::t(newS.xi))%*%Matrix::t(Bfull)%*%precision%*%temp
@@ -698,16 +698,18 @@ BSTFA <- function(ymat, dates, coords,
         #Bfullxi.long <- Bfullmiss%*%newS.xi%*%alpha.xi
       }else{
         ### Sample alpha.xi
-        alpha.var <- solve((1/tau2.xi)*StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
-        alpha.mean <- alpha.var%*%((1/tau2.xi)*Matrix::t(newS.xi)%*%xi)
+        alpha.var <- solve( kronecker(Matrix::t(newS)%*%newS, Matrix::Diagonal(x=1/tau2.xi)) + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots)) ) #Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))%*%StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
+        alpha.mean <- alpha.var%*%(Matrix::Diagonal(x=rep(1/tau2.xi, each=n.spatial.bases))%*%Matrix::t(newS.xi)%*%xi)
         alpha.xi <- as.vector(MASS::mvrnorm(1,alpha.mean,alpha.var))
       }
       
       ### Sample tau2.xi
-      tau2.shape <- tau2.gamma + length(xi)/2
-      tau2.rate <- tau2.phi + 0.5 * Matrix::t(xi - newS.xi%*%alpha.xi)%*%(xi - newS.xi%*%alpha.xi)
-      tau2.xi <- 1/rgamma(1, shape=tau2.shape, rate=as.vector(tau2.rate)) #scale of IG corresponds to rate of Gamma
-
+      for(myind in 1:n.seasn.knots){
+          thisxi <- seq(myind,n.seasn.knots*n.locs, by=n.seasn.knots)  
+          tau2.shape <- tau2.gamma + length(xi[thisxi])/2
+          tau2.rate <- tau2.phi + 0.5 * Matrix::t(xi[thisxi] - newS.xi[thisxi,]%*%alpha.xi)%*%(xi[thisxi] - newS.xi[thisxi,]%*%alpha.xi)
+          tau2.xi[myind] <- 1/rgamma(1, shape=tau2.shape, rate=as.vector(tau2.rate)) #scale of IG corresponds to rate of Gamma
+      }
       
       rm(list=c("tau2.shape", "tau2.rate", "alpha.var", "alpha.mean"))
       end = Sys.time()
