@@ -123,6 +123,8 @@ BSTFA <- function(ymat, dates, coords,
                  Fmat=matrix(0,nrow=n.times,ncol=n.factors), Lambda=matrix(0,nrow=n.locs, n.factors),
                  thin=1, burn=iters*0.5, verbose=TRUE, save.missing=TRUE, save.time=FALSE) {
 
+    marginalize=TRUE
+  
   start <- Sys.time()
 
   #Basic checks on inputs
@@ -542,10 +544,10 @@ BSTFA <- function(ymat, dates, coords,
     Lambda.tilde = Lambda
     Lambda.tilde[factors.fixed,] = diag(n.factors)
 
-    if (plot.factors) {
-      plot(coords, xlab='Longitude', ylab='Latitude', main='Fixed Factor Locations')
-      points(coords[factors.fixed,], col='red', cex=2, pch=19)
-    }
+    # if (plot.factors) {
+    #   plot(coords, xlab='Longitude', ylab='Latitude', main='Fixed Factor Locations')
+    #   points(coords[factors.fixed,], col='red', cex=2, pch=19)
+    # }
   }
 
   delayFA = min(floor(burn/2), 500)
@@ -564,7 +566,9 @@ BSTFA <- function(ymat, dates, coords,
 
   ### Useful one-time calculations
   
-  if (seasonal) StSI <- methods::as(kronecker(t(newS)%*%newS, Matrix::Diagonal(n=n.seasn.knots)), "sparseMatrix")
+  if (seasonal){
+    StSI <- methods::as(kronecker(t(newS)%*%newS, Matrix::Diagonal(n=n.seasn.knots)), "sparseMatrix")
+  }
   if (factors) {
     PQT <- Pmat.prime%*%QT
     PQTtPQT = t(PQT)%*%PQT
@@ -573,7 +577,13 @@ BSTFA <- function(ymat, dates, coords,
     QstQsI <- methods::as(kronecker(t(QS)%*%QS, diag(1, n.factors)), "sparseMatrix")
     #QstQsI <- kronecker(t(QS)%*%QS, diag(1, n.factors))
   }
-
+  if(linear){
+    TtT <- crossprod(tT)
+  }
+  if(seasonal){
+    BtB <- crossprod(tB)
+  }
+  
   ### Set up effective sample size calculations
   eSS.check=1000
   eSS.converged=100
@@ -631,18 +641,28 @@ BSTFA <- function(ymat, dates, coords,
       beta <- my_mvrnorm(beta.mean, beta.var)
       Tfullbeta.long <- Tfull%*%beta
       rm(list=c("beta.var", "beta.mean"))
-
+      
+      if(marginalize){
+        precision <- kronecker(Matrix::Diagonal(n=n.locs), solve(tau2.beta*Tsub%*%t(Tsub) + sig2*diag(1, n.times)))  #Tfull <- kronecker(Matrix::Diagonal(n=n.locs), Tsub) #solve(tau2.beta*TtT + Matrix::Diagonal(x=sig2, n=dim(TtT)[1]))
+        alpha.var <- solve(t(newS)%*%Matrix::t(Tfull)%*%precision%*%Tfull%*%newS + A.prec)
+        alpha.mean <- alpha.var%*%t(newS)%*%Matrix::t(Tfull)%*%precision%*%temp
+        alpha.beta <- as.numeric(MASS::mvrnorm(1, alpha.mean, alpha.var))
+        #Tfullbeta.long <- Tfull%*%newS%*%alpha.beta
+      }else{
+      ### Sample alpha.beta
+        alpha.var <- solve((1/tau2.beta)*t(newS)%*%newS + A.prec)
+        alpha.var <- .5*alpha.var + .5*t(alpha.var)
+        alpha.mean <- alpha.var%*%((1/tau2.beta)*t(newS)%*%beta)
+        alpha.beta <- c(MASS::mvrnorm(1, alpha.mean, alpha.var))
+      }
+      
       ### Sample tau2.beta
       tau2.shape <- tau2.gamma + n.locs/2
       tau2.rate <- tau2.phi + 0.5*t(beta - newS%*%alpha.beta)%*%(beta - newS%*%alpha.beta)
       tau2.beta <- 1/rgamma(1, shape=tau2.shape, rate=tau2.rate) #scale of IG corresponds to rate of Gamma
 
-      ### Sample alpha.beta
-      alpha.var <- solve((1/tau2.beta)*t(newS)%*%newS + A.prec)
-      alpha.var <- .5*alpha.var + .5*t(alpha.var)
-      alpha.mean <- alpha.var%*%((1/tau2.beta)*t(newS)%*%beta)
-      alpha.beta <- c(MASS::mvrnorm(1, alpha.mean, alpha.var))
       rm(list=c("tau2.shape", "tau2.rate", "alpha.var", "alpha.mean"))
+      
       end = Sys.time()
       time.data[i,1] = end-start
 
@@ -666,15 +686,29 @@ BSTFA <- function(ymat, dates, coords,
       Bfullxi.long <- Bfull%*%xi
       rm(list=c("xi.var", "xi.mean"))
 
+      if(marginalize){
+        #bs.basis <- mgcv::cSplineDes(doy, knots)
+        #Bfull <- kronecker(Matrix::Diagonal(n=n.locs), bs.basis)
+        
+        precision <- kronecker(Matrix::Diagonal(n=n.locs), solve(tau2.xi*bs.basis%*%t(bs.basis) + diag(sig2, nrow(bs.basis))))
+        #precision <- solve(tau2.xi*BtB + Matrix::Diagonal(x=sig2, n=dim(BtB)[1]))
+        alpha.var <- solve((Matrix::t(newS.xi))%*%Matrix::t(Bfull)%*%precision%*%Bfull%*%newS.xi + methods::as(kronecker(A.prec, diag(n.seasn.knots)), "sparseMatrix"))
+        alpha.mean <- alpha.var%*%(Matrix::t(newS.xi))%*%Matrix::t(Bfull)%*%precision%*%temp
+        alpha.xi <- as.numeric(MASS::mvrnorm(1, alpha.mean, alpha.var))
+        #Bfullxi.long <- Bfullmiss%*%newS.xi%*%alpha.xi
+      }else{
+        ### Sample alpha.xi
+        alpha.var <- solve((1/tau2.xi)*StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
+        alpha.mean <- alpha.var%*%((1/tau2.xi)*Matrix::t(newS.xi)%*%xi)
+        alpha.xi <- as.vector(MASS::mvrnorm(1,alpha.mean,alpha.var))
+      }
+      
       ### Sample tau2.xi
       tau2.shape <- tau2.gamma + length(xi)/2
       tau2.rate <- tau2.phi + 0.5 * Matrix::t(xi - newS.xi%*%alpha.xi)%*%(xi - newS.xi%*%alpha.xi)
       tau2.xi <- 1/rgamma(1, shape=tau2.shape, rate=as.vector(tau2.rate)) #scale of IG corresponds to rate of Gamma
 
-      ### Sample alpha.xi
-      alpha.var <- solve((1/tau2.xi)*StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
-      alpha.mean <- alpha.var%*%((1/tau2.xi)*Matrix::t(newS.xi)%*%xi)
-      alpha.xi <- as.vector(MASS::mvrnorm(1,alpha.mean,alpha.var))
+      
       rm(list=c("tau2.shape", "tau2.rate", "alpha.var", "alpha.mean"))
       end = Sys.time()
       time.data[i,2] = end-start
@@ -739,9 +773,21 @@ BSTFA <- function(ymat, dates, coords,
       Lambda.tilde <- matrix(Lambda.tilde.long, nrow=n.locs, ncol=n.factors, byrow=T)
 
       ### Sample values of alpha.S
-      alphaS.var <- solve((1/tau2.lambda)*QstQsI + kronecker(Matrix::Diagonal(x=1, n=n.factors), A.lambda.prec)) #Matrix::Diagonal(x=alpha.prec, n=n.factors*n.load.bases))
-      alphaS.mean <- alphaS.var%*%((1/tau2.lambda)*matrixcalc::vec(t(Lambda.tilde)%*%QS))
-      alphaS <- my_mvrnorm(alphaS.mean, alphaS.var)
+      if(marginalize){
+        #QsI <- methods::as(kronecker(QS, diag(1, n.factors)), "sparseMatrix")
+        #QsI <- kronecker(QS, diag(1,n.factors))
+        #QstQsI <- methods::as(kronecker(t(QS)%*%QS, diag(1, n.factors)), "sparseMatrix")
+        IFmat <- methods::as(kronecker(diag(1,n.locs), Fmat), "sparseMatrix")
+        precision <- kronecker(Matrix::Diagonal(x=1,n=n.locs), solve(diag(sig2, n.times)+ tau2.lambda*Fmat%*%t(Fmat))) #solve(tau2.lambda*IFmat%*%Matrix::t(IFmat) + Matrix::Diagonal(x=sig2, n=n.times*n.locs))
+        alphaS.var <- solve(Matrix::t(QsI)%*%Matrix::t(IFmat)%*%precision%*%IFmat%*%QsI + kronecker(A.lambda.prec, Matrix::Diagonal(x=1, n=n.factors)))
+        alphaS.mean <- as.numeric(alphaS.var%*%Matrix::t(QsI)%*%Matrix::t(IFmat)%*%precision%*%temp)
+        alphaS <- my_mvrnorm(alphaS.mean, alphaS.var)
+      }else{
+        alphaS.var <- solve((1/tau2.lambda)*QstQsI + kronecker(A.lambda.prec, Matrix::Diagonal(x=1, n=n.factors))) #Matrix::Diagonal(x=alpha.prec, n=n.factors*n.load.bases))
+        alphaS.mean <- alphaS.var%*%((1/tau2.lambda)*matrixcalc::vec(t(Lambda.tilde)%*%QS))
+        alphaS <- my_mvrnorm(alphaS.mean, alphaS.var)
+      }
+      rm(list=c("precision", "alphaS.var", "alphaS.mean"))
 
       ### Sample tau2.lambda
       tau2.shape = tau2.gamma + length(Lambda.tilde)/2
