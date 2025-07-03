@@ -942,7 +942,7 @@ plot_annual <- function(out, location, add=FALSE,
       ann.pred.bounds <- apply(ann.pred, 1, quantile, probs=c((1-interval)/2, (1+interval)/2))
     }else{
       ann.pred.bounds <- NULL
-    }
+    } #end interval
     if(add){
       lines(dates.pred, ann.pred.mean, lwd=1.5)
       if(interval>0){
@@ -1023,9 +1023,9 @@ plot_annual <- function(out, location, add=FALSE,
       predS = matrix(npreg::basis.tps(coords_added, knots=out$knots.spatial, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.spatial.bases)
     }
     if(out$spatial.style=='eigen'){
-      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(predloc))))
+      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
       cormat <- exp(-distmat/out$freq.lon)
-      predS <- cormat[out$n.locs + (1:nrow(predloc)),-(out$n.locs + (1:nrow(predloc)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec
+      predS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec
     }
 
     if (!is.null(new_x)) {
