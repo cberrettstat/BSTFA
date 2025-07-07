@@ -754,7 +754,11 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
                 "n.seasn.knots" = n.seasn.knots,
                 "n.spatial.bases" = n.spatial.bases,
                 "draws" = dim(as.mcmc(t(beta.save)))[1],
-                "load.style" = "full")
+                "load.style" = "full", 
+                "mean" = mean, 
+                "linear" = linear, 
+                "seasonal" = seasonal, 
+                "factors" = factors)
 
   output
 

@@ -146,7 +146,7 @@ A list containing the following elements (any elements that are the same as in t
 \item{tau2.beta}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the slopes.}
 \item{xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots*n.locs} containing posterior draws for the coefficients of the seasonal process.}
 \item{alpha.xi}{An mcmc object of size \code{draws} by \code{(n.spatial.bases + p)*n.seasn.knots} containing posterior draws for the coefficients modeling each coefficient of the seasonal process.}
-\item{tau2.xi}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the coefficients of the seasonal process.}
+\item{tau2.xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots} containing posterior draws of the variance of the coefficients of the seasonal process.}
 \item{F.tilde}{An mcmc object of size \code{draws} by \code{n.times*n.factors} containing posterior draws of the residual factors.}
 \item{alphaT}{An mcmc object of size \code{draws} by \code{n.factors*n.temp.bases} containing posterior draws of the coefficients for the factor temporally-dependent process.}
 \item{Lambda.tilde}{An mcmc object of size \code{draws} by \code{n.factors*n.locs} containing posterior draws of the loadings for each location.}

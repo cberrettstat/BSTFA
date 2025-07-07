@@ -901,7 +901,11 @@ BSTFA <- function(ymat, dates, coords,
                 "n.spatial.bases" = n.spatial.bases,
                 "n.temp.bases" = n.temp.bases,
                 "n.load.bases" = n.load.bases,
-                "draws" = dim(coda::as.mcmc(t(beta.save)))[1])
+                "draws" = dim(coda::as.mcmc(t(beta.save)))[1], 
+                "mean" = mean, 
+                "linear" = linear, 
+                "seasonal" = seasonal, 
+                "factors" = factors)
 
   output
 

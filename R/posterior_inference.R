@@ -40,27 +40,33 @@ predictBSTFA = function(out, location=NULL, type='mean',
       lam.seq <- append(lam.seq, ((location[i]-1)*out$n.factors + 1):(location[i]*out$n.factors))
     }
 
-    facts <- matrix(0, ncol=out$draws, nrow=length(loc.seq))
-    for(i in 1:out$draws){
-      facts[,i] <- c(matrix(out$F.tilde[i,],nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)%*%t(matrix(out$Lambda.tilde[i,lam.seq],nrow=length(location),ncol=out$n.factors,byrow=TRUE)))
+    ypreds = matrix(0, ncol=out$draws, nrow=out$n.times*length(location))
+    if(out$mean){
+      ypreds <- ypreds + kronecker(diag(length(location)), rep(1,out$n.times))%*%matrix(t(out$mu)[location,],nrow=length(location))
     }
-    if (pred.int) {
+    if(out$linear){
+      ypreds  <- ypreds + kronecker(diag(length(location)), out$model.matrices$linear.Tsub)%*%matrix(t(out$beta)[location,],nrow=length(location))
+    }
+    if(out$seasonal){
+      ypreds <- ypreds + kronecker(diag(length(location)), out$model.matrices$seasonal.bs.basis)%*%t(out$xi)[xi.seq,]
+    }
+    if(out$factors){
+      facts <- matrix(0, ncol=out$draws, nrow=length(loc.seq))
+      for(i in 1:out$draws){
+        facts[,i] <- c(matrix(out$F.tilde[i,],nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)%*%t(matrix(out$Lambda.tilde[i,lam.seq],nrow=length(location),ncol=out$n.factors,byrow=TRUE)))
+      }
+      facts
+    }
+    if(pred.int){
       resid = matrix(rnorm(out$draws*out$n.times,
                            mean=rep(0,out$draws*out$n.times),
                            sd=sqrt(rep(c(out$sig2),each=out$n.times))),ncol=out$draws,byrow=TRUE)
-      ypreds = kronecker(diag(length(location)), rep(1,out$n.times))%*%matrix(t(out$mu)[location,],nrow=length(location)) +
-        kronecker(diag(length(location)), out$model.matrices$linear.Tsub)%*%matrix(t(out$beta)[location,],nrow=length(location)) +
-        kronecker(diag(length(location)), out$model.matrices$seasonal.bs.basis)%*%t(out$xi)[xi.seq,] +
-        facts + resid
-    } else {
-      ypreds = kronecker(diag(length(location)), rep(1,out$n.times))%*%matrix(t(out$mu)[location,],nrow=length(location)) +
-        kronecker(diag(length(location)), out$model.matrices$linear.Tsub)%*%matrix(t(out$beta)[location,],nrow=length(location)) +
-        kronecker(diag(length(location)), out$model.matrices$seasonal.bs.basis)%*%t(out$xi)[xi.seq,] +
-        facts
+       ypreds = ypreds + resid
     }
 
   } else if (length(dim(location))>1) { # predict at a new location (coordinates should have given to location)
 
+    if(out$mean | out$linear | out$seasonal){
     if (out$spatial.style=='grid') {
       # predS=makePredS(out,location)
       predS <- NULL
@@ -108,93 +114,104 @@ predictBSTFA = function(out, location=NULL, type='mean',
       predloc <- predloc[complete.cases(predS),]
       predS <- predS[complete.cases(predS),]
     }
+    } #end create predS if mean | linear | seasonal
 
-    ### Mu
-    mumean <- predS%*%t(out$alpha.mu)
-    if(pred.int){
-        muresid = matrix(rnorm(nrow(location)*out$draws,
+
+      ### Mu
+    if(out$mean){
+      mumean <- predS%*%t(out$alpha.mu)
+      if(pred.int){
+          muresid = matrix(rnorm(nrow(location)*out$draws,
                              mean=rep(0,nrow(location)*out$draws),
                              sd=sqrt(rep(c(out$tau2.mu),each=nrow(location)))),ncol=out$draws,byrow=TRUE)
-        mupred <- mumean + muresid
-    }else{
-     mupred <- mumean
-    }
-    mulong = kronecker(Matrix::Diagonal(nrow(location)),
+          mupred <- mumean + muresid
+      }else{
+        mupred <- mumean
+      }
+      mulong = kronecker(Matrix::Diagonal(nrow(location)),
                        rep(1,out$n.times))%*%mupred
+    }else{
+      mulong = matrix(0, ncol=out$draws, nrow=out$n.times*nrow(location))
+    }
 
     ### Beta (linear slope)
-    betamean = predS%*%t(out$alpha.beta)
-    if(pred.int){
+    if(out$linear){
+      betapred = predS%*%t(out$alpha.beta)
+      if(pred.int){
         betaresid = matrix(rnorm(nrow(location)*out$draws,
                              mean=rep(0,nrow(location)*out$draws),
                              sd=sqrt(rep(c(out$tau2.beta),each=nrow(location)))),ncol=out$draws,byrow=TRUE)
-        betapred <- betamean + betaresid
-    }else{
-        betapred <- betamean
-    }
-    betalong = kronecker(Matrix::Diagonal(nrow(location)),
+        betapred <- betapred + betaresid
+      }
+      betalong = kronecker(Matrix::Diagonal(nrow(location)),
                          out$model.matrices$linear.Tsub)%*%betapred
+    }else{
+      betalong = matrix(0, ncol=out$draws, nrow=out$n.times*nrow(location))
+    }
 
     ### Xi (seasonal)
-    predS.xi = methods::as(kronecker(predS, diag(out$n.seasn.knots)), "sparseMatrix")
-    ximean <- predS.xi%*%t(out$alpha.xi)
-    if(pred.int){
+    if(out$seasonal){
+      predS.xi = methods::as(kronecker(predS, diag(out$n.seasn.knots)), "sparseMatrix")
+      xipred <- predS.xi%*%t(out$alpha.xi)
+      if(pred.int){
         xiresid <- matrix(rnorm(nrow(location)*out$n.seasn.knots*out$draws,
                             mean=rep(0,nrow(location)*out$n.seasn.knots*out$draws),
                             sd=sqrt(rep(c(out$tau2.xi),each=nrow(location)*out$n.seasn.knots))),ncol=out$draws,byrow=TRUE)
-        xipred <- ximean + xiresid
-    }else{
-        xipred <- ximean
-    }
-    xilong = kronecker(Matrix::Diagonal(nrow(location)),
+        xipred <- xipred + xiresid
+      }
+      xilong = kronecker(Matrix::Diagonal(nrow(location)),
                        out$model.matrices$seasonal.bs.basis)%*%xipred
+    }else{
+      xilong = matrix(0, ncol=out$draws, nrow=out$n.times*nrow(location))
+    }
 
     ### Factor Analysis
-    if (out$load.style == 'grid') {
-      predQS <- NULL
-      for(kk in 1:length(out$knots.load)) {
-        bspred <- bisquare2d(as.matrix(location), as.matrix(out$knots.load[[kk]]))
-        predQS <- cbind(predS, bspred)
-      }
-    }
-    if (out$load.style == 'fourier') {
-      m.fft.lon <- sapply(1:(sqrt(out$n.load.bases)/2), function(k) {
-        sin_term <- sin(2 * pi * k * (location[,1])/out$freq.lon)
-        cos_term <- cos(2 * pi * k * (location[,1])/out$freq.lon)
-        cbind(sin_term, cos_term)
-      })
-      m.fft.lat <- sapply(1:(sqrt(out$n.load.bases)/2), function(k) {
-        sin_term <- sin(2 * pi * k * (location[,2])/out$freq.lat)
-        cos_term <- cos(2 * pi * k * (location[,2])/out$freq.lat)
-        cbind(sin_term, cos_term)
-      })
-      Slon <- cbind(m.fft.lon[1:nrow(location),], m.fft.lon[(nrow(location)+1):(2*nrow(location)),])
-      Slat <- cbind(m.fft.lat[1:nrow(location),], m.fft.lat[(nrow(location)+1):(2*nrow(location)),])
-      predQS = matrix(NA, nrow=nrow(location),ncol=out$n.load.bases)
-      col_idx <- 1
-      for (thisi in 1:ncol(Slon)) {
-        for (thisj in 1:ncol(Slat)) {
-          predQS[, col_idx] <- Slon[, thisi] * Slat[, thisj]
-          col_idx <- col_idx + 1
+    if(out$factors){
+      if (out$load.style == 'grid') {
+        predQS <- NULL
+        for(kk in 1:length(out$knots.load)) {
+          bspred <- bisquare2d(as.matrix(location), as.matrix(out$knots.load[[kk]]))
+          predQS <- cbind(predS, bspred)
         }
       }
-    }
-    if (out$load.style == 'tps') {
-      coords_added = rbind(out$coords,as.matrix(location))
-      predQS = matrix(npreg::basis.tps(coords_added, knots=out$knots.load, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.load.bases)
-    }
-    if(out$load.style=='eigen'){
-      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
-      cormat <- exp(-distmat/out$freq.lon)
-      predQS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$QS%*%out$model.matrices$A.lambda.prec
-    }
-    if(out$load.style=='full'){
-      predQS = diag(1, dim(location)[1])
-    }
+      if (out$load.style == 'fourier') {
+        m.fft.lon <- sapply(1:(sqrt(out$n.load.bases)/2), function(k) {
+          sin_term <- sin(2 * pi * k * (location[,1])/out$freq.lon)
+          cos_term <- cos(2 * pi * k * (location[,1])/out$freq.lon)
+          cbind(sin_term, cos_term)
+        })
+        m.fft.lat <- sapply(1:(sqrt(out$n.load.bases)/2), function(k) {
+          sin_term <- sin(2 * pi * k * (location[,2])/out$freq.lat)
+          cos_term <- cos(2 * pi * k * (location[,2])/out$freq.lat)
+          cbind(sin_term, cos_term)
+        })
+        Slon <- cbind(m.fft.lon[1:nrow(location),], m.fft.lon[(nrow(location)+1):(2*nrow(location)),])
+        Slat <- cbind(m.fft.lat[1:nrow(location),], m.fft.lat[(nrow(location)+1):(2*nrow(location)),])
+        predQS = matrix(NA, nrow=nrow(location),ncol=out$n.load.bases)
+        col_idx <- 1
+        for (thisi in 1:ncol(Slon)) {
+          for (thisj in 1:ncol(Slat)) {
+            predQS[, col_idx] <- Slon[, thisi] * Slat[, thisj]
+            col_idx <- col_idx + 1
+          }
+        }
+      }
+      if (out$load.style == 'tps') {
+        coords_added = rbind(out$coords,as.matrix(location))
+        predQS = matrix(npreg::basis.tps(coords_added, knots=out$knots.load, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.load.bases)
+      }
+      if(out$load.style=='eigen'){
+        distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
+        cormat <- exp(-distmat/out$freq.lon)
+        predQS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$QS%*%out$model.matrices$A.lambda.prec
+      }
+      if(out$load.style=='full'){
+        predQS = diag(1, dim(location)[1])
+      }
 
-    # Lambda (loadings)
-    Lam = array(dim=c(nrow(predQS),out$n.factors,out$draws))
-    if(out$load.style=='full'){
+      # Lambda (loadings)
+      Lam = array(dim=c(nrow(predQS),out$n.factors,out$draws))
+      if(out$load.style=='full'){
         names(out$coords) <- c("Lon", "Lat")
         npred <- dim(location)[1]
         predloc2 <- rbind(out$coords, as.matrix(location))
@@ -220,38 +237,39 @@ predictBSTFA = function(out, location=NULL, type='mean',
             #cholC <- chol(condvar)
             #lamresid[mycount,] <- as.numeric(cholC%*%rnorm(npred))
           }
-        Lam[,thisload,] <- t(lammean)
-        }
-      }else{
-        for (i in 1:out$draws) {
-          Lammean = predQS%*%matrix(out$alphaS[i,],nrow=out$n.load.bases,ncol=out$n.factors,byrow=TRUE)
-          if(pred.int){
-            Lamresid = matrix(rnorm(nrow(location)*out$n.factors,
+          Lam[,thisload,] <- t(lammean)
+          }
+        }else{
+          for (i in 1:out$draws) {
+            Lam[,,i] = predQS%*%matrix(out$alphaS[i,],nrow=out$n.load.bases,ncol=out$n.factors,byrow=TRUE)
+            if(pred.int){
+              Lamresid = matrix(rnorm(nrow(location)*out$n.factors,
                               mean=rep(0,nrow(location)*out$n.factors),
                               sd=sqrt(rep(c(out$tau2.lambda[i]),each=out$n.factors))),ncol=out$n.factors,byrow=TRUE)
-            Lam[,,i] = Lammean + Lamresid
-          }else{
-            Lam[,,i] = Lammean
-          }
-        }
-      }
+              Lam[,,i] = Lam[,,i] + Lamresid
+            } #end pred.int 
+          } #end draws loop
+        } #end if load.style
 
-    # F (factor scores)
-    facts = array(dim=c(out$n.times,nrow(location),out$draws))
-    for (i in 1:out$draws) {
-      facts[,,i] = matrix(out$F.tilde[i,],nrow=out$n.times,ncol=out$n.factors)%*%matrix(t(Lam[,,i]),nrow=out$n.factors,ncol=nrow(location))
+      # F (factor scores)
+      facts = array(dim=c(out$n.times,nrow(location),out$draws))
+      for (i in 1:out$draws) {
+        facts[,,i] = matrix(out$F.tilde[i,],nrow=out$n.times,ncol=out$n.factors)%*%matrix(t(Lam[,,i]),nrow=out$n.factors,ncol=nrow(location))
+      }
+    }else{
+      facts <-  array(0, dim=c(out$n.times,nrow(location),out$draws))
     }
 
+    ypreds = mulong + betalong + xilong + matrix(facts, nrow=out$n.times*nrow(location), ncol=out$draws)
+    
     if (pred.int) {
       resid = matrix(rnorm(out$draws*out$n.times,
                            mean=rep(0,out$draws*out$n.times),
                            sd=sqrt(rep(c(out$sig2),each=out$n.times))),ncol=out$draws,byrow=TRUE)
-      ypreds = mulong + betalong + xilong + matrix(facts, nrow=out$n.times*nrow(location), ncol=out$draws) + resid
-    } else {
-      ypreds = mulong + betalong + xilong + matrix(facts, nrow=out$n.times*nrow(location), ncol=out$draws)
-    }
+      ypreds = ypreds + resid
+    } 
 
-  }
+  } #end if-else new location
 
   if (type == 'all') ypreds.return = ypreds
 
