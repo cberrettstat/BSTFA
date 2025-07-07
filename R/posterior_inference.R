@@ -21,14 +21,36 @@ predictBSTFA = function(out, location=NULL, type='mean',
                        ci.level = c(0.025, 0.975), new_x=NULL, pred.int=FALSE) {
 
   if (is.null(location)) { # predict for all observed locations
-    facts <- matrix(0, ncol=out$draws, nrow=out$n.times*out$n.locs)
-    for(i in 1:out$draws){
-      facts[,i] <- c(matrix(out$F.tilde[i,],nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)%*%t(matrix(out$Lambda.tilde[i,],nrow=out$n.locs,ncol=out$n.factors,byrow=TRUE)))
+    
+    ypreds <- matrix(0, ncol=out$draws, nrow=out$n.times*out$n.locs)
+    
+    if(out$mean){
+      ypreds <- ypreds + kronecker(Matrix::Diagonal(out$n.locs), rep(1,out$n.times))%*%t(out$mu)
     }
-    ypreds = kronecker(Matrix::Diagonal(out$n.locs), rep(1,out$n.times))%*%t(out$mu) +
-      kronecker(Matrix::Diagonal(out$n.locs), out$model.matrices$linear.Tsub)%*%t(out$beta) +
-      kronecker(Matrix::Diagonal(out$n.locs), out$model.matrices$seasonal.bs.basis)%*%t(out$xi) +
-      facts
+    
+    if(out$linear){
+      ypreds <- ypreds + kronecker(Matrix::Diagonal(out$n.locs), out$model.matrices$linear.Tsub)%*%t(out$beta)
+    }
+    
+    if(out$seasonal){
+      ypreds <- ypreds + kronecker(Matrix::Diagonal(out$n.locs), out$model.matrices$seasonal.bs.basis)%*%t(out$xi)
+    }
+    
+    if(out$factors){
+      facts <- matrix(0, ncol=out$draws, nrow=out$n.times*out$n.locs)
+      for(i in 1:out$draws){
+        facts[,i] <- c(matrix(out$F.tilde[i,],nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)%*%t(matrix(out$Lambda.tilde[i,],nrow=out$n.locs,ncol=out$n.factors,byrow=TRUE)))
+      }
+      ypreds <- ypreds + facts
+    }
+    
+    if(pred.int){
+      resid <- matrix(0, ncol=out$draws, nrow=out$n.times*out$n.locs)
+      for(i in 1:out$draws){
+        resid[,i] <- rnorm(out$n.times*out$n.locs, 0, sqrt(out$sig2[i,]))
+      }
+      ypreds <- ypreds + resid
+    }
 
   } else if (is.null(dim(location))) {  # predict a specific observed location
     loc.seq=c()
@@ -55,7 +77,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
       for(i in 1:out$draws){
         facts[,i] <- c(matrix(out$F.tilde[i,],nrow=out$n.times,ncol=out$n.factors,byrow=FALSE)%*%t(matrix(out$Lambda.tilde[i,lam.seq],nrow=length(location),ncol=out$n.factors,byrow=TRUE)))
       }
-      facts
+      ypreds <- ypreds + facts
     }
     if(pred.int){
       resid = matrix(rnorm(out$draws*out$n.times,
