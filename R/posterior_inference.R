@@ -109,8 +109,8 @@ predictBSTFA = function(out, location=NULL, type='mean',
         cos_term <- cos(2 * pi * k * (location[,2])/out$freq.lat)
         cbind(sin_term, cos_term)
       })
-      Slon <- cbind(m.fft.lon[1:nrow(location),], m.fft.lon[(nrow(location)+1):(2*nrow(location)),])
-      Slat <- cbind(m.fft.lat[1:nrow(location),], m.fft.lat[(nrow(location)+1):(2*nrow(location)),])
+      Slon <- cbind(matrix(m.fft.lon[1:nrow(location),], nrow=nrow(location), ncol=sqrt(out$n.spatial.bases)/2), matrix(m.fft.lon[(nrow(location)+1):(2*nrow(location)),], nrow=nrow(location), ncol=sqrt(out$n.spatial.bases)/2))
+      Slat <- cbind(matrix(m.fft.lat[1:nrow(location),], nrow=nrow(location), ncol=sqrt(out$n.spatial.bases)/2), matrix(m.fft.lat[(nrow(location)+1):(2*nrow(location)),], nrow=nrow(location), ncol=sqrt(out$n.spatial.bases)/2))
       predS = matrix(NA, nrow=nrow(location), ncol=out$n.spatial.bases)
       col_idx <- 1
       for (thisi in 1:ncol(Slon)) {
@@ -133,9 +133,8 @@ predictBSTFA = function(out, location=NULL, type='mean',
 
     if (!is.null(new_x)) {
       predS <- cbind(predS, new_x)
-      predloc <- predloc[complete.cases(predS),]
-      predS <- predS[complete.cases(predS),]
     }
+      #predS <- predS[complete.cases(predS),]
     } #end create predS if mean | linear | seasonal
 
 
@@ -207,8 +206,8 @@ predictBSTFA = function(out, location=NULL, type='mean',
           cos_term <- cos(2 * pi * k * (location[,2])/out$freq.lat)
           cbind(sin_term, cos_term)
         })
-        Slon <- cbind(m.fft.lon[1:nrow(location),], m.fft.lon[(nrow(location)+1):(2*nrow(location)),])
-        Slat <- cbind(m.fft.lat[1:nrow(location),], m.fft.lat[(nrow(location)+1):(2*nrow(location)),])
+        Slon <- cbind(matrix(m.fft.lon[1:nrow(location),], nrow=nrow(location), ncol=sqrt(out$n.load.bases)/2), matrix(m.fft.lon[(nrow(location)+1):(2*nrow(location)),], nrow=nrow(location), ncol=sqrt(out$n.load.bases)/2))
+        Slat <- cbind(matrix(m.fft.lat[1:nrow(location),], nrow=nrow(location), ncol=sqrt(out$n.load.bases)/2), matrix(m.fft.lat[(nrow(location)+1):(2*nrow(location)),], nrow=nrow(location), ncol=sqrt(out$n.load.bases)/2))
         predQS = matrix(NA, nrow=nrow(location),ncol=out$n.load.bases)
         col_idx <- 1
         for (thisi in 1:ncol(Slon)) {
@@ -1047,8 +1046,8 @@ plot_annual <- function(out, location, add=FALSE,
         cos_term <- cos(2 * pi * k * (location[,2])/out$freq.lat)
         cbind(sin_term, cos_term)
       })
-      Slon <- cbind(m.fft.lon[1:nrow(location),], m.fft.lon[(nrow(location)+1):(2*nrow(location)),])
-      Slat <- cbind(m.fft.lat[1:nrow(location),], m.fft.lat[(nrow(location)+1):(2*nrow(location)),])
+      Slon <- cbind(matrix(m.fft.lon[1:nrow(location),], nrow=nrow(location), ncol=sqrt(out$n.spatial.bases)/2), matrix(m.fft.lon[(nrow(location)+1):(2*nrow(location)),], nrow=nrow(location), ncol=sqrt(out$n.spatial.bases)/2))
+      Slat <- cbind(matrix(m.fft.lat[1:nrow(location),], nrow=nrow(location), ncol=sqrt(out$n.spatial.bases)/2), matrix(m.fft.lat[(nrow(location)+1):(2*nrow(location)),], nrow=nrow(location), ncol=sqrt(out$n.spatial.bases)/2))
       predS = matrix(NA, nrow=nrow(location), ncol=out$n.spatial.bases)
       col_idx <- 1
       for (thisi in 1:ncol(Slon)) {
@@ -1070,18 +1069,19 @@ plot_annual <- function(out, location, add=FALSE,
 
     if (!is.null(new_x)) {
       predS <- cbind(predS, new_x)
-      predloc <- predloc[complete.cases(predS),]
-      predS <- predS[complete.cases(predS),]
     }
+      #predS <- predS[complete.cases(predS),]
+    
 
     predS.xi = methods::as(kronecker(predS, diag(out$n.seasn.knots)), "sparseMatrix")
     ximean <- predS.xi%*%t(out$alpha.xi)
-    xiresid <- matrix(rnorm(nrow(location)*out$n.seasn.knots*out$draws,
-                            mean=rep(0,nrow(location)*out$n.seasn.knots*out$draws),
-                            sd=sqrt(rep(c(out$tau2.xi),each=nrow(location)*out$n.seasn.knots))),ncol=out$draws,byrow=TRUE)
+    #xiresid <- matrix(rnorm(nrow(location)*out$n.seasn.knots*out$draws,
+   #                         mean=rep(0,nrow(location)*out$n.seasn.knots*out$draws),
+    #                        sd=sqrt(rep(c(out$tau2.xi),each=nrow(location)*out$n.seasn.knots))),ncol=out$draws,byrow=TRUE)
     # xi.pred <- ximean + xiresid
     xi.pred <- ximean
-    ann.pred <- bs.basis%*%xi.pred
+    Bfull <- kronecker(Matrix::Diagonal(n=nrow(location)), bs.basis)
+    ann.pred <- Bfull%*%xi.pred
     ann.pred.mean <- apply(ann.pred, 1, mean)
     if(interval>0){
       ann.pred.bounds <- apply(ann.pred, 1, quantile, probs=c((1-interval)/2, (1+interval)/2))
@@ -1095,18 +1095,26 @@ plot_annual <- function(out, location, add=FALSE,
       ylims <- yrange
     }
     if(years=="all"){
-      plot(dates.pred, ann.pred.mean, lwd=1.5, type='l', xlab="Date", ylab="Annual Seasonal Cycle", ylim=ylims, main=paste("Location", location[1], location[2]))
+      for(ll in 1:nrow(location)){
+        plot(dates.pred, ann.pred.mean[((ll-1)*length(dates.pred) + 1):(ll*length(dates.pred))], lwd=1.5, type='l', xlab="Date", ylab="Annual Seasonal Cycle", ylim=ylims, main=paste("Location", location[1], location[2]))
+      }
     }else{
-      plot(doy.pred, ann.pred.mean, lwd=1.5, type='l', xaxt="n", xlab="Date", ylab="Annual Seasonal Cycle", ylim=ylims)
+      for(ll in 1:nrow(location)){
+      plot(doy.pred, ann.pred.mean[((ll-1)*length(doy.pred) + 1):(ll*length(doy.pred))], lwd=1.5, type='l', xaxt="n", xlab="Date", ylab="Annual Seasonal Cycle", ylim=ylims)
       axis(1, at=at.doy.plot, labels=months.plot)
+      }
     }
     if(interval>0){
       if(years=="all"){
-        polygon(c(dates.pred, rev(dates.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=grDevices::rgb(.5, .5, .5, .4), border=NA)
-        lines(dates.pred, ann.pred.mean, lwd=1.5)
+        for(ll in 1:nrow(location)){
+          polygon(c(dates.pred, rev(dates.pred)), c(ann.pred.bounds[1,((ll-1)*length(dates.pred) + 1):(ll*length(dates.pred))], rev(ann.pred.bounds[2,((ll-1)*length(dates.pred) + 1):(ll*length(dates.pred))])), col=grDevices::rgb(.5, .5, .5, .4), border=NA)
+          lines(dates.pred, ann.pred.mean, lwd=1.5)
+        }
       }else{
-        polygon(c(doy.pred, rev(doy.pred)), c(ann.pred.bounds[1,], rev(ann.pred.bounds[2,])), col=grDevices::rgb(.5, .5, .5, .4), border=NA)
-        lines(doy.pred, ann.pred.mean, lwd=1.5)
+        for(ll in 1:nrow(location)){
+          polygon(c(doy.pred, rev(doy.pred)), c(ann.pred.bounds[1,((ll-1)*length(doy.pred) + 1):(ll*length(doy.pred))], rev(ann.pred.bounds[2,((ll-1)*length(doy.pred) + 1):(ll*length(doy.pred))])), col=grDevices::rgb(.5, .5, .5, .4), border=NA)
+          lines(doy.pred, ann.pred.mean, lwd=1.5)
+        }
       }
     }
   }
