@@ -559,8 +559,8 @@ BSTFA <- function(ymat, dates, coords,
   tau2.lambda.save <- matrix(0, nrow=1, ncol=floor((iters-burn)/thin))
   alphaT <- rep(0, n.factors*n.temp.bases)
   alphaS <- rep(0, n.factors*n.load.bases)
-  FLambda.long = rep(0, n.times*n.locs)
-
+  FLambda.long <- c(Fmat%*%t(Lambda))
+  
   ### Set up variance component
   sig2.save <- matrix(0, nrow=1, ncol=floor((iters-burn)/thin))
 
@@ -779,8 +779,8 @@ BSTFA <- function(ymat, dates, coords,
         #QsI <- methods::as(kronecker(QS, diag(1, n.factors)), "sparseMatrix")
         #QsI <- kronecker(QS, diag(1,n.factors))
         #QstQsI <- methods::as(kronecker(t(QS)%*%QS, diag(1, n.factors)), "sparseMatrix")
-        IFmat <- methods::as(kronecker(diag(1,n.locs), Fmat), "sparseMatrix")
-        precision <- kronecker(Matrix::Diagonal(x=1,n=n.locs), solve(diag(sig2, n.times)+ tau2.lambda*Fmat%*%t(Fmat))) #solve(tau2.lambda*IFmat%*%Matrix::t(IFmat) + Matrix::Diagonal(x=sig2, n=n.times*n.locs))
+        IFmat <- methods::as(kronecker(diag(1,n.locs), F.tilde), "sparseMatrix")
+        precision <- kronecker(Matrix::Diagonal(x=1,n=n.locs), solve(diag(sig2, n.times)+ tau2.lambda*F.tilde%*%t(F.tilde))) #solve(tau2.lambda*IFmat%*%Matrix::t(IFmat) + Matrix::Diagonal(x=sig2, n=n.times*n.locs))
         alphaS.var <- solve(Matrix::t(QsI)%*%Matrix::t(IFmat)%*%precision%*%IFmat%*%QsI + kronecker(A.lambda.prec, Matrix::Diagonal(x=1, n=n.factors)))
         alphaS.mean <- as.numeric(alphaS.var%*%Matrix::t(QsI)%*%Matrix::t(IFmat)%*%precision%*%temp)
         alphaS <- my_mvrnorm(alphaS.mean, alphaS.var)
