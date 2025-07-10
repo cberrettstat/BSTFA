@@ -281,7 +281,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
       facts <-  array(0, dim=c(out$n.times,nrow(location),out$draws))
     }
 
-    ypreds = mulong + betalong + xilong + matrix(facts, nrow=out$n.times*nrow(location), ncol=out$draws)
+    ypreds = mulong + betalong + xilong + matrix(facts, nrow=out$n.times*nrow(location), ncol=out$draws, byrow=FALSE)
     
     if (pred.int) {
       resid = matrix(rnorm(out$draws*out$n.times,

@@ -28,8 +28,8 @@ BSTFA(
   plot.factors = FALSE,
   load.style = "eigen",
   n.load.bases = 4,
-  freq.lon = diff(range(coords[, 1])),
-  freq.lat = diff(range(coords[, 2])),
+  freq.lon = 2 * diff(range(coords[, 1])),
+  freq.lat = 2 * diff(range(coords[, 2])),
   n.temp.bases = ifelse(floor(n.times * 0.1)\%\%2 == 1, floor(n.times * 0.1) - 1,
     floor(n.times * 0.1)),
   freq.temp = n.times,
@@ -98,9 +98,9 @@ BSTFA(
 
 \item{n.load.bases}{Numeric scalar indicating the number of bases to use for the spatially-dependent loadings when \code{load.style} is either \code{'fouier'} or \code{'tps'}.  This can be the same as or different than  \code{n.spatial.bases}.  Default is \code{4}. When \code{load.style='fourier'}, this value must be an even square number.}
 
-\item{freq.lon}{Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,1]))}.}
+\item{freq.lon}{Numeric scalar used for \code{spatial.style} or \code{load.style} equal to \code{'fourier'} or \code{'eigen'}.  For \code{'fourier'}, this is the frequency used for the first column of \code{coords} (assumed to be longitude) for the Fourier bases. For \code{'eigen'}, this is the range parameter of the exponential spatial correlation matrix used to create the eigenvectors. Default value is \code{2*diff(range(coords[,1]))}.}
 
-\item{freq.lat}{Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,2]))}.}
+\item{freq.lat}{Numeric scalar used for \code{spatial.style} or \code{load.style} equal to \code{'fourier'}.  This is the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases. Default value is \code{2*diff(range(coords[,2]))}.}
 
 \item{n.temp.bases}{Numeric scalar indicating the number of Fourier bases to use for the temporally-dependent factors. The default value is 10\% of \code{n.times}.}
 

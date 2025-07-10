@@ -26,8 +26,8 @@
 #' @param plot.factors Logical scalar indicating whether to plot the fixed factor locations.  Default is \code{FALSE}.
 #' @param load.style Character scalar indicating the style of spatial bases to use for the spatially-dependent loadings. Options are \code{'fourier'} (default) for the Fourier bases, \code{'tps'} for thin plate splines, and \code{'grid'} for multiresolution bases.  This can be the same as or different than \code{spatial.style}.
 #' @param n.load.bases Numeric scalar indicating the number of bases to use for the spatially-dependent loadings when \code{load.style} is either \code{'fouier'} or \code{'tps'}.  This can be the same as or different than  \code{n.spatial.bases}.  Default is \code{4}. When \code{load.style='fourier'}, this value must be an even square number.
-#' @param freq.lon Numeric scalar indicating the frequency to use for the first column of \code{coords} (assumed to be longitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,1]))}.
-#' @param freq.lat Numeric scalar indicating the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases when \code{spatial.style='fourier'} and/or \code{load.style='fourier'}. Default value is \code{diff(range(coords[,2]))}.
+#' @param freq.lon Numeric scalar used for \code{spatial.style} or \code{load.style} equal to \code{'fourier'} or \code{'eigen'}.  For \code{'fourier'}, this is the frequency used for the first column of \code{coords} (assumed to be longitude) for the Fourier bases. For \code{'eigen'}, this is the range parameter of the exponential spatial correlation matrix used to create the eigenvectors. Default value is \code{2*diff(range(coords[,1]))}.
+#' @param freq.lat Numeric scalar used for \code{spatial.style} or \code{load.style} equal to \code{'fourier'}.  This is the frequency to use for the second column of \code{coords} (assumed to be latitude) for the Fourier bases. Default value is \code{2*diff(range(coords[,2]))}.
 #' @param n.temp.bases Numeric scalar indicating the number of Fourier bases to use for the temporally-dependent factors. The default value is 10% of \code{n.times}.
 #' @param freq.temp Numeric scalar indicating the frequency to use for the Fourier bases of the temporally-dependent factors.  The default value is \code{n.times}.
 #' @param alpha.prec Numeric scalar indicating the prior precision for all model process coefficients. Default value is \code{1/100000}.
@@ -115,8 +115,8 @@ BSTFA <- function(ymat, dates, coords,
                  n.factors=min(4,ceiling(n.locs/20)), factors.fixed=NULL, plot.factors=FALSE,
                  load.style='eigen',
                  n.load.bases=4,
-                 freq.lon=diff(range(coords[,1])),
-                 freq.lat=diff(range(coords[,2])),
+                 freq.lon=2*diff(range(coords[,1])),
+                 freq.lat=2*diff(range(coords[,2])),
                  n.temp.bases=ifelse(floor(n.times*0.10)%%2==1, floor(n.times*0.10)-1, floor(n.times*0.10)),
                  freq.temp=n.times,
                  alpha.prec=1/100000, tau2.gamma=2, tau2.phi=0.0000001, sig2.gamma=2, sig2.phi=1e-5,
