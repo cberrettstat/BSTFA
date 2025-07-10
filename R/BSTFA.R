@@ -701,8 +701,8 @@ BSTFA <- function(ymat, dates, coords,
         #Bfullxi.long <- Bfullmiss%*%newS.xi%*%alpha.xi
       }else{
         ### Sample alpha.xi
-        alpha.var <- solve( kronecker(Matrix::Diagonal(x=1/tau2.xi), Matrix::t(newS)%*%newS) + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots)) ) #Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))%*%StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
-        alpha.mean <- alpha.var%*%(Matrix::Diagonal(x=rep(1/tau2.xi, each=n.spatial.bases))%*%Matrix::t(newS.xi)%*%xi)
+        alpha.var <- solve( kronecker(Matrix::t(newS)%*%newS, Matrix::Diagonal(x=1/tau2.xi)) + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots)) ) #Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))%*%StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
+        alpha.mean <- alpha.var%*%(Matrix::Diagonal(x=rep(1/tau2.xi, n.spatial.bases))%*%Matrix::t(newS.xi)%*%xi)
         alpha.xi <- as.vector(MASS::mvrnorm(1,alpha.mean,alpha.var))
       }
       
