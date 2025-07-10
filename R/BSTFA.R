@@ -310,6 +310,8 @@ BSTFA <- function(ymat, dates, coords,
   alpha.beta.save <- matrix(0, nrow=dim(newS)[2], ncol=floor((iters-burn)/thin))
   tau2.beta.save <- matrix(0,nrow=1,ncol=floor((iters-burn)/thin))
 
+  ######### If eigen style, can use variog and variofit to estimate phi get a "better" newS?
+  
 
   ### Set up seasonal component
   model.matrices$seasonal.bs.basis <- matrix(0,nrow=n.times,ncol=n.seasn.knots)
@@ -699,7 +701,7 @@ BSTFA <- function(ymat, dates, coords,
         #Bfullxi.long <- Bfullmiss%*%newS.xi%*%alpha.xi
       }else{
         ### Sample alpha.xi
-        alpha.var <- solve( kronecker(Matrix::t(newS)%*%newS, Matrix::Diagonal(x=1/tau2.xi)) + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots)) ) #Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))%*%StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
+        alpha.var <- solve( kronecker(Matrix::Diagonal(x=1/tau2.xi), Matrix::t(newS)%*%newS) + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots)) ) #Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))%*%StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
         alpha.mean <- alpha.var%*%(Matrix::Diagonal(x=rep(1/tau2.xi, each=n.spatial.bases))%*%Matrix::t(newS.xi)%*%xi)
         alpha.xi <- as.vector(MASS::mvrnorm(1,alpha.mean,alpha.var))
       }
