@@ -226,9 +226,9 @@ BSTFA <- function(ymat, dates, coords,
     newS <- eigs$vectors[,1:n.spatial.bases]
     if (!is.null(x)){
       newS <- cbind(newS, x)
-      A.prec <- diag(c(1/eigs$values[1:n.spatial.bases], rep(alpha.prec, dim(x)[2])))
+      A.prec <- diag(c(.001*1/eigs$values[1:n.spatial.bases], rep(alpha.prec, dim(x)[2])))
     }else{
-      A.prec <- solve(diag(eigs$values[1:n.spatial.bases]))
+      A.prec <- .001*solve(diag(eigs$values[1:n.spatial.bases]))
     }
   }
   

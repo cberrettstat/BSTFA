@@ -128,7 +128,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
     if(out$spatial.style=='eigen'){
       distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
       cormat <- exp(-distmat/out$freq.lon)
-      predS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec
+      predS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec/.001
     }
 
     if (!is.null(new_x)) {
@@ -643,7 +643,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
     if(out$spatial.style=='eigen'){
       distmat <- as.matrix(dist(rbind(out$coords, as.matrix(predloc))))
       cormat <- exp(-distmat/out$freq.lon)
-      predS <- cormat[out$n.locs + (1:nrow(predloc)),-(out$n.locs + (1:nrow(predloc)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec
+      predS <- cormat[out$n.locs + (1:nrow(predloc)),-(out$n.locs + (1:nrow(predloc)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec/.001
     }
     
     if (!is.null(new_x)) predS <- cbind(predS, new_x)
@@ -1064,7 +1064,7 @@ plot_annual <- function(out, location, add=FALSE,
     if(out$spatial.style=='eigen'){
       distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
       cormat <- exp(-distmat/out$freq.lon)
-      predS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec
+      predS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec/.001
     }
 
     if (!is.null(new_x)) {
