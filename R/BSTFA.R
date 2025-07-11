@@ -226,9 +226,9 @@ BSTFA <- function(ymat, dates, coords,
     newS <- eigs$vectors[,1:n.spatial.bases]
     if (!is.null(x)){
       newS <- cbind(newS, x)
-      A.prec <- diag(c(1/eigs$values[1:n.spatial.bases], rep(alpha.prec, dim(x)[2])))
+      A.prec <- diag(c(alpha.prec*1/eigs$values[1:n.spatial.bases], rep(alpha.prec, dim(x)[2])))
     }else{
-      A.prec <- solve(diag(eigs$values[1:n.spatial.bases]))
+      A.prec <- alpha.prec*solve(diag(eigs$values[1:n.spatial.bases]))
     }
   }
   
@@ -335,7 +335,7 @@ BSTFA <- function(ymat, dates, coords,
     Bfullxi.long <- Bfull%*%xi
     model.matrices$seasonal.bs.basis <- bs.basis
     alpha.xi <- rep(0, dim(newS.xi)[2])
-    tau2.xi <- rep(0.01, n.seasn.knots) #as.numeric(var(xi))
+    tau2.xi <- apply(matrix(xi, nrow=n.seasn.knots, ncol=n.locs, byrow=F), 1, var)/sqrt(n.locs) #rep(0.01, n.seasn.knots) #as.numeric(var(xi))
   } else {
     xi <- rep(0, n.locs*n.seasn.knots)
     Bfullxi.long <- rep(0, n.locs*n.times)
@@ -392,26 +392,6 @@ BSTFA <- function(ymat, dates, coords,
 
     ### Set up spatial FA
     tau2.lambda=0.01
-
-    ### Eigen Method
-    # if (is.null(phi.S)) {
-    #   if (is.matrix(coords) | is.data.frame(coords)) {
-    #     if (sum(dim(coords)==1)==0) coord.dim = 'D2'
-    #     else coord.dim = 'D1'
-    #   } else {
-    #     coord.dim = 'D1'
-    #   }
-    #   if (coord.dim=='D2') phi.S = mean(c(diff(range(coords[,1])), diff(range(coords[,2]))))
-    #   else phi.S = diff(range(coords))
-    # }
-    # distmat <- as.matrix(dist(coords))
-    # corS <- exp(-distmat/phi.S)
-    # QS <- eigen(corS)$vectors[,1:n.load.bases]
-    # bigQS <- kronecker(diag(1, n.factors), QS)
-
-    ### Thin Plate Method
-    # QS = newS[,1:n.spatial.bases]
-    # model.matrices$QS = QS
 
     ### Bisquare Method
     if (load.style == 'grid') {
@@ -682,36 +662,41 @@ BSTFA <- function(ymat, dates, coords,
     ### Sample Xi
     if (seasonal) {
       start = Sys.time()
+      
+      Tau2.xi <- Matrix::Diagonal(x=rep(1/tau2.xi, n.locs)) #Inverse of the full matrix of tau2.xi
       temp <- y - Jfullmu.long - Tfullbeta.long - FLambda.long
-      xi.var <- solve((1/sig2)*tBB + Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))) #ItBB + (1/tau2.xi)*Matrix::Diagonal(n=n.locs*n.seasn.knots))
-      xi.mean <- xi.var%*%((1/sig2)*tB%*%temp[notmissind] + Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))%*%newS.xi%*%alpha.xi) #ItB%*%temp + (1/tau2.xi)*newS.xi%*%alpha.xi)
-      xi <- my_mvrnorm(xi.mean,xi.var)
-      Bfullxi.long <- Bfull%*%xi
-      rm(list=c("xi.var", "xi.mean"))
-
+      
+      ### Sample alpha.xi
       if(marginalize){
         #bs.basis <- mgcv::cSplineDes(doy, knots)
         #Bfull <- kronecker(Matrix::Diagonal(n=n.locs), bs.basis)
         #newS.xi <- methods::as(base::kronecker(newS, diag(n.seasn.knots)), "sparseMatrix")
         precision <- kronecker(Matrix::Diagonal(n=n.locs), solve(bs.basis%*%diag(tau2.xi)%*%t(bs.basis) + diag(sig2, nrow(bs.basis))))
-        #precision <- solve(tau2.xi*BtB + Matrix::Diagonal(x=sig2, n=dim(BtB)[1]))
-        alpha.var <- solve((Matrix::t(newS.xi))%*%Matrix::t(Bfull)%*%precision%*%Bfull%*%newS.xi + methods::as(kronecker(A.prec, diag(n.seasn.knots)), "sparseMatrix"))
+        #precision <- solve(Bfull%*%diag(rep(tau2.xi, n.locs))%*%Matrix::t(Bfull) + Matrix::Diagonal(x=sig2, n=n.locs*n.times)) #n=dim(BtB)[1]))
+        
+        alpha.var <- solve((Matrix::t(newS.xi))%*%Matrix::t(Bfull)%*%precision%*%Bfull%*%newS.xi + methods::as(kronecker(diag(n.seasn.knots), A.prec), "sparseMatrix"))
         alpha.mean <- alpha.var%*%(Matrix::t(newS.xi))%*%Matrix::t(Bfull)%*%precision%*%temp
         alpha.xi <- as.numeric(MASS::mvrnorm(1, alpha.mean, alpha.var))
         #Bfullxi.long <- Bfullmiss%*%newS.xi%*%alpha.xi
       }else{
-        ### Sample alpha.xi
-        alpha.var <- solve( kronecker(Matrix::t(newS)%*%newS, Matrix::Diagonal(x=1/tau2.xi)) + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots)) ) #Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))%*%StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
-        alpha.mean <- alpha.var%*%(Matrix::Diagonal(x=rep(1/tau2.xi, n.spatial.bases))%*%Matrix::t(newS.xi)%*%xi)
+        alpha.var <- solve( Matrix::t(newS.xi)%*%Tau2.xi%*%newS.xi + kronecker(Matrix::Diagonal(x=1,n=n.seasn.knots), A.prec) ) #Matrix::Diagonal(x=rep(1/tau2.xi, n.locs))%*%StSI + kronecker(A.prec, Matrix::Diagonal(x=1,n=n.seasn.knots))) #Matrix::Diagonal(x=alpha.prec, n=dim(newS.xi)[2]))
+        alpha.mean <- alpha.var%*%(Matrix::t(newS.xi)%*%Tau2.xi%*%xi)
         alpha.xi <- as.vector(MASS::mvrnorm(1,alpha.mean,alpha.var))
       }
+      
+      #Sample xi
+      xi.var <- solve((1/sig2)*crossprod(Bfull) + Tau2.xi) #ItBB + (1/tau2.xi)*Matrix::Diagonal(n=n.locs*n.seasn.knots))
+      xi.mean <- xi.var%*%((1/sig2)*Matrix::t(Bfull)%*%temp + Tau2.xi%*%newS.xi%*%alpha.xi) #ItB%*%temp + (1/tau2.xi)*newS.xi%*%alpha.xi)
+      xi <- my_mvrnorm(xi.mean,xi.var)
+      Bfullxi.long <- Bfull%*%xi
+      rm(list=c("xi.var", "xi.mean"))
       
       ### Sample tau2.xi
       for(myind in 1:n.seasn.knots){
           thisxi <- seq(myind,n.seasn.knots*n.locs, by=n.seasn.knots)  
-          tau2.shape <- tau2.gamma + length(xi[thisxi])/2
-          tau2.rate <- tau2.phi + 0.5 * Matrix::t(xi[thisxi] - newS.xi[thisxi,]%*%alpha.xi)%*%(xi[thisxi] - newS.xi[thisxi,]%*%alpha.xi)
-          tau2.xi[myind] <- 1/rgamma(1, shape=tau2.shape, rate=as.vector(tau2.rate)) #scale of IG corresponds to rate of Gamma
+          tau2.shape <- tau2.gamma + length(thisxi)/2
+          tau2.rate <- tau2.phi + 0.5 * crossprod(xi[thisxi] - newS.xi[thisxi,]%*%alpha.xi)
+          tau2.xi[myind] <- 1/rgamma(1, shape=tau2.shape, rate=as.numeric(tau2.rate)) #scale of IG corresponds to rate of Gamma
       }
       
       rm(list=c("tau2.shape", "tau2.rate", "alpha.var", "alpha.mean"))

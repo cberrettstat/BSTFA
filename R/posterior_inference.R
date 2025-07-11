@@ -896,7 +896,7 @@ plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
   if (is.null(xrange)) xlims=1:out$n.times
   else xlims=which(out$dates > xrange[1] & out$dates < xrange[2])
   if (together) {
-    mycols <- RColorBrewer::brewer.pal(out$n.factors, 'Dark2')
+    mycols <- RColorBrewer::brewer.pal(max(3,out$n.factors), 'Dark2')[1:out$n.factors]
     mycolssee <- paste0(mycols, "20")
     plot(y=F.tilde[xlims,1], x=out$dates[xlims], type='l', main = ('All Factors'),
          xlab = 'Time', ylab='Value', col=mycols[1],
