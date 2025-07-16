@@ -12,7 +12,7 @@ vignette: >
 bibliography: references.bib
 csl: apa.csl
 cache: true
-abstract: "An overview of the functions for fitting and understanding Bayesian spatio-temporal factor analysis (BSTFA) models for spatio-temporal data. To improve computational efficiency, the package includes a function for a BSTFA model that uses dimension reduction via basis functions. A more computationally intensive model using Gaussian processes is also available. Users can generate posterior predictions, visualize spatio-temporal trends, and explore latent factor behavior through functions for mapping, time series plotting, and interpolation. The package is designed to support both exploratory data analysis and formal inference in applications with spatial and temporal dependence. Functionality is demonstrated using a historical temperature dataset collected from weather stations across Utah, USA."
+abstract: "An overview of the functions for fitting and understanding Bayesian spatio-temporal factor analysis (BSTFA) models for spatio-temporal data. To improve computational efficiency, the package includes a function for a BSTFA model that uses dimension reduction via basis functions. A more computationally intensive model using Gaussian processes is also available. Users can generate posterior interpolations, visualize spatio-temporal trends, and explore latent factor behavior through functions for mapping, time series plotting, and interpolation. The package is designed to support both exploratory data analysis and formal inference in applications with spatial and temporal dependence. Functionality is demonstrated using a historical temperature dataset collected from weather stations across Utah, USA."
 ---
 
 
@@ -42,11 +42,11 @@ The outline is as follows. First, we introduce the motivation behind the BSTFA m
 
 ## Motivation
 
-Consider the motivating data for the `BSTFA` package: a collection of temperature measurements across the state of Utah. The data were collected from May 1912 through January 2015 from 146 weather stations across the state. These measurements are 30-day averages of daily minimum observed temperatures in degrees Celcius, with each location's measurements zero-centered. This environmental process exhibits some of the challenges common in environmental modeling; that is, the data show obvious spatial and temporal dependence and not all contributing agents are known or easy to include in a modeling scheme. 
+Consider the motivating data set for the `BSTFA` package: a collection of temperature measurements across the state of Utah. The data were collected from May 1912 through January 2015 from 146 weather stations across the state. These measurements are 30-day averages of daily minimum observed temperatures in degrees Celcius, with each location's measurements zero-centered. This environmental process exhibits some of the challenges common in environmental modeling; that is, the data exhibit spatial and temporal dependence and not all contributing agents are known or easy to include in a modeling scheme. 
 
 Take, for example, the observations for three weather stations: Moab, Canyonlands National Park, and Logan. The Moab and Canyonlands stations are near one another (within 50 miles) while the Logan station is far away (300 miles). Figure \@ref(fig:fig-utahTemps) shows these same temperature series zoomed in on the years 1999 through 2001. The difference between low temperatures in winter 2000 and winter 2001 is slight in Moab and the Canyonlands, but in Logan, the low temperature is much lower in winter 2001 than it was in winter 2000.  This anecdote illustrates that locations near each other in space exhibit similar environmental behavior. Spatio-temporal factor analysis accounts for such spatio-temporal dependencies and can provide numerical and visual summaries of that dependence. 
 
-Estimation of a fully-parameterized Bayesian spatio-temporal factor analysis model is computationally burdensome. The `BSTFA` package accounts for this by using dimension reduction via basis functions, allowing for faster computation. The remainder of this vignette describes the `BSTFA` package and its use of basis functions, as well as all implemented methods for plotting, prediction, and inference.
+Estimation of a fully-parameterized Bayesian spatio-temporal factor analysis model is computationally burdensome. The `BSTFA` package accounts for this by using dimension reduction via basis functions, allowing for faster computation. The remainder of this vignette describes the `BSTFA` package and its use of basis functions, as well as all implemented methods for plotting, interpolating, and inference.
 
 ```{r fig-utahTemps, echo=FALSE, fig.height=3.5, fig.width=6, fig.cap='Mean-centered 30-day average daily minimum temperatures for three Utah weather stations (Moab, green; Canyonlands, orangee; Logan, purple) from January 1999 through December 2001.', fig.align="center"}
 
@@ -71,7 +71,7 @@ legend("bottomleft", legend=c("Moab", "Canyonlands", "Logan"), col=mycols[1:3], 
 
 # What is Implemented? {#sec-implement}
 
-The `BSTFA` package contains implementation of two versions of a spatio-temporal factor analysis model along with functions for prediction, plotting and visualizing posterior surfaces. The model-fitting functions are defined in Section \@ref(subsec-modelfit), while the methodology associated with these models is described more fully in Section \@ref(sec-methods). The `BSTFA` package's prediction methods are discussed in Section \@ref(subsec-predict), functions for plotting/visualization are described in Section \@ref(subsec-plots), and notes about computational speed are outlined in Section \@ref(subsec-speed). 
+The `BSTFA` package contains implementation of two versions of a spatio-temporal factor analysis model along with functions for interpolation, plotting and visualizing posterior surfaces. The model-fitting functions are defined in Section \@ref(subsec-modelfit), while the methodology associated with these models is described more fully in Section \@ref(sec-methods). The `BSTFA` package's interpolation methods are discussed in Section \@ref(subsec-predict), functions for plotting/visualization are described in Section \@ref(subsec-plots), and notes about computational speed are outlined in Section \@ref(subsec-speed). 
 
 While each of these sections describes some arguments to the functions, the best way to understand all available function arguments is to look at the R help documentation.
 
@@ -105,30 +105,34 @@ The `BSTFA` and `BSTFAfull` functions are demonstrated below. Additional Markov-
 #Code used to create the "out.sm" data object in the BSTFA package. 
 #Note: Not run within this vignette.
 
+#Load the full temperature data set
+data(UtahDataList)
+attach(UtahDataList)
+
 #Load the data and select a subset
-dates.ind <- 1191:1251
+dates.ind <- 1151:1251
 locs.use <- c(3, 8, 11, 16, 17,
-		 	20, 23, 29, 30, 46,
-		 	47, 49, 60, 62, 66, 73,
-		 	75, 76, 77, 78, 85, 89, 94,
-		 	96, 98, 100, 109, 112,
-		 	115, 121, 124, 128, 133, 144)
+               		 	20, 23, 29, 30, 46,
+               		 	47, 49, 60, 62, 66, 73,
+               		 	75, 76, 77, 78, 85, 89, 94,
+               		 	96, 98, 100, 109, 112,
+              		 	115, 121, 124, 128, 133, 144)
 temps.sm <- TemperatureVals[dates.ind, locs.use]
 coords.sm <- Coords[locs.use,]
 dates.sm <- Dates[dates.ind]
 locsm.names <- Locations[locs.use]
 
 #Fit the model
-set.seed(481)
+set.seed(466)
 out.sm <- BSTFA(ymat=temps.sm, 
-	dates=dates.sm, 
-	coords=coords.sm, 
-	iters=200000,  
-	thin=913, 
-	save.missing=F, 
-	factors.fixed=c(34, 22, 15, 20), 
-	n.load.bases=4,
-	n.spatial.bases=4)
+                 	dates=dates.sm, 
+                 	coords=coords.sm, 
+                 	iters=5000, 
+                 	burn=1000,
+                 	thin=40, 
+                 	factors.fixed=c(14, 22, 15, 20), 
+                 	n.temp.bases=45, 
+                  save.missing=FALSE)
 ```
 
 The `verbose` argument controls whether or not the function prints status updates during sampling. Although the default value for this is `TRUE`, for the sake of this vignette, `verbose` will always be set to `FALSE`. 
@@ -151,14 +155,14 @@ full.out = BSTFAfull(ymat=utahDataList$TemperatureVals,
 ```
 
 ```{r sampleout, eval=TRUE}
-#Load pre-fit model output
+#Load small pre-fit model output
 data(out.sm)
 attach(out.sm)
 ```
 
 ### Understanding Output {#subsubsec-output}
 
-The `BSTFA` and `BSTFAfull` functions output a list object. It should be noted that a user can use all functions within the `BSTFA` package without understanding or using the specific output. We provide these additional details for more in-depth analyses and summaries. Most objects contained in the list are self-explanatory. A few, however, warrant further explanation. 
+The `BSTFA` and `BSTFAfull` functions return a list object. It should be noted that a user can use all functions within the `BSTFA` package without understanding or using the specific output. We provide these additional details for more in-depth analyses and summaries. Most objects contained in the list are self-explanatory. A few, however, warrant further explanation. 
 
 - Each object that is a parameter (i.e., `beta`) is an MCMC object from the `coda` package [@codapackage] with number of rows equal to the number of MCMC draws.
 
@@ -177,13 +181,13 @@ The `BSTFA` and `BSTFAfull` functions output a list object. It should be noted t
   
 - $\mathbf{Note:}$ Care must be taken in understanding the ordering of `F.tilde` and `Lambda.tilde` (discussed in greater detail in Section \@ref(subsubsec-fa)). Each draw of `F.tilde` (meaning, each column) has dimension $TL \times 1$. This means the first $T$ values correspond to factor one, the next $T$ values correspond to factor two, and so on. However, each draw of `Lambda.tilde` has dimension $Ln \times 1$. This means the first $L$ values correspond to location one, the next $L$ values correspond to location two, and so on. When converting a draw of `F.tilde` into a matrix, setting `byrow=FALSE` provides the appropriate $T \times L$ matrix, while when converting a draw of `Lambda.tilde` into a matrix, setting `byrow=TRUE` provides the appropriate $n \times L$ matrix.
 
-## Prediction {#subsec-predict}
+## Interpolation {#subsec-predict}
 
-The function `predictBSTFA` takes as its first argument the output from the `BSTFA` or `BSTFAfull` functions. Within the function, posterior samples from relevant parameters are used to generate predictions either for the spatio-temporal processes, $Y(\mathbf{s}, t)$, at observed location $\mathbf{s}$ and time $t$, or for, $Y(\mathbf{s^*}, t)$, at $\textit{unobserved}$ location $\mathbf{s^*}$ and time $t$. The `location` argument takes either a location number (corresponding to the appropriate column of your `ymat` argument) for predicting at an observed location, or a matrix/data frame of coordinate values if predicting at a new location. 
+The function `predictBSTFA` takes as its first argument the output from the `BSTFA` or `BSTFAfull` functions. Within the function, posterior samples from relevant parameters are used to interpolate either spatio-temporal processes, $Y(\mathbf{s}, t)$, at observed location $\mathbf{s}$ and time $t$, or for, $Y(\mathbf{s^*}, t)$, at $\textit{unobserved}$ location $\mathbf{s^*}$ and time $t$. The `location` argument takes either a location number (corresponding to the appropriate column of your `ymat` argument) for estimation at an observed location, or a matrix of coordinate values if interpolating to a new location. 
 
-If the argument `type` is set to `"all"`, the function will return draws of $Y(\mathbf{s}, t) \text{ } \forall \text{ } (\mathbf{s},t)$. `type` can also be set to `"mean"`, `"median"`, `"ub"` (upper bound), or `"lb"` (lower bound). The option `pred.int` controls whether the calculated uncertainty is a prediction interval (`pred.int == TRUE`; default value) or a credible interval (`pred.int == FALSE`).
+If the argument `type` is set to `"all"`, the function will return draws of $Y(\mathbf{s}, t)\text{ } \forall \text{ } t$ for each saved draw of the parameters. `type` can also be set to `"mean"`, `"median"`, `"ub"` (upper bound), or `"lb"` (lower bound). The option `pred.int` controls whether the calculated uncertainty is a prediction interval (`pred.int == TRUE`) or a credible interval (`pred.int == FALSE`; default value).
 
-The code below provides posterior predictive draws of temperatures at an observed location, Loa, Utah. Since `type == "all"`, the function will return a $T \times d$ matrix of posterior draws of $Y(\mathbf{s}, t) \text{ } \forall \text{ } t$ with $d$ being the number of MCMC draws. Each column represents one draw of the $T \times 1$ vector, $\mathbf{Y}$.
+The code below provides posterior predictive draws of temperatures at an observed location, Loa, Utah. Since `type == "all"`, the function will return a $T \times d$ matrix of posterior draws of $Y(\mathbf{s}, t) \text{ } \forall \text{ } t$ with $d$ being the number of saved MCMC draws. Each column represents one draw of the $T \times 1$ vector, $\mathbf{Y(\mathbf{s})}$.
 
 ```{r predall, eval=F}
 loc = 17 # Loa, Utah in our small data set
@@ -203,10 +207,10 @@ preds = predictBSTFA(out.sm,
                      type='mean')
 ```
 
-The code below provides posterior predictive draws for temperatures at an $\textit{unobserved}$ location by setting the `location` argument to a data frame of coordinate values. In this case, we consider a city without a monitor, Torrey, Utah (near Loa), with longitude 111.41$^\circ$ W and latitude 38.29$^\circ$ N.
+The code below provides posterior predictive draws for temperatures at an $\textit{unobserved}$ location by setting the `location` argument to a matrix of coordinate values. In this case, we consider a city without a monitor, Torrey, Utah (near Loa), with longitude 111.41$^\circ$ W and latitude 38.29$^\circ$ N.
 
 ```{r plotpred, eval=F}
-loc = data.frame('Longitude' = -111.41, 'Latitude' = 38.29) # Torrey, Utah
+loc = matrix(c(-111.41, 38.29), nrow=1, ncol=2) # Torrey, Utah
 preds_new = predictBSTFA(out.sm, 
                          location = loc,
                          type='all',
@@ -216,14 +220,13 @@ preds_new = predictBSTFA(out.sm,
 
 The `predictBSTFA` function is also called within the `plot_location` function, which takes similar arguments as `predictBSTFA` with the addition of a few extra plotting arguments. `xrange` defines the time points $\{t: t \in \mathcal{T}\}$ at which the posterior estimates are plotted, with default value `NULL` indicating to plot on all of $\mathcal{T}$. `truth` (default value `FALSE`) will plot the observed data along with the estimates if `location` comes from the data set. `uncertainty` (default value `TRUE`) indicates whether to include a posterior predictive interval (`pred.int==TRUE`) or a credible interval (`pred.int==FALSE`).
 
-Below is an example of code used to plot the posterior mean temperature values (black line) at an observed location, Loa, Utah, with 95\% posterior predictive bounds (gray bands), and observed measurements (gray circles). Figure \@ref(fig:fig-location) provides the plot.  Notice that the posterior mean (black line) closely follows the pattern of the observed data, but, as expected due to basis smoothing, is more smooth than the observed data. Increasing the number of bases will decrease the smoothness (but increase computation time).
+Below is an example of code used to plot the posterior mean temperature values (black line) at an observed location, Loa, Utah, with 95\% posterior credible bounds (gray bands), and observed measurements (gray circles). Figure \@ref(fig:fig-location) provides the plot.  Notice that the posterior mean (black line) closely follows the pattern of the observed data, but, as expected due to basis smoothing, is more smooth than the observed data. Increasing the number of bases will decrease the smoothness (but increase computation time).
 
 ```{r fig-location, fig.cap="Posterior mean temperature values (black line) at an in-sample location, Loa, Utah, with 95% posterior predictive bounds (gray bands), and observed temperature measurements (gray circles).", fig.align="center", fig.height=3.5, fig.width=6}
 loc = 17 # Loa, Utah in our small data set
 plot_location(out.sm,
               location=loc,
               type='mean',
-              pred.int=TRUE,
               uncertainty=TRUE,
               ci.level=c(0.025,0.975),
               truth=TRUE)
@@ -232,11 +235,10 @@ plot_location(out.sm,
 Below is an example of code used to plot the estimated posterior mean temperature values at an $\textit{unobserved}$ location, "Torrey, Utah," a location near Loa. Figure \@ref(fig:fig-prediction) provides the plot where again, the black line represents the posterior mean and the gray bands represent the 95\% posterior predictive intervals.  
 
 ```{r fig-prediction, fig.cap="Posterior mean temperature values (black line) at an out-of-sample location, Torrey, Utah, with 95% posterior predictive bounds (gray bands).", fig.align="center",fig.height=3.5, fig.width=6}
-loc = data.frame('Longitude' = -111.41, 'Latitude' = 38.29) # Torrey, Utah
+loc = matrix(c(-111.41, 38.29), nrow=1, ncol=2) # Torrey, Utah
 plot_location(out.sm,
               location=loc,
               type='mean',
-              pred.int=TRUE,
               uncertainty=TRUE,
               ci.level=c(0.025,0.975),
               truth=FALSE)
@@ -253,7 +255,7 @@ kable(
   data.frame(
     "Function" = c("\\texttt{plot\\_location}", "\\texttt{plot\\_annual}", "\\texttt{plot\\_spatial\\_param}", "\\texttt{map\\_spatial\\_param}", "\\texttt{plot\\_factor}"),
     "Description" = c(
-      "Plot predicted response variable at a specific location (either observed or unobserved) for a specified time range. Credible or prediction interval bands for a given probability (default is 95\\%) can be included. Uses base R for plotting.",
+      "Plot estimated response variable at a specific location (either observed or unobserved) for a specified time range. Credible or prediction interval bands for a given probability (default is 95\\%) can be included. Uses base R for plotting.",
       "Plot the estimated annual seasonal behavior at a specific location (either observed or unobserved). Credible interval bands for a given probability (default is 95\\%) can be included. Uses base R for plotting.", 
       "Plot the estimated spatially-dependent linear slope or specific factor loading (the user specifies the parameter of interest) at all observed locations. Credible interval bounds for a given probability (default is 95\\%) can also be plotted. Uses \\texttt{ggplot2} for plotting.", 
       "Plot the interpolated spatially-dependent linear slope or specific factor loading (the user specifies the parameter of interest) on a grid of unobserved locations. Credible interval bounds for a given probability (default is 95\\%) can also be plotted. Contains arguments to import and plot the grid on a map using functions from the \\texttt{sf} package. Uses \\texttt{ggplot2} for plotting.", 
@@ -279,7 +281,7 @@ plot_annual(out.sm,
             years='one')
 ```
 
-The `plot_spatial_param` function can plot the posterior mean of the linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year." If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. Figure \@ref(fig:fig-obsslope) provides the corresponding plot, where the color represents the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Notice that most locations show an average increase in temperature of between 0 and approximately 0.3 degrees Celcius per year over the 2010 to 2015 time period.
+The `plot_spatial_param` function can plot the posterior mean of the linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year." If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. Figure \@ref(fig:fig-obsslope) provides the corresponding plot, where the color represents the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Notice that most locations show an average increase in temperature of between 0 and approximately 0.3 degrees Celcius per year over the 2007 to 2015 time period.
 
 ```{r fig-obsslope, fig.align="center", fig.cap="Posterior mean linear change in time (slope) of temperatures at observed locations.", fig.width=3.5, fig.height=3.5}
 plot_spatial_param(out.sm,
@@ -288,7 +290,7 @@ plot_spatial_param(out.sm,
           yearscale=TRUE)
 ```
 
-Next, we provide example code for plotting a particular loading, in this case, the posterior mean loadings for the first factor. Figure \@ref(fig:fig-obsloading1) provides the corresponding plot showing the posterior mean loading values that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The circled dot shows the location of the fixed factor; in this case, the first factor is fixed at Wendover, Utah.  This means that the loading corresponding to factor 1 for that location was fixed at a value of 1 (and fixed to be 0 for factors 2, 3, and 4) and the loadings for other locations are estimated given that value. The model accounts for spatial dependence in the loadings so that locations near to Wendover are modeled to have posterior mean loadings closer to one.
+Next, we provide example code for plotting a particular loading, in this case, the posterior mean loading for the first factor. Figure \@ref(fig:fig-obsloading1) provides the corresponding plot showing the posterior mean loading values that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The circled dot shows the location of the fixed factor; in this case, the first factor is fixed at Ibapah, Utah.  This means that the loading corresponding to factor 1 for that location was fixed at a value of 1 (and fixed to be 0 for factors 2, 3, and 4) and the loadings for other locations are estimated given that value. The model accounts for spatial dependence in the loadings so that locations near to Ibapah are modeled to have posterior mean loadings closer to one.
 
 ```{r fig-obsloading1, fig.cap="Posterior mean estimates of loadings for factor 1 at observed locations.  The circled red dot shows the location of the fixed factor loading.", fig.align="center", fig.width=4, fig.height=3.5}
 plot_spatial_param(out.sm,
@@ -298,7 +300,7 @@ plot_spatial_param(out.sm,
 ```
 
 
-The `plot_factor` function plots the estimated temporally-dependent factors either together (setting `together=TRUE`) or separate (setting `together=FALSE` and `factor` to the factor number you want to plot). The example code below plots the first factor, corresponding to the loadings shown in the previous example. Figure \@ref(fig:fig-factorexample2) shows the posterior mean (black line) and 95\% credible intervals (gray band) of the first factor across the 2010-2015 time period. Notice how this first factor in 2014 tends to have higher values (values > 0).  This means that after accounting for the constant increase/decrease in temperature across time and the seasonal cycle, locations whose loadings weight positively on this factor saw saw higher-than-typical temperatures during this time period.  
+The `plot_factor` function plots the estimated temporally-dependent factors either together (setting `together=TRUE`) or separate (setting `together=FALSE` and `factor` to the factor number you want to plot). The example code below plots the first factor, corresponding to the loadings shown in the previous example. Figure \@ref(fig:fig-factorexample2) shows the posterior mean (black line) and 95\% credible intervals (gray band) of the first factor across the 2007-2015 time period. Notice how this first factor around 2013 tends to have lower values (values < 0).  This means that after accounting for the constant increase/decrease in temperature across time and the seasonal cycle, locations whose loadings weight positively on this factor saw lower-than-typical temperatures during this time period.  
 
 ```{r fig-factorexample2, fig.cap="Posterior mean (black line) and 95% credible interval (gray band) of the first factor across the observed time period.", fig.align="center", fig.height=3.5, fig.width=6}
 plot_factor(out.sm,
@@ -319,7 +321,7 @@ plot_factor(out.sm,
 
 
 
-The `map_spatial_param` function is similar to `plot_spatial_param`, but the parameter is plotted on a grid of unobserved locations. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=25` creates a $25 \times 25$ grid of locations to estimate the parameter values.  This function is demonstrated below for the estimated linear increase/decrease of temperatures across Utah (once again, setting `yearscale=TRUE` to provide "per year" estimates). Figure \@ref(fig:fig-mapexample1) shows the temperatures tend to be increasing across the state by betwee  $\approx$ 0 and 0.5$^{\circ}$ C each year.
+The `map_spatial_param` function is similar to `plot_spatial_param`, but the parameter is plotted on a grid of unobserved locations. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=25` creates a $25 \times 25$ grid of locations to estimate the parameter values.  This function is demonstrated below for the estimated linear increase/decrease of temperatures across Utah (once again, setting `yearscale=TRUE` to provide "per year" estimates). Figure \@ref(fig:fig-mapexample1) shows the model estimates that temperatures tend to be increasing across the state by between $\approx$ 0 and 0.3$^{\circ}$ C each year.
 
 ```{r fig-mapexample1, cache=FALSE, warning=FALSE, fig.cap="Posterior mean linear change in temperatures across time for locations across the observed space.", fig.align="center", fig.width=3.5}
 map_spatial_param(out.sm,
@@ -546,7 +548,40 @@ kable(
 
 ## Basis Functions {#subsec-basis}
 
-Basis functions are a projection of a process onto a set of linear combinations of lower-dimension functions [@Cressie2022]. We make use of basis functions to allow for smooth estimates for each process across space and to drastically increase computational speed. For spatial modeling, the `BSTFA` package has three basis function forms built in: Fourier bases, bisquare bases, and thin-plate spline bases. For temporal modeling, only Fourier bases are implemented. Because the Fourier basis function is the default for the `BSTFA` package, that is the only methodology discussed in detail here; for the others, we refer the reader to @cressie2008bisquare for bisquare bases and @nychka2000spatial for thin-plate spline bases.
+Basis functions are a projection of a process onto a set of linear combinations of lower-dimension functions [@Cressie2022]. We make use of basis functions to allow for smooth estimates for each process across space and to drastically increase computational speed. For spatial modeling, the `BSTFA` package has three basis function forms built in: eigenvectors of an exponential correlation, Fourier bases, bisquare bases, and thin-plate spline bases. For temporal modeling, only Fourier bases are implemented. Eigenvectors (`eigen`) is the default approach in the `BSTFA` package. We discuss this and the Fourier basis approach in this vignette; for the others, we refer the reader to @cressie2008bisquare for bisquare bases and @nychka2000spatial for thin-plate spline bases.
+
+### Eigenvector Basis Functions {#subsubsec-eigen}
+
+The exponential correlation function for two locations $\mathbf{s}$ and $\mathbf{s}'$ can be written as, 
+$$
+\rho(\mathbf{s}, \mathbf{s}') = \exp(-|| \mathbf{s} - \mathbf{s}'||/\phi),
+$$
+where $||\cdot||$ represents the norm (or another distance metric) and $\phi$ is the range parameter.  Note that the value of $\phi$ is determined in the `BSTFA` function using the value of `freq.lon`.  We obtain the eigenvector bases by computing the correlation matrix made up of the correlation for each pair of observed locations and computing the eigenvalue decomposition on this matrix.  Thus, let $\mathbf{R}$ represent this correlation matrix, the eigenvalue decomposition can be written using, 
+$$
+\mathbf{R} = \boldsymbol{\Psi}\boldsymbol{\Omega}\boldsymbol{\Psi}',
+$$
+where the $n$ columns of $\boldsymbol{\Psi}$ make up the eigenvectors and the diagonal matrix $\boldsymbol{\Omega}$ contains the eigenvalues.  We use the first eigenvectors (indicated in the package as `n.spatial.bases` for the mean, linear, and seasonal processes, or `n.load.bases` for the loadings) as the bases matrix of spatial bases, $\mathbf{B}$, and a scaled version of the corresponding submatrix of $\boldsymbol{\Omega}$, denoted by $\boldsymbol{\dot{\Omega}}$, as the prior covariance of the estimated coefficients.  Note that $\mathbf{R} \approx \mathbf{B}\boldsymbol{\dot{\Omega}}\mathbf{B}'$. Thus, for any spatially-dependent parameter, denoted generally by $\boldsymbol{\theta}$, we model,
+$$
+\boldsymbol{\theta} \sim \mathcal{N}(\mathbf{B}\boldsymbol{\alpha}_\theta, \tau^2_\theta\mathbf{I}),
+$$
+with prior distribution, 
+$$
+\boldsymbol{\alpha}_\theta \sim \mathcal{N}(\mathbf{0}, a\,\boldsymbol{\dot{\Omega}}).
+$$
+To estimate the spatial process at an unobserved location, we need to determine the appropriate values of the eigen bases for the new locations. Let $\mathbf{R}^{[adj]}$ represent the exponential correlation matrix of all observed and unobserved locations for interpolation, such that
+$$
+\mathbf{R}^{[adj]} = \left[ \begin{matrix} \mathbf{R} & \mathbf{R}_{(obs,new)}\\ \mathbf{R}_{(obs,new)}' & \mathbf{R}_{(new)} \end{matrix} \right],
+$$
+where $\mathbf{R}_{(obs,new)}$ represents the correlation matrix specifically between the observed and new locations and $\mathbf{R}_{(new)}$ represents the correlation matrix specific to the new locations.  Note that taking the eigenvalue decomposition of this adjusted correlation matrix will *not* result in correct basis values for the new locations.  Instead, we can scale $\mathbf{R}_{(obs,new)}$ by the original $\mathbf{B}$ and $\boldsymbol{\dot{\Omega}}$.  Specifically, 
+$$
+\mathbf{B}_{(new)} = \mathbf{R}_{(obs,new)}'\,\mathbf{B}\,\boldsymbol{\dot{\Omega}}.
+$$
+Thus, values of the spatial parameter at the new location(s), $\mathbf{s}_{(new)}$, can be estimated using $\theta(\mathbf{s}_{(new)}) \sim \mathcal{N}(\mathbf{B}_{(new)}\boldsymbol{\alpha}_\theta, \tau^2_\theta\mathbf{I})$.
+
+
+
+
+### Fourier Basis Functions {#subsubsec-fourier}
 
 We use Fourier bases because of their connection to Gaussian processes and their computational flexibility. A Gaussian process can be approximated quite well with orthogonal spectral basis functions [@wikle2002spatial]. One example is to use some number of principal components of the spatial covariance matrix. These spectral basis functions can themselves be represented as a sum of sine and cosine functions [@paciorek2007fourier] reminiscent of a trigonometric Fourier series. Fourier bases, then, can capture the frequencies exhibited in the principal components of the underlying Gaussian process, granting a smooth approximation of the process.
 
@@ -559,12 +594,12 @@ Q^T_{r+1}(t) = \cos\left(2\pi \frac{r+1}{2} \frac{t}{f_t}\right),
 $$
 where $f_t$ is the frequency of the Fourier function. 
 
-For the spatial basis functions, we must accommodate the two-dimensional nature of space.  Thus, we multiply the sine and cosine functions for each dimension [@paciorek2007fourier]. Let $Q^S_r(\mathbf{s})$ and $Q^S_{r+1}(\mathbf{s})$ be the $r^{\text{th}}$ and $(r+1)^{\text{th}}$ columns of the matrix of bases evaluated at location $\mathbf{s}$ for $r = 1, 3, 5, \dots R_s$.  Then,
+For the spatial basis functions, we must accommodate the two-dimensional nature of space.  Thus, we must multiply the sine and cosine functions for each dimension [@paciorek2007fourier]. Let $\mathbf{B}_r(\mathbf{s})$ represent the $r^{\text{th}}$ through $(r+3)^{\text{th}}$ columns of the matrix of bases evaluated at location $\mathbf{s}$.  Then,
 $$
-    Q^S_r(\mathbf{s}) = \sin\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[1]}}{f_{\mathbf{s}_{[1]}}}\right)  \times \sin\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[2]}}{f_{\mathbf{s}_{[2]}}}\right),
-$$
-$$
-    Q^S_{r+1}(\mathbf{s}) = \cos\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[1]}}{f_{\mathbf{s}_{[1]}}}\right)  \times \cos\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[2]}}{f_{\mathbf{s}_{[2]}}}\right),
+    \mathbf{B}_r(\mathbf{s}) = \left[ \begin{matrix} \sin\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[1]}}{f_{\mathbf{s}_{[1]}}}\right)  \times \sin\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[2]}}{f_{\mathbf{s}_{[2]}}}\right) \\
+    \sin\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[1]}}{f_{\mathbf{s}_{[1]}}}\right) \times \cos\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[2]}}{f_{\mathbf{s}_{[2]}}}\right)\\
+    \cos\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[1]}}{f_{\mathbf{s}_{[1]}}}\right)  \times \sin\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[2]}}{f_{\mathbf{s}_{[2]}}}\right)\\
+    \cos\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[1]}}{f_{\mathbf{s}_{[1]}}}\right)  \times \cos\left(2\pi \frac{r+1}{2} \frac{\mathbf{s}_{[2]}}{f_{\mathbf{s}_{[2]}}}\right) \end{matrix}\right] ',
 $$
 where $\mathbf{s}_{[1]}$ represents the first coordinate of $\mathbf{s}$ (e.g., longitude), and $\mathbf{s}_{[2]}$ the second coordinate (e.g., latitude),  and $f_{\mathbf{s}_{[1]}}$ and $f_{\mathbf{s}_{[2]}}$ are the corresponding frequencies of the Fourier functions.
 
@@ -587,7 +622,9 @@ $$
 $$
     \mathbf{\tilde{\Lambda}} \sim N\left(( \mathbf{Q^S} \otimes \mathbf{I}_L)\mathbf{\alpha}_{\Lambda}, \tau_{\Lambda}^2 \mathbf{I}_{Ln} \right),
 $$
-where $\mathbf{Q^T}$ is a $T \times (R_t+1)$ matrix of temporal bases, $\mathbf{Q^S}$ is a $n \times (R_s+1)$ matrix of spatial bases, $\mathbf{I}_L$ is the $L\times L$ identity matrix, $\mathbf{\alpha}_F$ is an $(R_t+1)L\times 1$ vector of coefficients, $\mathbf{\alpha}_\Lambda$ is an $L(R_s+1)\times 1$ vector of coefficients, and $\tau_{\Lambda}^2$ is the residual variance for the loadings.
+where $\mathbf{Q^T}$ is a $T \times (R_t+1)$ matrix of temporal bases, $\mathbf{Q^S}$ is an $n \times (R_s+1)$ matrix of spatial bases, $\mathbf{I}_L$ is the $L\times L$ identity matrix, $\mathbf{\alpha}_F$ is an $(R_t+1)L\times 1$ vector of coefficients, $\mathbf{\alpha}_\Lambda$ is an $L(R_s+1)\times 1$ vector of coefficients, and $\tau_{\Lambda}^2$ is the residual variance for the loadings.
+
+A word about notation: the `BSTFA` function allows the spatial bases for the mean, linear, and seasonal components to be different from the spatial bases used for the loadings.  Thus, the notation for the spatial bases for the loadings are distinguished here using $Q^S$, although they are determined the same as $\mathbf{B}$.  
 
 Both sets of coefficients are modeled \emph{a priori} in the same way as $\mathbf{\alpha}_\beta$ and $\mathbf{\alpha}_{\xi_j}$, namely,
 $$
@@ -612,8 +649,8 @@ kable(
       "Number of basis functions to use for the linear and seasonal components. For Fourier bases, this value is $R_s$. For bisquare bases, this value is ignored. For thin-plate spline bases, the number of bases is \\texttt{floor(sqrt(n.spatial.bases))\\^2} to create an even grid.", 
       "The same as \\texttt{spatial.style} but for the factor loadings.  This does not have to be the same bases as \\texttt{spatial.style}.", 
       "The same as \\texttt{n.spatial.bases} but for the factor loadings.  This does not have to be the same vvalue as \\texttt{n.spatial.bases}.",
-      "Frequency of the Fourier basis function for longitude (or, if using other coordinate system, the first coordinate value). This value is $f_{s_{[1]}}$. Default value is four times the range of the longitude coordinates. If not using Fourier bases, this argument is not used.", 
-      "Same as \\texttt{freq.lon} but for latitude (or the second coordinate value).", 
+      "Spatial range parameter for the eigenvalue bases ($\\phi$).  For the Fourier bases, this is the frequency for longitude ($f_{s_{[1]}}$; or, if using other coordinate system, the first coordinate value). Default value is two times the range of the longitude coordinates. If not using \\texttt{'eigen'} or \\texttt{'fourier'}, this argument is not used.", 
+      "Same as \\texttt{freq.lon} for the Fourier bases but for latitude (or the second coordinate value).", 
       "Number of Fourier basis functions to use for the temporally-dependent factors. This value is $R_t$. The default value is \\texttt{floor(n.times/10)}.", 
       "Frequency of the Fourier bases functions for the temporally-dependent factors. This value is $f_t$. Default value is $T$ (\\texttt{n.times}).",
       "The number of resolutions when using the bisquare basis functions. If not using bisquare bases, this argument is not used.",
@@ -677,7 +714,7 @@ m
 ```
 
 
-Because Wendover is the first fixed loading location (western-most red dot in Figure \@ref(fig:fig-dataplot)), the map of estimates for the first loading indicate the strength of the relationship of each location's temperatures to Wendover's temperatures, after accounting for linear and seasonal behavior. Higher loading values indicate greater similarity. We can use the `map_spatial_param` to plot the estimated loadings across a grid over the observed locations by using `parameter='loading'` and `loading=1` (for the first loading). 
+Because Ibapah is the first fixed loading location (western-most red dot in Figure \@ref(fig:fig-dataplot)), the map of estimates for the first loading indicate the strength of the relationship of each location's temperatures to Ibapah's temperatures, after accounting for linear and seasonal behavior. Higher loading values indicate greater similarity. We can use the `map_spatial_param` to plot the estimated loadings across a grid over the observed locations by using `parameter='loading'` and `loading=1` (for the first loading). 
 
 ## Basis Function Details
 
@@ -774,7 +811,7 @@ loo::waic(loglik)
 loo::loo(loglik)
 ```
 
-Table \@ref(tab:tab-waic) compares the WAIC and LOO-CV for 12 different models fit to the Utah data. In each instance, the number of spatial bases is the same for both the linear/seasonal components and the factor analysis component -- that is, `n.spatial.bases` = `n.load.bases`. The number of temporal bases is the `n.temp.bases` argument; 126 is the default for the Utah data (10\% of $T$). 
+Table \@ref(tab:tab-waic) compares the WAIC and LOO-CV for 12 different models fit to the full Utah temperature data. In each instance, the number of spatial bases is the same for both the linear/seasonal components and the factor analysis component -- that is, `n.spatial.bases` = `n.load.bases`. The number of temporal bases is the `n.temp.bases` argument; 126 is the default for the Utah data (10\% of $T$). 
 
 ```{r tab-waic, results='asis', label="tab-waic", echo=FALSE}
 kable(
@@ -820,7 +857,7 @@ The other available helper function is `convergence_diag`. This function takes a
 ```{r, eval=FALSE}
 convergence_diag(out.sm,
                   type='geweke',
-                  cutoff = 1.96)
+                  cutoff = 2)
 ```
 
 We encourage the user to read additional resources on MCMC and convergence, such as @johnson2022bayes for introductory readers or @gelman2013bayesian for more advanced readers.

@@ -19,7 +19,7 @@ data(out.sm)
 #Code used to obtain this output
 data("utahDataList")
 attach(utahDataList)
-dates.ind <- 1191:1251
+dates.ind <- 1151:1251
 locs.use <- c(3, 8, 11, 16, 17,
               20, 23, 29, 30, 46,
               47, 49, 60, 62, 66, 73,
@@ -30,16 +30,16 @@ temps.sm <- TemperatureVals[dates.ind, locs.use]
 coords.sm <- Coords[locs.use,]
 dates.sm <- Dates[dates.ind]
 locsm.names <- Locations[locs.use]
-set.seed(481)
+set.seed(466)
 out.sm <- BSTFA(ymat=temps.sm, 
-              dates=dates.sm, 
-              coords=coords.sm, 
-              iters=200000,  
-              thin=913, 
-              save.missing=FALSE, 
-              factors.fixed=c(34, 22, 15, 20), 
-              n.load.bases=4,
-              n.spatial.bases=4)
+                dates=dates.sm, 
+                coords=coords.sm, 
+                iters=5000, 
+                burn=1000,
+                thin=40, 
+                factors.fixed=c(14, 22, 15, 20), 
+                n.temp.bases=45, 
+                save.missing=FALSE)
 }
 }
 \keyword{datasets}
