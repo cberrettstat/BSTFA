@@ -772,12 +772,13 @@ BSTFA <- function(ymat, dates, coords,
         alphaS.var <- solve(Matrix::t(QsI)%*%Matrix::t(IFmat)%*%precision%*%IFmat%*%QsI + kronecker(A.lambda.prec, Matrix::Diagonal(x=1, n=n.factors)))
         alphaS.mean <- as.numeric(alphaS.var%*%Matrix::t(QsI)%*%Matrix::t(IFmat)%*%precision%*%temp)
         alphaS <- my_mvrnorm(alphaS.mean, alphaS.var)
+        rm(list=c("precision"))
       }else{
         alphaS.var <- solve((1/tau2.lambda)*QstQsI + kronecker(A.lambda.prec, Matrix::Diagonal(x=1, n=n.factors))) #Matrix::Diagonal(x=alpha.prec, n=n.factors*n.load.bases))
         alphaS.mean <- alphaS.var%*%((1/tau2.lambda)*matrixcalc::vec(t(Lambda.tilde)%*%QS))
         alphaS <- my_mvrnorm(alphaS.mean, alphaS.var)
       }
-      rm(list=c("precision", "alphaS.var", "alphaS.mean"))
+      rm(list=c("alphaS.var", "alphaS.mean"))
 
       ### Sample tau2.lambda
       tau2.shape = tau2.gamma + length(Lambda.tilde)/2
