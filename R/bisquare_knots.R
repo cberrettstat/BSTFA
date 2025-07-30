@@ -56,7 +56,7 @@ bisquare1d <- function(locs, knots){
 #' @param max.knot.dist Maximum distance between an observation and a knot.  Default is \code{mean(dist(coords))}.
 #' @param x Optional matrix of covariates to include in the model.
 #' @param premade.knots Optional list of length \code{knot.levels} each list item containing pre-chosen knots for that level.
-#' @param plot.knots Logical scalar indicating whether or not to plot the knots.  Default is \code{TRUE}.
+#' @param plot.knots Logical scalar indicating whether or not to plot the knots.  Default is \code{FALSE}.
 #' @param regions Logical scalar indicating if the space should be divided into multiresolution regions. Default is \code{FALSE}.
 #' @importFrom stats dist
 #' @returns A matrix containing all the multiresolution bisquare bases evaluated at the input coordinates.
@@ -64,7 +64,7 @@ bisquare1d <- function(locs, knots){
 #' @export makeNewS
 makeNewS <- function(coords, n.locations, knot.levels=2,
                      max.knot.dist=mean(dist(coords)), x=NULL, premade.knots=NULL,
-                     plot.knots=TRUE, regions=FALSE) {
+                     plot.knots=FALSE, regions=FALSE) {
 
   if (is.matrix(coords) | is.data.frame(coords)) {
     if (dim(coords)[2]>1) dist.bisquare='D2'

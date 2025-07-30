@@ -807,8 +807,8 @@ There are few ways to decide which spatial basis functions to use for your data.
 ```{r, eval=FALSE}
 loglik = computeLogLik(out.sm,
                        verbose=FALSE)
-loo::waic(loglik)
-loo::loo(loglik)
+loo::waic(t(loglik))
+loo::loo(t(loglik))
 ```
 
 Table \@ref(tab:tab-waic) compares the WAIC and LOO-CV for 12 different models fit to the full Utah temperature data. In each instance, the number of spatial bases is the same for both the linear/seasonal components and the factor analysis component -- that is, `n.spatial.bases` = `n.load.bases`. The number of temporal bases is the `n.temp.bases` argument; 126 is the default for the Utah data (10\% of $T$). 

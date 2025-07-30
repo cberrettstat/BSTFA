@@ -45,7 +45,7 @@
 #' @param verbose Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10% of the MCMC process is completed.
 #' @param save.missing Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.
 #' @param save.time Logical scalar indicating whether to save the computation time for each MCMC iteration.  Default value is \code{FALSE}.  When \code{FALSE}, the function \code{compute_summary()} will not be useful.
-#' @param marginalize Logical scalar indicating whether to sample hyper-coefficients by marginalizing out the corresponding parameters.  Default value is \code{TRUE}.
+#' @param marginalize Logical scalar indicating whether to sample hyper-coefficients by marginalizing out the corresponding parameters.  Default value is \code{FALSE}.  Setting to \code{TRUE} will be slower but can improve effective sample sizes.
 #' @importFrom matrixcalc vec
 #' @importFrom mgcv cSplineDes
 #' @importFrom coda as.mcmc
@@ -122,8 +122,8 @@ BSTFA <- function(ymat, dates, coords,
                  alpha.prec=1/100000, tau2.gamma=2, tau2.phi=0.0000001, sig2.gamma=2, sig2.phi=1e-5,
                  sig2=NULL, beta=NULL, xi=NULL,
                  Fmat=matrix(0,nrow=n.times,ncol=n.factors), Lambda=matrix(0,nrow=n.locs, n.factors),
-                 thin=1, burn=iters*0.5, verbose=TRUE, save.missing=TRUE, save.time=FALSE, 
-                 marginalize=TRUE) {
+                 thin=1, burn=floor(iters*0.5), verbose=TRUE, save.missing=TRUE, save.time=FALSE, 
+                 marginalize=FALSE) {
 
   
   start <- Sys.time()
@@ -527,10 +527,10 @@ BSTFA <- function(ymat, dates, coords,
     Lambda.tilde = Lambda
     Lambda.tilde[factors.fixed,] = diag(n.factors)
 
-    # if (plot.factors) {
-    #   plot(coords, xlab='Longitude', ylab='Latitude', main='Fixed Factor Locations')
-    #   points(coords[factors.fixed,], col='red', cex=2, pch=19)
-    # }
+   if (plot.factors) {
+       plot(coords[,1], coords[,2], xlab='Longitude', ylab='Latitude', main='Fixed Factor Locations')
+       points(coords[factors.fixed,1],coords[factors.fixed,2], col='red', cex=1.5, pch=19)
+     }
   }
 
   delayFA = min(floor(burn/2), 500)

@@ -44,11 +44,11 @@ BSTFA(
   Fmat = matrix(0, nrow = n.times, ncol = n.factors),
   Lambda = matrix(0, nrow = n.locs, n.factors),
   thin = 1,
-  burn = iters * 0.5,
+  burn = floor(iters * 0.5),
   verbose = TRUE,
   save.missing = TRUE,
   save.time = FALSE,
-  marginalize = TRUE
+  marginalize = FALSE
 )
 }
 \arguments{
@@ -136,7 +136,7 @@ BSTFA(
 
 \item{save.time}{Logical scalar indicating whether to save the computation time for each MCMC iteration.  Default value is \code{FALSE}.  When \code{FALSE}, the function \code{compute_summary()} will not be useful.}
 
-\item{marginalize}{Logical scalar indicating whether to sample hyper-coefficients by marginalizing out the corresponding parameters.  Default value is \code{TRUE}.}
+\item{marginalize}{Logical scalar indicating whether to sample hyper-coefficients by marginalizing out the corresponding parameters.  Default value is \code{FALSE}.  Setting to \code{TRUE} will be slower but can improve effective sample sizes.}
 }
 \value{
 A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):

@@ -365,7 +365,7 @@ plot_location = function(out, location, new_x=NULL,
 
   
   oldpar <- par(no.readonly=TRUE)
-  on.exit(par(oldpar))
+  on.exit(par(mfrow=oldpar$mfrow))
   
   par(mfrow=par.mfrow)
 

@@ -11,7 +11,7 @@ makeNewS(
   max.knot.dist = mean(dist(coords)),
   x = NULL,
   premade.knots = NULL,
-  plot.knots = TRUE,
+  plot.knots = FALSE,
   regions = FALSE
 )
 }
@@ -28,7 +28,7 @@ makeNewS(
 
 \item{premade.knots}{Optional list of length \code{knot.levels} each list item containing pre-chosen knots for that level.}
 
-\item{plot.knots}{Logical scalar indicating whether or not to plot the knots.  Default is \code{TRUE}.}
+\item{plot.knots}{Logical scalar indicating whether or not to plot the knots.  Default is \code{FALSE}.}
 
 \item{regions}{Logical scalar indicating if the space should be divided into multiresolution regions. Default is \code{FALSE}.}
 }

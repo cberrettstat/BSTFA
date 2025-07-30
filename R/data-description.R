@@ -1,6 +1,6 @@
 #' Utah Minimum Temperatures
 #'
-#' Zero-centered daily minimum temperatures averaged across 30-day windows from 1919 to 2014 across the US state of Utah; also includes dates, coordinates, and station names.
+#' Zero-centered daily minimum temperatures averaged across 30-day windows from 1919 to 2014 across the US state of Utah; also includes dates, coordinates, and station names. Originally collected from the Utah Climate Center.
 #'
 #' @format A data set with 4 variables:
 #' \describe{
