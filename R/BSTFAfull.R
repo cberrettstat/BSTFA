@@ -100,23 +100,13 @@
 #' }
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' #Very small example to check functional capability.
-#' 
-#' #load the data
 #' data(utahDataList)
 #' attach(utahDataList)
-#' 
-#' #identify locations with very little missing data just for this example
 #' low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02) 
-#' 
-#' #fit model to small subset of data
 #' out <- BSTFAfull(ymat=TemperatureVals[1:50,low.miss], 
 #'        dates=Dates[1:50], 
 #'        coords=Coords[low.miss,], 
 #'        n.factors=2, iters=10)
-#'        
-#' # More full example that will take several hours to run
-#' # out <- BSTFAfull(TemperatureVals, Dates, Coords)
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                      mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,

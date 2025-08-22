@@ -16,10 +16,8 @@ Prints the computation time per iteration for each parameter.
 Print computation summary
 }
 \examples{
-#Very small example to illustrate use and ensure functionality
 data(utahDataList)
 attach(utahDataList)
-#identify locations with very little missing data just for this example
 low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02)
 out <- BSTFA(ymat=TemperatureVals[1:50,low.miss],
   dates=Dates[1:50],

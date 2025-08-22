@@ -202,23 +202,13 @@ A list containing the following elements (any elements that are the same as in t
 This function uses MCMC to draw from posterior distributions of a Bayesian spatio-temporal factor analysis model.  The spatial processes for the mean, linear, and seasonal behavior use one of Fourier, thin plate spline, or multiresolution basis functions.  The temporal dependence of the factors is modeled using a vector autoregressive model.  The spatially-dependent loadings are modeled using a mean-zero Gaussian process with an exponential covariance structure.  The default values are chosen to work well for many data sets.  Thus, it is possible to use this function using only three arguments: \code{ymat}, \code{dates}, and \code{coords}.  The default number of MCMC iterations is 10000 (saving 5000); however, depending on the number of observations and processes modeled, it may need more draws than this to ensure the posterior draws are representative of the entire posterior distribution space.
 }
 \examples{
-#Very small example to check functional capability.
-
-#load the data
 data(utahDataList)
 attach(utahDataList)
-
-#identify locations with very little missing data just for this example
 low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02) 
-
-#fit model to small subset of data
 out <- BSTFAfull(ymat=TemperatureVals[1:50,low.miss], 
        dates=Dates[1:50], 
        coords=Coords[low.miss,], 
        n.factors=2, iters=10)
-       
-# More full example that will take several hours to run
-# out <- BSTFAfull(TemperatureVals, Dates, Coords)
 }
 \author{
 Candace Berrett and Adam Simpson

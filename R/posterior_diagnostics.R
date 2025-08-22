@@ -38,10 +38,8 @@ plot_trace = function(out, parameter, param.range=NULL,
 #' @returns Prints the computation time per iteration for each parameter.
 #' @author Adam Simpson
 #' @examples
-#' #Very small example to illustrate use and ensure functionality
 #' data(utahDataList)
 #' attach(utahDataList)
-#' #identify locations with very little missing data just for this example
 #' low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02)
 #' out <- BSTFA(ymat=TemperatureVals[1:50,low.miss],
 #'   dates=Dates[1:50],
@@ -135,7 +133,6 @@ convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,1.96)
 #' data(out.sm)
 #' attach(out.sm)
 #' loglik <- computeLogLik(out.sm, addthin=2)
-#' #can then use to compute likelihood-based model measures such as looic and waic
 #' @export computeLogLik
 computeLogLik <- function(out, verbose=FALSE, addthin=1) {
   y = out$y
