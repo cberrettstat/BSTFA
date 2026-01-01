@@ -143,7 +143,7 @@ computeLogLik <- function(out, verbose=FALSE, addthin=1) {
                           ncol=length(myseq))
   if (verbose) cat('Starting Log-likelihood calculation \n')
   for (d in 1:length(myseq)) {
-      log_lik[,d] = dnorm(y,mu[,myseq[d]],sd=out$sig2[myseq[d]],log=TRUE)
+      log_lik[,d] = dnorm(y,mu[,myseq[d]],sd=sqrt(out$sig2[myseq[d]]),log=TRUE)
     if (verbose & (d %% floor(length(myseq)*.1) == 0)){ cat(paste('Draw', d, '\n')) }
   }
   log_lik

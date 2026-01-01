@@ -334,7 +334,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' plot_location(out.sm, location=1, pred.int=FALSE)
 #' @export plot_location
 plot_location = function(out, location, new_x=NULL,
-                         type='mean', par.mfrow=c(1,1), pred.int=FALSE,
+                         type='mean', par.mfrow=NULL, pred.int=FALSE,
                          ci.level = c(0.025, 0.975),
                          uncertainty=TRUE, xrange=NULL, truth=FALSE,
                          ylim=NULL) {
@@ -363,11 +363,12 @@ plot_location = function(out, location, new_x=NULL,
   if (is.null(xrange)) xlims=1:out$n.times
   else xlims=which(out$dates > xrange[1] & out$dates < xrange[2])
 
+  if(!is.null(par.mfrow)){
+  	oldpar <- par(no.readonly=TRUE)
+  	on.exit(par(mfrow=oldpar$mfrow))
   
-  oldpar <- par(no.readonly=TRUE)
-  on.exit(par(mfrow=oldpar$mfrow))
-  
-  par(mfrow=par.mfrow)
+  	par(mfrow=par.mfrow)
+  }
 
   for (i in 1:n.col) {
     if (is.null(ylim)) {
@@ -474,7 +475,7 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
       scale_colour_gradientn(colors=color.gradient,
                              name='Slope', limits = c(min_value, max_value))
     print(myp)
-    invisible(myp)
+    return(myp)
   }
   if (parameter == 'loading') {
     for (i in loadings) {
@@ -494,7 +495,7 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
         guides(color = guide_colorbar(order = 1),
                shape = guide_legend(order = 2))
       print(mm)
-      invisible(mm)
+      return(mm)
     }
   }
 }
@@ -749,7 +750,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
       ggtitle(plot.title) + xlab("Longitude") + ylab("Latitude")
     if (!with.uncertainty){
       print(m)
-      invisible(m)
+      return(m)
     }
     if (with.uncertainty) {
       l <- ggplot(data=predloc, aes(x=.data$Lon, y=.data$Lat, fill=.data$predl)) +
@@ -764,7 +765,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Upper Bound')) + xlab("Longitude") + ylab("Latitude")
       lmu <- ggpubr::ggarrange(l, m, u, nrow=1, common.legend=TRUE, legend="right")
       print(lmu)
-      invisible(lmu)
+      return(lmu)
     }
   }
 
@@ -811,7 +812,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
       ylab('Latitude')
     if(!with.uncertainty){
       print(m)
-      invisible(m)
+      return(m)
       }
 
 
@@ -857,7 +858,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
         ylab('Latitude')
       lmu <- ggpubr::ggarrange(l, m, u, nrow=1, common.legend=TRUE, legend="right")
       print(lmu)
-      invisible(lmu)
+      return(lmu)
     }
   }
 
