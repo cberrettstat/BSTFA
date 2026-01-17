@@ -319,7 +319,6 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' @param location Either a single integer indicating the location in the data set to plot or a vector of length 2 providing the longitude and latitude of the new location.
 #' @param new_x If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.
 #' @param type One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic of the predicted values to return.
-#' @param par.mfrow A vector of length 2 indicating the number of rows and columns to divide the plotting window. Default is \code{c(1,1)}.
 #' @param pred.int Logical scalar indicating whether the interval should be a posterior predictive interval (\code{TRUE}) or a posterior credible interval (\code{FALSE}; default).
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param uncertainty Logical scalar indicating whether to plot the uncertainty bounds (\code{TRUE}; default) or not.
@@ -334,7 +333,7 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' plot_location(out.sm, location=1, pred.int=FALSE)
 #' @export plot_location
 plot_location = function(out, location, new_x=NULL,
-                         type='mean', par.mfrow=NULL, pred.int=FALSE,
+                         type='mean', pred.int=FALSE,
                          ci.level = c(0.025, 0.975),
                          uncertainty=TRUE, xrange=NULL, truth=FALSE,
                          ylim=NULL) {
@@ -362,13 +361,6 @@ plot_location = function(out, location, new_x=NULL,
 
   if (is.null(xrange)) xlims=1:out$n.times
   else xlims=which(out$dates > xrange[1] & out$dates < xrange[2])
-
-  if(!is.null(par.mfrow)){
-  	oldpar <- par(no.readonly=TRUE)
-  	on.exit(par(mfrow=oldpar$mfrow))
-  
-  	par(mfrow=par.mfrow)
-  }
 
   for (i in 1:n.col) {
     if (is.null(ylim)) {
@@ -428,6 +420,7 @@ plot_location = function(out, location, new_x=NULL,
 #' @param yearscale If \code{parameter='slope'}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param color.gradient The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)}.
+#' @param collims Numeric vector of length 2 providing the lower and upper limits for the color scale. If \code{NULL} (default), the limits are set to be symmetric around zero based on the maximum absolute value of the parameter being plotted.
 #' @returns A plot of spatially-dependent parameter values for the observed locations.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
@@ -438,7 +431,7 @@ plot_location = function(out, location, new_x=NULL,
 #' @importFrom RColorBrewer brewer.pal
 #' @export plot_spatial_param
 plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=c(0.025, 0.975), yearscale=TRUE,
-                     color.gradient=grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)) {
+                     color.gradient=grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50), collims=NULL) {
 
   if (parameter=='slope') {
     if (type=='mean') vals = apply(out$beta,2,mean)
@@ -461,8 +454,13 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
     vals <- vals*365.25/(out$doy[2] - out$doy[1])
   }
 
-  max_value = max(abs(min(vals)),abs(max(vals)))
-  min_value = -max_value
+  if(is.null(collims)){
+    max_value = max(abs(min(vals)),abs(max(vals)))
+    min_value = -max_value
+  }else{
+    max_value=collims[2]
+    min_value=collims[1]
+  }
 
   if (parameter == 'slope' | parameter == 'mean') {
     myp <- ggplot(mapping=aes(x=out$coords[,1], y=out$coords[,2],
@@ -516,6 +514,7 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
 #' @param state Logical scalar used when \code{map=TRUE} indicating whether the \code{location} is a state in the United States (\code{TRUE}) or a country (\code{FALSE}).
 #' @param location Name of region to include in the map.  Fed to \code{region} in the function \code{ggplot2::map_data}.
 #' @param addthin Integer indicating the number of saved draws to thin.  Default is to not thin any \code{addthin=1}.  This can save time when the object is from \code{BSTFAfull} and \code{parameter='loading'}.
+#' @param collims Numeric vector of length 2 providing the lower and upper limits for the color scale. If \code{NULL} (default), the limits are set to be symmetric around zero based on the maximum absolute value of the parameter being plotted.
 #' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
@@ -535,7 +534,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
                     ci.level=c(0.025, 0.975), fine=100,
                     color.gradient=grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(fine),
                     with.uncertainty=FALSE, map=FALSE, state=FALSE, location=NULL,
-                    addthin=1) {
+                    addthin=1, collims=NULL) {
 
   if (map) {
     if (!requireNamespace("maps", quietly = TRUE)) {
@@ -732,14 +731,24 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
     plot.title = paste0((ci.level[2] - ci.level[1])*100, "% Upper Bound")
   }
   if (!with.uncertainty) {
-    max_value = max(abs(min(predloc$predm)),abs(max(predloc$predm)))
-    min_value = -max_value
+    if(is.null(collims)){
+      max_value = max(abs(min(predloc$predm)),abs(max(predloc$predm)))
+      min_value = -max_value
+    }else{
+      max_value=collims[2]
+      min_value=collims[1]
+    }
   }
   if (with.uncertainty) {
     predloc$predl <- apply(pred, 1, quantile, prob=ci.level[1])
     predloc$predu <- apply(pred, 1, quantile, prob=ci.level[2])
-    max_value = max(abs(min(predloc$predl)),abs(max(predloc$predl)), abs(min(predloc$predu)),abs(max(predloc$predu)))
-    min_value = -max_value
+    if(is.null(collims)){
+      max_value = max(abs(min(predloc$predl)),abs(max(predloc$predl)), abs(min(predloc$predu)),abs(max(predloc$predu)))
+      min_value = -max_value
+    }else{
+      max_value=collims[2]
+      min_value=collims[1]      
+    }
   }
 
   if (!map) {
@@ -783,12 +792,17 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
     }
 
     predloc.inside = predloc[inside, ]
-    if (!with.uncertainty) {
+    if(is.null(collims)){
+      if (!with.uncertainty) {
       max_value = max(abs(min(predloc.inside$predm)),abs(max(predloc.inside$predm)))
       min_value = -max_value
-    } else{
+      } else{
       max_value = max(abs(min(predloc.inside$predl)),abs(max(predloc.inside$predl)), abs(min(predloc.inside$predu)),abs(max(predloc.inside$predu)))
       min_value = -max_value
+      }
+    }else{
+      max_value = collims[2]
+      min_value = collims[1]
     }
 
     m = ggplot() +
