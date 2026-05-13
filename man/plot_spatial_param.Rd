@@ -12,7 +12,9 @@ plot_spatial_param(
   ci.level = c(0.025, 0.975),
   yearscale = TRUE,
   color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =
-    "RdBu"))))(50)
+    "RdBu"))))(50),
+  collims = NULL,
+  plotmap = TRUE
 )
 }
 \arguments{
@@ -29,6 +31,10 @@ plot_spatial_param(
 \item{yearscale}{If \code{parameter='slope'}, a logical scalar indicating whether to translate it to a yearly scale (\code{TRUE}; default).}
 
 \item{color.gradient}{The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)}.}
+
+\item{collims}{Numeric vector of length 2 providing the lower and upper limits for the color scale. If \code{NULL} (default), the limits are set to be symmetric around zero based on the maximum absolute value of the parameter being plotted.}
+
+\item{plotmap}{Logical scalar indicating whether to plot the resulting map or not.  Default is \code{TRUE}.}
 }
 \value{
 A plot of spatially-dependent parameter values for the observed locations.

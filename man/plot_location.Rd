@@ -9,7 +9,6 @@ plot_location(
   location,
   new_x = NULL,
   type = "mean",
-  par.mfrow = c(1, 1),
   pred.int = FALSE,
   ci.level = c(0.025, 0.975),
   uncertainty = TRUE,
@@ -26,8 +25,6 @@ plot_location(
 \item{new_x}{If the original model included covariates \code{x}, include the same covariates for prediction \code{location}.}
 
 \item{type}{One of \code{mean} (default), \code{median}, \code{ub}, or \code{lb} indicating which summary statistic of the predicted values to return.}
-
-\item{par.mfrow}{A vector of length 2 indicating the number of rows and columns to divide the plotting window. Default is \code{c(1,1)}.}
 
 \item{pred.int}{Logical scalar indicating whether the interval should be a posterior predictive interval (\code{TRUE}) or a posterior credible interval (\code{FALSE}; default).}
 

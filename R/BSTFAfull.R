@@ -171,6 +171,8 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
     newS = newS.output[[1]]
     knots.vec.save = newS.output[[2]]
+  }else{
+    knots.vec.save = NULL
   }
   if (spatial.style=='fourier') {
     if (sqrt(n.spatial.bases)%%1 != 0 | n.spatial.bases%%2 != 0) {

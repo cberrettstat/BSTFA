@@ -421,6 +421,7 @@ plot_location = function(out, location, new_x=NULL,
 #' @param ci.level If \code{type='lb'} or \code{'ub'}, the percentiles for the posterior interval.
 #' @param color.gradient The color palette to use for the plot.  Default is \code{colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50)}.
 #' @param collims Numeric vector of length 2 providing the lower and upper limits for the color scale. If \code{NULL} (default), the limits are set to be symmetric around zero based on the maximum absolute value of the parameter being plotted.
+#' @param plotmap Logical scalar indicating whether to plot the resulting map or not.  Default is \code{TRUE}.
 #' @returns A plot of spatially-dependent parameter values for the observed locations.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
@@ -431,7 +432,8 @@ plot_location = function(out, location, new_x=NULL,
 #' @importFrom RColorBrewer brewer.pal
 #' @export plot_spatial_param
 plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=c(0.025, 0.975), yearscale=TRUE,
-                     color.gradient=grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50), collims=NULL) {
+                     color.gradient=grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(50), 
+                     collims=NULL, plotmap=TRUE) {
 
   if (parameter=='slope') {
     if (type=='mean') vals = apply(out$beta,2,mean)
@@ -472,7 +474,7 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
             labs(color = ifelse(parameter=='slope', "Slope", "Mean")) +
       scale_colour_gradientn(colors=color.gradient,
                              name='Slope', limits = c(min_value, max_value))
-    print(myp)
+    if(plotmap){print(myp)}
     return(myp)
   }
   if (parameter == 'loading') {
@@ -492,7 +494,7 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
         scale_shape_manual(name = "", values = c("Fixed Location" = 1)) +  # shape 1 = open circle
         guides(color = guide_colorbar(order = 1),
                shape = guide_legend(order = 2))
-      print(mm)
+      if(plotmap){print(mm)}
       return(mm)
     }
   }
@@ -515,6 +517,7 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
 #' @param location Name of region to include in the map.  Fed to \code{region} in the function \code{ggplot2::map_data}.
 #' @param addthin Integer indicating the number of saved draws to thin.  Default is to not thin any \code{addthin=1}.  This can save time when the object is from \code{BSTFAfull} and \code{parameter='loading'}.
 #' @param collims Numeric vector of length 2 providing the lower and upper limits for the color scale. If \code{NULL} (default), the limits are set to be symmetric around zero based on the maximum absolute value of the parameter being plotted.
+#' @param printmap Logical scalar indicating whether to plot the resulting image.  Default is \code{TRUE}.
 #' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
@@ -534,7 +537,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
                     ci.level=c(0.025, 0.975), fine=100,
                     color.gradient=grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name='RdBu')))(fine),
                     with.uncertainty=FALSE, map=FALSE, state=FALSE, location=NULL,
-                    addthin=1, collims=NULL) {
+                    addthin=1, collims=NULL, printmap=TRUE) {
 
   if (map) {
     if (!requireNamespace("maps", quietly = TRUE)) {
@@ -758,7 +761,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
                              limits = c(min_value, max_value)) +
       ggtitle(plot.title) + xlab("Longitude") + ylab("Latitude")
     if (!with.uncertainty){
-      print(m)
+      if(printmap){print(m)}
       return(m)
     }
     if (with.uncertainty) {
@@ -773,7 +776,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
                                limits = c(min_value, max_value)) +
         ggtitle(paste0((ci.level[2]-ci.level[1])*100,'% Upper Bound')) + xlab("Longitude") + ylab("Latitude")
       lmu <- ggpubr::ggarrange(l, m, u, nrow=1, common.legend=TRUE, legend="right")
-      print(lmu)
+      if(printmap){print(lmu)}
       return(lmu)
     }
   }
@@ -825,7 +828,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
       xlab('Longitude') +
       ylab('Latitude')
     if(!with.uncertainty){
-      print(m)
+      if(printmap){print(m)}
       return(m)
       }
 
@@ -871,7 +874,7 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
         xlab('Longitude') +
         ylab('Latitude')
       lmu <- ggpubr::ggarrange(l, m, u, nrow=1, common.legend=TRUE, legend="right")
-      print(lmu)
+      if(printmap){print(lmu)}
       return(lmu)
     }
   }

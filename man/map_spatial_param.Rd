@@ -19,7 +19,9 @@ map_spatial_param(
   map = FALSE,
   state = FALSE,
   location = NULL,
-  addthin = 1
+  addthin = 1,
+  collims = NULL,
+  printmap = TRUE
 )
 }
 \arguments{
@@ -50,6 +52,10 @@ map_spatial_param(
 \item{location}{Name of region to include in the map.  Fed to \code{region} in the function \code{ggplot2::map_data}.}
 
 \item{addthin}{Integer indicating the number of saved draws to thin.  Default is to not thin any \code{addthin=1}.  This can save time when the object is from \code{BSTFAfull} and \code{parameter='loading'}.}
+
+\item{collims}{Numeric vector of length 2 providing the lower and upper limits for the color scale. If \code{NULL} (default), the limits are set to be symmetric around zero based on the maximum absolute value of the parameter being plotted.}
+
+\item{printmap}{Logical scalar indicating whether to plot the resulting image.  Default is \code{TRUE}.}
 }
 \value{
 A plot of spatially-dependent parameter values for a grid of interpolated locations.
