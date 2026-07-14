@@ -20,7 +20,7 @@ BSTFAfull(
   spatial.style = "grid",
   n.spatial.bases = ceiling(n.locs/2),
   knot.levels = 2,
-  max.knot.dist = n.locs * 0.05,
+  max.knot.dist = mean(dist(coords)),
   premade.knots = NULL,
   plot.knots = FALSE,
   freq.lon = diff(range(coords[, 1])),
@@ -55,6 +55,7 @@ BSTFAfull(
   c.phi.lambda = rep(0.001, n.factors),
   adapt.iter = (burn + 10),
   adapt.epsilon = 1e-20,
+  latlon = FALSE,
   verbose = TRUE,
   save.missing = TRUE,
   save.time = FALSE
@@ -161,6 +162,8 @@ BSTFAfull(
 
 \item{adapt.epsilon}{Numeric scalar indicating the small value to add to the proposal standard deviations when using the adaptive Metropolis random walk algorithms.  Default is \code{1e-20}.}
 
+\item{latlon}{Logical scalar indicating whether to use euclidean distance (\code{FALSE}; default) or great circle distance (\code{TRUE}).}
+
 \item{verbose}{Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10\% of the MCMC process is completed.}
 
 \item{save.missing}{Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.}
@@ -202,13 +205,20 @@ A list containing the following elements (any elements that are the same as in t
 This function uses MCMC to draw from posterior distributions of a Bayesian spatio-temporal factor analysis model.  The spatial processes for the mean, linear, and seasonal behavior use one of Fourier, thin plate spline, or multiresolution basis functions.  The temporal dependence of the factors is modeled using a vector autoregressive model.  The spatially-dependent loadings are modeled using a mean-zero Gaussian process with an exponential covariance structure.  The default values are chosen to work well for many data sets.  Thus, it is possible to use this function using only three arguments: \code{ymat}, \code{dates}, and \code{coords}.  The default number of MCMC iterations is 10000 (saving 5000); however, depending on the number of observations and processes modeled, it may need more draws than this to ensure the posterior draws are representative of the entire posterior distribution space.
 }
 \examples{
-data(utahDataList)
-attach(utahDataList)
-low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02) 
-out <- BSTFAfull(ymat=TemperatureVals[1:50,low.miss], 
-       dates=Dates[1:50], 
-       coords=Coords[low.miss,], 
-       n.factors=2, iters=10)
+set.seed(240)
+ff <- c(
+  22, #west
+  20, #south
+  48, #north
+  14 #east
+)
+out <- BSTFAfull(ymat=out.sm$ymat,
+dates=out.sm$dates,
+coords=out.sm$coords,
+iters=500, 
+spatial.style="eigen",
+save.missing=F, 
+factors.fixed=ff)
 }
 \author{
 Candace Berrett and Adam Simpson

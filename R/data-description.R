@@ -15,35 +15,22 @@
 
 #' Output of BSTFA evaluated on a subset of utahDataList
 #'
-#' List object named \code{out.sm} containing the output from running the BSTFA function provided in the example code below using a subset of the \code{utahDataList}.
+#' 'bstfa' object named \code{out.sm} containing the output from running the BSTFA function on a small simulated data set.
 #'
 #' @format See \code{help(BSTFA)} for details of what is included as output from the BSTFA function.
 #' @examples
-#' data(out.sm)
-#' \donttest{
-#' #Code used to obtain this output
-#' data("utahDataList")
-#' attach(utahDataList)
-#' dates.ind <- 1151:1251
-#' locs.use <- c(3, 8, 11, 16, 17,
-#'               20, 23, 29, 30, 46,
-#'               47, 49, 60, 62, 66, 73,
-#'               75, 76, 77, 78, 85, 89, 94,
-#'               96, 98, 100, 109, 112,
-#'               115, 121, 124, 128, 133, 144)
-#' temps.sm <- TemperatureVals[dates.ind, locs.use]
-#' coords.sm <- Coords[locs.use,]
-#' dates.sm <- Dates[dates.ind]
-#' locsm.names <- Locations[locs.use]
-#' set.seed(466)
-#' out.sm <- BSTFA(ymat=temps.sm, 
-#'                 dates=dates.sm, 
-#'                 coords=coords.sm, 
-#'                 iters=5000, 
-#'                 burn=1000,
-#'                 thin=40, 
-#'                 factors.fixed=c(14, 22, 15, 20), 
-#'                 n.temp.bases=45, 
-#'                 save.missing=FALSE)
-#' }
+#' set.seed(240)
+#' ff <- c(
+#'   22, #west
+#'   20, #south
+#'   48, #north
+#'   14 #east
+#' )
+#' out.sm <- BSTFA(ymat=out.sm$ymat, 
+#' dates=out.sm$dates, 
+#' coords=out.sm$coords, 
+#' iters=500, 
+#' save.missing=F, 
+#' factors.fixed=ff, 
+#' n.temp.bases=22)
 "out.sm"

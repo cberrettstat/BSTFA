@@ -16,6 +16,7 @@
 #' attach(out.sm)
 #' loc1means <- predictBSTFA(out.sm, location=1, pred.int=FALSE)
 #' @importFrom npreg basis.tps
+#' @importFrom geosphere distm
 #' @export predictBSTFA
 predictBSTFA = function(out, location=NULL, type='mean',
                        ci.level = c(0.025, 0.975), new_x=NULL, pred.int=FALSE) {
@@ -126,7 +127,11 @@ predictBSTFA = function(out, location=NULL, type='mean',
     }
     
     if(out$spatial.style=='eigen'){
-      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
+      if(out$latlon){
+        distmat <- geosphere::distm(rbind(out$coords, as.matrix(location)))
+      }else{
+        distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
+      }
       cormat <- exp(-distmat/out$freq.lon)
       predS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec/.001
     }
@@ -222,7 +227,11 @@ predictBSTFA = function(out, location=NULL, type='mean',
         predQS = matrix(npreg::basis.tps(coords_added, knots=out$knots.load, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.load.bases)
       }
       if(out$load.style=='eigen'){
-        distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
+        if(out$latlon){
+          distmat <- geosphere::distm(rbind(out$coords, as.matrix(location)))
+        }else{
+          distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
+        }
         cormat <- exp(-distmat/out$freq.lon)
         predQS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$QS%*%out$model.matrices$A.lambda.prec
       }
@@ -236,7 +245,11 @@ predictBSTFA = function(out, location=NULL, type='mean',
         names(out$coords) <- c("Lon", "Lat")
         npred <- dim(location)[1]
         predloc2 <- rbind(out$coords, as.matrix(location))
-        preddist <- as.matrix(dist(predloc2))
+        if(out$latlon){
+          preddist <- geosphere::distm(predloc2)
+        }else{
+          preddist <- as.matrix(dist(predloc2))
+        }
         condinds <- 1:out$n.locs
         for(thisload in 1:out$n.factors){
           lammean <- matrix(0, nrow=floor(out$draws), ncol=npred)
@@ -528,6 +541,7 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
 #' @importFrom sf st_sfc
 #' @importFrom sf st_polygon
 #' @importFrom sf st_point
+#' @importFrom geosphere distm
 #' @importFrom ggpubr ggarrange
 #' @importFrom RColorBrewer brewer.pal
 #' @import sf
@@ -600,7 +614,11 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
       predS = npreg::basis.tps(predloc,knots=out$knots.load,rk=TRUE)[,-(1:2)]
     }
     if(out$load.style=='eigen'){
-      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(predloc))))
+      if(out$latlon){
+        distmat <- geosphere::distm(rbind(out$coords, as.matrix(predloc)))
+      }else{
+        distmat <- as.matrix(dist(rbind(out$coords, as.matrix(predloc))))
+      }
       cormat <- exp(-distmat/out$freq.lon)
       predS <- cormat[out$n.locs + (1:nrow(predloc)),-(out$n.locs + (1:nrow(predloc)))]%*%out$model.matrices$QS%*%out$model.matrices$A.lambda.prec
     }
@@ -644,7 +662,11 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
       predS = npreg::basis.tps(predloc,knots=out$knots.spatial,rk=TRUE)[,-(1:2)]
     }
     if(out$spatial.style=='eigen'){
-      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(predloc))))
+      if(out$latlon){
+        distmat <- geosphere::distm(rbind(out$coords, as.matrix(predloc)))
+      }else{
+        distmat <- as.matrix(dist(rbind(out$coords, as.matrix(predloc))))
+      }
       cormat <- exp(-distmat/out$freq.lon)
       predS <- cormat[out$n.locs + (1:nrow(predloc)),-(out$n.locs + (1:nrow(predloc)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec/.001
     }
@@ -686,7 +708,11 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
         names(out$coords) <- c("Lon", "Lat")
         npred <- dim(predloc)[1]
         predloc2 <- rbind(out$coords, as.matrix(predloc))
-        preddist <- as.matrix(dist(predloc2))
+        if(out$latlon){
+          preddist <- geosphere::distm(predloc2)
+        }else{
+          preddist <- as.matrix(dist(predloc2))
+        }
         condinds <- 1:out$n.locs
         lammean <- matrix(0, nrow=floor(out$draws/addthin), ncol=npred)
         lamresid <- matrix(0, nrow=floor(out$draws/addthin), ncol=npred)
@@ -968,6 +994,7 @@ plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
 #' attach(out.sm)
 #' plot_annual(out.sm, location=1)
 #' @importFrom mgcv cSplineDes
+#' @importFrom geosphere distm
 #' @export plot_annual
 plot_annual <- function(out, location, add=FALSE,
                         years='one',
@@ -1080,7 +1107,11 @@ plot_annual <- function(out, location, add=FALSE,
       predS = matrix(npreg::basis.tps(coords_added, knots=out$knots.spatial, rk=TRUE)[-(1:nrow(out$coords)),-(1:2)],ncol=out$n.spatial.bases)
     }
     if(out$spatial.style=='eigen'){
-      distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
+      if(out$latlon){
+        distmat <- geosphere::distm(rbind(out$coords, as.matrix(location)))
+      }else{
+        distmat <- as.matrix(dist(rbind(out$coords, as.matrix(location))))
+      }
       cormat <- exp(-distmat/out$freq.lon)
       predS <- cormat[out$n.locs + (1:nrow(location)),-(out$n.locs + (1:nrow(location)))]%*%out$model.matrices$newS[,1:out$n.spatial.bases]%*%out$model.matrices$A.prec/.001
     }

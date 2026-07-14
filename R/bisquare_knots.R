@@ -6,12 +6,17 @@
 #' @param locs Matrix of 2-dimensional coordinates for locations of interest.
 #' @param knots A matrix of 2-dimensional knot coordinates for a given resolution.
 #' @importFrom stats dist
+#' @importFrom geosphere distm
 #' @returns A matrix containing the bisquare bases for a given resolution evaluated at the input locations.
 #' @author Candace Berrett and Adam Simpson
 #' @export bisquare2d
-bisquare2d <- function(locs, knots){ #knots are rows
+bisquare2d <- function(locs, knots, latlon=FALSE){ #knots are rows
   if(dim(knots)[1]>1){
-    knot.width <- min(dist(knots))
+    if(latlon){
+      knot.width <- min(geosphere::distm(knots)[lower.tri(diag(1, nrow(knots)))])
+    }else{
+      knot.width <- min(as.matrix(dist(knots))[lower.tri(diag(1, nrow(knots)))])
+    }
   }else{
     knot.bnds <- expand.grid(c(min(locs[,1]), max(locs[,1])), c(min(locs[,2]), max(locs[,2])))
     knot.width <- min(dist(rbind(knot.bnds, knots)))
@@ -58,13 +63,14 @@ bisquare1d <- function(locs, knots){
 #' @param premade.knots Optional list of length \code{knot.levels} each list item containing pre-chosen knots for that level.
 #' @param plot.knots Logical scalar indicating whether or not to plot the knots.  Default is \code{FALSE}.
 #' @param regions Logical scalar indicating if the space should be divided into multiresolution regions. Default is \code{FALSE}.
+#' @param latlon Logical scalar indicating whether to use euclidean distance (\code{FALSE}; default) or great circle distance (\code{TRUE}).
 #' @importFrom stats dist
 #' @returns A matrix containing all the multiresolution bisquare bases evaluated at the input coordinates.
 #' @author Candace Berrett and Adam Simpson
 #' @export makeNewS
 makeNewS <- function(coords, n.locations, knot.levels=2,
                      max.knot.dist=mean(dist(coords)), x=NULL, premade.knots=NULL,
-                     plot.knots=FALSE, regions=FALSE) {
+                     plot.knots=FALSE, regions=FALSE, latlon=FALSE) {
 
   if (is.matrix(coords) | is.data.frame(coords)) {
     if (dim(coords)[2]>1) dist.bisquare='D2'
@@ -190,7 +196,11 @@ makeNewS <- function(coords, n.locations, knot.levels=2,
       for(jj in 1:knot.levels){
         toofar<-c()
         for(k in 1:nrow(knots.list[[jj]])) {
-          loc.dist <- as.matrix(dist(rbind(c(knots.list[[jj]][k,]), coords)))[-1,1]
+          if(latlon){
+            loc.dist <- geosphere::distm(rbind(c(knots.list[[jj]][k,]), coords))[-1,1]
+          }else{
+            loc.dist <- as.matrix(dist(rbind(c(knots.list[[jj]][k,]), coords)))[-1,1]
+          }
           if(sum(loc.dist<max.knot.dist)>=(n.locations*0.05)){
             toofar[k]<-F
           } else {

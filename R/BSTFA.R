@@ -42,6 +42,7 @@
 #' @param Lambda Numeric matrix of size \code{n.locs} by \code{n.factors} indicating starting values for the loadings.  Default value is to start all loadings at 0.
 #' @param thin Numeric scalar indicating how many MCMC iterations to thin by.  Default value is 1, indicating no thinning.
 #' @param burn Numeric scalar indicating how many MCMC iterations to burn before saving.  Default value is one-half of \code{iters}.
+#' @param latlon Logical scalar indicating whether to use euclidean distance (\code{FALSE}; default) or great circle distance (\code{TRUE}).
 #' @param verbose Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10% of the MCMC process is completed.
 #' @param save.missing Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.
 #' @param save.time Logical scalar indicating whether to save the computation time for each MCMC iteration.  Default value is \code{FALSE}.  When \code{FALSE}, the function \code{compute_summary()} will not be useful.
@@ -53,11 +54,12 @@
 #' @importFrom npreg basis.tps
 #' @importFrom lubridate yday
 #' @importFrom utils combn
+#' @importFrom geosphere distm
 #' @import matrixcalc
 #' @import npreg
 #' @import stats
 #' @import graphics
-#' @returns A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):
+#' @returns A bstfa object containing the following elements (any elements that are the same as in the function input are removed here for brevity):
 #' \describe{
 #'   \item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the values will all be zero.}
 #'   \item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
@@ -89,14 +91,20 @@
 #' }
 #' @author Adam Simpson and Candace Berrett
 #' @examples
-#' data(utahDataList)
-#' attach(utahDataList)
-#' low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02)
-#' out <- BSTFA(ymat=TemperatureVals[1:50,low.miss],
-#'   dates=Dates[1:50],
-#'   coords=Coords[low.miss,],
-#'   n.factors=2,
-#'   iters=10)
+#' set.seed(240)
+#' ff <- c(
+#'   22, #west
+#'   20, #south
+#'   48, #north
+#'   14 #east
+#' )
+#' out <- BSTFA(ymat=out.sm$ymat,
+#'   dates=out.sm$dates,
+#'   coords=out.sm$coords,
+#'   iters=500, 
+#'   save.missing=F, 
+#'   factors.fixed=ff, 
+#'   n.temp.bases=22)
 #' @export BSTFA
 BSTFA <- function(ymat, dates, coords,
                  iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
@@ -115,7 +123,7 @@ BSTFA <- function(ymat, dates, coords,
                  alpha.prec=1/100000, tau2.gamma=2, tau2.phi=0.0000001, sig2.gamma=2, sig2.phi=1e-5,
                  sig2=NULL, beta=NULL, xi=NULL,
                  Fmat=matrix(0,nrow=n.times,ncol=n.factors), Lambda=matrix(0,nrow=n.locs, n.factors),
-                 thin=1, burn=floor(iters*0.5), verbose=TRUE, save.missing=TRUE, save.time=FALSE, 
+                 thin=1, burn=floor(iters*0.5), latlon=FALSE, verbose=TRUE, save.missing=TRUE, save.time=FALSE, 
                  marginalize=FALSE) {
 
   
@@ -213,7 +221,12 @@ BSTFA <- function(ymat, dates, coords,
   }
   
   if(spatial.style=='eigen'){
-    distmat <- as.matrix(dist(coords))
+    if(latlon){
+      distmat <- geosphere::distm(coords)
+    }else{
+      distmat <- as.matrix(dist(coords))
+    }
+    
     cormat <- exp(-distmat/freq.lon)
     eigs <- eigen(cormat)
     newS <- eigs$vectors[,1:n.spatial.bases]
@@ -363,13 +376,6 @@ BSTFA <- function(ymat, dates, coords,
   if (factors) {
     ### Set up temporal FA
 
-    ### Eigen Method
-    # if (is.null(phi.T)) phi.T = n.times/2
-    # distT <- as.matrix(dist(1:n.times))
-    # corT <- exp(-distT/phi.T)
-    # QT <- eigen(corT)$vectors[,1:n.temp.bases]
-    # bigQT <- kronecker(QT, diag(1,n.factors))
-
     ### Fourier Method
     # Create Fourier basis functions
     if (n.temp.bases%%2 == 1) n.temp.bases=n.temp.bases+1
@@ -447,7 +453,11 @@ BSTFA <- function(ymat, dates, coords,
     }
     
     if(load.style=='eigen'){
-      distmat <- as.matrix(dist(coords))
+      if(latlon){
+        distmat <- geosphere::distm(coords)
+      }else{
+        distmat <- as.matrix(dist(coords))
+      }
       cormat <- exp(-distmat/freq.lon)
       eigs <- eigen(cormat)
       QS <- eigs$vectors[,1:n.load.bases]
@@ -503,7 +513,11 @@ BSTFA <- function(ymat, dates, coords,
       if(n.factors==1){
         factors.fixed <- sample(which(prop.missing==min(prop.missing, na.rm=T)), size=1)
       }else{
-      distmat <- as.matrix(dist(coords))
+        if(latlon){
+          distmat <- geosphere::distm(coords)
+        }else{
+          distmat <- as.matrix(dist(coords))
+        }
       far = FALSE
       d = c()
       while (!far) {
@@ -887,8 +901,12 @@ BSTFA <- function(ymat, dates, coords,
                 "mean" = mean, 
                 "linear" = linear, 
                 "seasonal" = seasonal, 
-                "factors" = factors)
+                "factors" = factors, 
+                "latlon" = latlon,
+                call=match.call())
 
+  class(output) <- "bstfa"
+  
   output
 
 }

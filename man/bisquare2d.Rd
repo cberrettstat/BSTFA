@@ -4,7 +4,7 @@
 \alias{bisquare2d}
 \title{Bisquare bases for 2-dimensional space}
 \usage{
-bisquare2d(locs, knots)
+bisquare2d(locs, knots, latlon = FALSE)
 }
 \arguments{
 \item{locs}{Matrix of 2-dimensional coordinates for locations of interest.}

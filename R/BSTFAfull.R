@@ -53,6 +53,7 @@
 #' @param c.phi.lambda Numeric vector of starting values for the proposal standard deviations (for the Metropolis random walk algorithm) for sampling proposal values of the range of the spatially-dependent loadings.  Default is \code{rep(0.001, n.factors)}.
 #' @param adapt.iter Numeric scalar indicating the number of iterations to start adjusting the proposal standard deviations for the Metropolis random walk algorithms.  Value must be at least 2 larger than \code{burn}. Default value is \code{burn+10}.
 #' @param adapt.epsilon Numeric scalar indicating the small value to add to the proposal standard deviations when using the adaptive Metropolis random walk algorithms.  Default is \code{1e-20}.
+#' @param latlon Logical scalar indicating whether to use euclidean distance (\code{FALSE}; default) or great circle distance (\code{TRUE}).
 #' @param verbose Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10% of the MCMC process is completed.
 #' @param save.missing Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.
 #' @param save.time Logical scalar indicating whether to save the computation time for each MCMC iteration.  Default value is \code{FALSE}.  When \code{FALSE}, the function \code{compute_summary()} will not be useful.
@@ -64,6 +65,7 @@
 #' @importFrom npreg basis.tps
 #' @importFrom lubridate yday
 #' @importFrom utils combn
+#' @importFrom geosphere distm
 #' @import Rcpp
 #' @import RcppArmadillo
 #' @import stats
@@ -100,19 +102,26 @@
 #' }
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' data(utahDataList)
-#' attach(utahDataList)
-#' low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02) 
-#' out <- BSTFAfull(ymat=TemperatureVals[1:50,low.miss], 
-#'        dates=Dates[1:50], 
-#'        coords=Coords[low.miss,], 
-#'        n.factors=2, iters=10)
+#' set.seed(240)
+#' ff <- c(
+#'   22, #west
+#'   20, #south
+#'   48, #north
+#'   14 #east
+#' )
+#' out <- BSTFAfull(ymat=out.sm$ymat,
+#' dates=out.sm$dates,
+#' coords=out.sm$coords,
+#' iters=500, 
+#' spatial.style="eigen",
+#' save.missing=F, 
+#' factors.fixed=ff)
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                      mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
                      n.seasn.knots=min(7, ceiling(length(unique(yday(dates)))/3)),
                      spatial.style='grid', n.spatial.bases=ceiling(n.locs/2),
-                     knot.levels=2, max.knot.dist=n.locs*0.05, premade.knots=NULL, plot.knots=FALSE,
+                     knot.levels=2, max.knot.dist=mean(dist(coords)), premade.knots=NULL, plot.knots=FALSE,
                      freq.lon=diff(range(coords[,1])),
                      freq.lat=diff(range(coords[,2])),
                      n.factors=min(4,ceiling(n.locs/20)), factors.fixed=NULL, plot.factors=FALSE,
@@ -124,7 +133,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
                      Lambda=matrix(0,nrow=n.locs, n.factors), phi.lambda=rep(1, n.factors),
                      thin=1, burn=floor(iters*0.5),
                      c.omega=matrix(0.001, n.factors, n.factors), c.phi.lambda=rep(0.001, n.factors),
-                     adapt.iter=(burn+10), adapt.epsilon=1e-20,
+                     adapt.iter=(burn+10), adapt.epsilon=1e-20, latlon=FALSE,
                      verbose=TRUE, save.missing=TRUE, save.time=FALSE) {
 
 
@@ -209,7 +218,11 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     if (!is.null(x)){newS <- cbind(newS, x)}
   }
   if(spatial.style=='eigen'){
-    distmat <- as.matrix(dist(coords))
+    if(latlon){
+      distmat <- geosphere::distm(coords)
+    }else{
+      distmat <- as.matrix(dist(coords))
+    }
     cormat <- exp(-distmat/freq.lon)
     eigs <- eigen(cormat)
     newS <- eigs$vectors[,1:n.spatial.bases]
@@ -330,7 +343,11 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     ## Set up temporal FA
     Sigma.F.inv = solve(Sigma.F)
     ### Set up spatial FA
-    distmat <- as.matrix(dist(coords))
+    if(latlon){
+      distmat <- geosphere::distm(coords)
+    }else{
+      distmat <- as.matrix(dist(coords))
+    }
     tau2.lambda <- rep(1,n.factors)
     Sigma.lambda <- NULL
     Sigma.lambda.inv <- NULL
@@ -750,7 +767,11 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
                 "mean" = mean, 
                 "linear" = linear, 
                 "seasonal" = seasonal, 
-                "factors" = factors)
+                "factors" = factors,
+                "latlon" = latlon,
+                call=match.call())
+  
+  class(output) <- "bstfa"
 
   output
 

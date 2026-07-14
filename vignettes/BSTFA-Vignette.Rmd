@@ -190,7 +190,7 @@ If the argument `type` is set to `"all"`, the function will return draws of $Y(\
 The code below provides posterior predictive draws of temperatures at an observed location, Loa, Utah. Since `type == "all"`, the function will return a $T \times d$ matrix of posterior draws of $Y(\mathbf{s}, t) \text{ } \forall \text{ } t$ with $d$ being the number of saved MCMC draws. Each column represents one draw of the $T \times 1$ vector, $\mathbf{Y(\mathbf{s})}$.
 
 ```{r predall, eval=F}
-loc = 17 # Loa, Utah in our small data set
+loc = 1
 preds = predictBSTFA(out.sm, 
                      location = loc,
                      type='all',
@@ -201,7 +201,7 @@ preds = predictBSTFA(out.sm,
 The code below sets `type == "mean"` and returns a $T \times 1$ vector containing the posterior $\textit{mean}$ of $Y(\mathbf{s}, t) \text{ } \forall \text{ } t$.
 
 ```{r plotpredobs, eval=F}
-loc = 17 # Loa, Utah in our small data set
+loc = 1
 preds = predictBSTFA(out.sm, 
                      location = loc,
                      type='mean')
@@ -210,7 +210,7 @@ preds = predictBSTFA(out.sm,
 The code below provides posterior predictive draws for temperatures at an $\textit{unobserved}$ location by setting the `location` argument to a matrix of coordinate values. In this case, we consider a city without a monitor, Torrey, Utah (near Loa), with longitude 111.41$^\circ$ W and latitude 38.29$^\circ$ N.
 
 ```{r plotpred, eval=F}
-loc = matrix(c(-111.41, 38.29), nrow=1, ncol=2) # Torrey, Utah
+loc = matrix(c(0.89, 0.21), nrow=1, ncol=2) #Coordinates close to Location 1
 preds_new = predictBSTFA(out.sm, 
                          location = loc,
                          type='all',
@@ -223,7 +223,7 @@ The `predictBSTFA` function is also called within the `plot_location` function, 
 Below is an example of code used to plot the posterior mean temperature values (black line) at an observed location, Loa, Utah, with 95\% posterior credible bounds (gray bands), and observed measurements (gray circles). Figure \@ref(fig:fig-location) provides the plot.  Notice that the posterior mean (black line) closely follows the pattern of the observed data, but, as expected due to basis smoothing, is more smooth than the observed data. Increasing the number of bases will decrease the smoothness (but increase computation time).
 
 ```{r fig-location, fig.cap="Posterior mean temperature values (black line) at an in-sample location, Loa, Utah, with 95% posterior predictive bounds (gray bands), and observed temperature measurements (gray circles).", fig.align="center", fig.height=3.5, fig.width=6}
-loc = 17 # Loa, Utah in our small data set
+loc = 1
 plot_location(out.sm,
               location=loc,
               type='mean',
@@ -235,7 +235,7 @@ plot_location(out.sm,
 Below is an example of code used to plot the estimated posterior mean temperature values at an $\textit{unobserved}$ location, "Torrey, Utah," a location near Loa. Figure \@ref(fig:fig-prediction) provides the plot where again, the black line represents the posterior mean and the gray bands represent the 95\% posterior predictive intervals.  
 
 ```{r fig-prediction, fig.cap="Posterior mean temperature values (black line) at an out-of-sample location, Torrey, Utah, with 95% posterior predictive bounds (gray bands).", fig.align="center",fig.height=3.5, fig.width=6}
-loc = matrix(c(-111.41, 38.29), nrow=1, ncol=2) # Torrey, Utah
+loc = matrix(c(0.89, 0.21), nrow=1, ncol=2) #Coordinates close to Location 1
 plot_location(out.sm,
               location=loc,
               type='mean',
@@ -277,7 +277,7 @@ For instance, `plot_annual` can plot the estimated annual seasonal behavior at a
 
 ```{r fig-season, fig.cap="Posterior mean annual seasonal behavior (black line) with 95% credible interval (gray band), and observed data (open gray circles) plotted by day of year.", fig.align="center",fig.height=3.5, fig.width=5}
 plot_annual(out.sm,
-            location=17, # Loa, Utah in our small data set
+            location=1,
             years='one')
 ```
 
@@ -328,9 +328,8 @@ map_spatial_param(out.sm,
          parameter='slope',
          yearscale=TRUE,
          type='mean',
-         map=TRUE,
-         state=TRUE,
-         location='utah',
+         map=FALSE,
+         state=FALSE,
          fine=25)
 ```
 
@@ -678,7 +677,7 @@ Factor analysis allows for interpretability of the factors and/or loadings. Sinc
 
 It's important that the fixed factor locations have a low proportion of missing data. If fixed factor locations are not given, they will be smartly chosen by the function according to distance and proportion of missing data.
 
-```{r dataplotsetup, echo=FALSE, warning=FALSE, include=FALSE, fig.width=3}
+```{r dataplotsetup, echo=FALSE, warning=FALSE, include=FALSE, fig.width=3, eval=FALSE}
 map_data_loc <- ggplot2::map_data('state')[ggplot2::map_data('state')$region == 'utah',]
 full_map <- ggplot2::map_data('state')
 sf_polygon <- sf::st_sfc(sf::st_polygon(list(as.matrix(map_data_loc[,c(1,2)]))), crs=4326)
@@ -709,7 +708,7 @@ m = ggplot() +
   ylab("")
 ```
 
-```{r fig-dataplot, echo=FALSE, fig.cap="Plot of Utah showing locations of fixed factors (in red) and all locations (in black).", fig.align="center", fig.width=3}
+```{r fig-dataplot, echo=FALSE, fig.cap="Plot of Utah showing locations of fixed factors (in red) and all locations (in black).", fig.align="center", fig.width=3, eval=FALSE}
 m
 ```
 

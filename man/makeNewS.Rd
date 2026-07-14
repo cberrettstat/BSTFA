@@ -12,7 +12,8 @@ makeNewS(
   x = NULL,
   premade.knots = NULL,
   plot.knots = FALSE,
-  regions = FALSE
+  regions = FALSE,
+  latlon = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ makeNewS(
 \item{plot.knots}{Logical scalar indicating whether or not to plot the knots.  Default is \code{FALSE}.}
 
 \item{regions}{Logical scalar indicating if the space should be divided into multiresolution regions. Default is \code{FALSE}.}
+
+\item{latlon}{Logical scalar indicating whether to use euclidean distance (\code{FALSE}; default) or great circle distance (\code{TRUE}).}
 }
 \value{
 A matrix containing all the multiresolution bisquare bases evaluated at the input coordinates.

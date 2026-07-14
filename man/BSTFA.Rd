@@ -45,6 +45,7 @@ BSTFA(
   Lambda = matrix(0, nrow = n.locs, n.factors),
   thin = 1,
   burn = floor(iters * 0.5),
+  latlon = FALSE,
   verbose = TRUE,
   save.missing = TRUE,
   save.time = FALSE,
@@ -130,6 +131,8 @@ BSTFA(
 
 \item{burn}{Numeric scalar indicating how many MCMC iterations to burn before saving.  Default value is one-half of \code{iters}.}
 
+\item{latlon}{Logical scalar indicating whether to use euclidean distance (\code{FALSE}; default) or great circle distance (\code{TRUE}).}
+
 \item{verbose}{Logical scalar indicating whether or not to print the status of the MCMC process.  If \code{TRUE} (default), the function will print every time an additional 10\% of the MCMC process is completed.}
 
 \item{save.missing}{Logical scalar indicating whether or not to save the MCMC draws for the missing observations.  If \code{TRUE} (default), the function will save an additional MCMC object containing the MCMC draws for each missing observation.  Use \code{FALSE} to save file space and memory.}
@@ -139,7 +142,7 @@ BSTFA(
 \item{marginalize}{Logical scalar indicating whether to sample hyper-coefficients by marginalizing out the corresponding parameters.  Default value is \code{FALSE}.  Setting to \code{TRUE} will be slower but can improve effective sample sizes.}
 }
 \value{
-A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):
+A bstfa object containing the following elements (any elements that are the same as in the function input are removed here for brevity):
 \describe{
 \item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the values will all be zero.}
 \item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
@@ -174,14 +177,20 @@ A list containing the following elements (any elements that are the same as in t
 This function uses MCMC to draw from posterior distributions of a Bayesian spatio-temporal factor analysis model.  All spatial processes use one of Fourier, thin plate spline, or multiresolution basis functions.  The temporally-dependent factors use Fourier bases.  The default values are chosen to work well for many data sets.  Thus, it is possible to use this function using only three arguments: \code{ymat}, \code{dates}, and \code{coords}.  The default number of MCMC iterations is 10000 (saving 5000); however, depending on the number of observations and processes modeled, it may need more draws than this to ensure the posterior draws are representative of the entire posterior distribution space.
 }
 \examples{
-data(utahDataList)
-attach(utahDataList)
-low.miss <- which(apply(is.na(TemperatureVals), 2, mean)<.02)
-out <- BSTFA(ymat=TemperatureVals[1:50,low.miss],
-  dates=Dates[1:50],
-  coords=Coords[low.miss,],
-  n.factors=2,
-  iters=10)
+set.seed(240)
+ff <- c(
+  22, #west
+  20, #south
+  48, #north
+  14 #east
+)
+out <- BSTFA(ymat=out.sm$ymat,
+  dates=out.sm$dates,
+  coords=out.sm$coords,
+  iters=500, 
+  save.missing=F, 
+  factors.fixed=ff, 
+  n.temp.bases=22)
 }
 \author{
 Adam Simpson and Candace Berrett
