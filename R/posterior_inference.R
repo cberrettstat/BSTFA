@@ -12,9 +12,9 @@
 #' @returns A matrix or vector of estimated/predicted values for \code{location}.
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' data(out.sm)
-#' attach(out.sm)
-#' loc1means <- predictBSTFA(out.sm, location=1, pred.int=FALSE)
+#' data(out.sim)
+#' attach(out.sim)
+#' loc1means <- predictBSTFA(out.sim, location=1, pred.int=FALSE)
 #' @importFrom npreg basis.tps
 #' @importFrom geosphere distm
 #' @export predictBSTFA
@@ -341,9 +341,9 @@ predictBSTFA = function(out, location=NULL, type='mean',
 #' @returns A plot of predicted values for \code{location}.
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' data(out.sm)
-#' attach(out.sm)
-#' plot_location(out.sm, location=1, pred.int=FALSE)
+#' data(out.sim)
+#' attach(out.sim)
+#' plot_location(out.sim, location=1, pred.int=FALSE)
 #' @export plot_location
 plot_location = function(out, location, new_x=NULL,
                          type='mean', pred.int=FALSE,
@@ -438,9 +438,9 @@ plot_location = function(out, location, new_x=NULL,
 #' @returns A plot of spatially-dependent parameter values for the observed locations.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
-#' data(out.sm)
-#' attach(out.sm)
-#' plot_spatial_param(out.sm, parameter='slope')
+#' data(out.sim)
+#' attach(out.sim)
+#' plot_spatial_param(out.sim, parameter='slope')
 #' @import ggplot2
 #' @importFrom RColorBrewer brewer.pal
 #' @export plot_spatial_param
@@ -534,9 +534,9 @@ plot_spatial_param = function(out, parameter, loadings=1, type='mean', ci.level=
 #' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
-#' data(out.sm)
-#' attach(out.sm)
-#' map_spatial_param(out.sm, parameter='slope', map=TRUE, state=TRUE, location='utah', fine=25)
+#' data(out.sim)
+#' attach(out.sim)
+#' map_spatial_param(out.sim, parameter='slope', fine=25)
 #' @importFrom npreg basis.tps
 #' @importFrom sf st_sfc
 #' @importFrom sf st_polygon
@@ -920,9 +920,9 @@ map_spatial_param = function(out, parameter='slope', loadings=1, type='mean',
 #' @returns A plot of spatially-dependent parameter values for a grid of interpolated locations.
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' data(out.sm)
-#' attach(out.sm)
-#' plot_factor(out.sm, factor=1:4, together=TRUE)
+#' data(out.sim)
+#' attach(out.sim)
+#' plot_factor(out.sim, factor=1:4, together=TRUE)
 #' @export plot_factor
 plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
                        type='mean', uncertainty=TRUE, ci.level=c(0.025, 0.975),
@@ -990,9 +990,9 @@ plot_factor = function(out, factor=1, together=FALSE, include.legend=TRUE,
 #' @returns A plot of the annual/seasonal process at \code{location}.
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' data(out.sm)
-#' attach(out.sm)
-#' plot_annual(out.sm, location=1)
+#' data(out.sim)
+#' attach(out.sim)
+#' plot_annual(out.sim, location=1)
 #' @importFrom mgcv cSplineDes
 #' @importFrom geosphere distm
 #' @export plot_annual

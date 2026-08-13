@@ -21,8 +21,6 @@ plot_fourier_bases(
 
 \item{fine}{Number of grid points to include on both axes.  Total grid size will be \code{fine^2}.  Default is \code{100}.}
 
-\item{plot.3d}{Logical scalar indicating whether to plot the bases.  Default is \code{FALSE}.}
-
 \item{freq.lon}{Numeric value indicating the frequency to use for the Fourier bases in the longitude direction.  Default is \code{diff(range(coords[,1]))}.}
 
 \item{freq.lat}{Numeric value indicating the frequency to use for the Fourier bases in the latitude direction.  Default is \code{diff(range(coords[,2]))}.}

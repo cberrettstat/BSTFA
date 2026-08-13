@@ -18,7 +18,7 @@ A numeric vector for BSTFA model coefficients.  Names of the values are labeled 
 This function provides the posterior mean values for main-effects coefficients.
 }
 \examples{
-coef(out.sm)
+coef(out.sim)
 }
 \author{
 Candace Berrett and Adam Simpson

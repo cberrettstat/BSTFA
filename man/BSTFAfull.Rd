@@ -173,9 +173,9 @@ BSTFAfull(
 \value{
 A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):
 \describe{
-\item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the values will all be zero.}
-\item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
-\item{tau2.mu}{An mcmc object of size \code{draws} by \code{1} containing the posterior draws for the variance of the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
+\item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the object is \code{NA}.}
+\item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), the object is \code{NA}.}
+\item{tau2.mu}{An mcmc object of size \code{draws} by \code{1} containing the posterior draws for the variance of the mean process.  If \code{mean=FALSE} (default), the object is \code{NA}.}
 \item{beta}{An mcmc object of size \code{draws} by \code{n.locs} containing the posterior draws for the increase/decrease (slope) across time for each location.}
 \item{alpha.beta}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the slope.}
 \item{tau2.beta}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the slopes.}
@@ -212,9 +212,9 @@ ff <- c(
   48, #north
   14 #east
 )
-out <- BSTFAfull(ymat=out.sm$ymat,
-dates=out.sm$dates,
-coords=out.sm$coords,
+out <- BSTFAfull(ymat=out.sim$ymat,
+dates=out.sim$dates,
+coords=out.sim$coords,
 iters=500, 
 spatial.style="eigen",
 save.missing=F, 

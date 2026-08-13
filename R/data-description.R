@@ -13,24 +13,26 @@
 "utahDataList"
 
 
-#' Output of BSTFA evaluated on a subset of utahDataList
+#' Output of BSTFA evaluated on a simulated data set
 #'
-#' 'bstfa' object named \code{out.sm} containing the output from running the BSTFA function on a small simulated data set.
+#' 'bstfa' object named \code{out.sim} containing the output from running the BSTFA function on a small simulated data set.
 #'
 #' @format See \code{help(BSTFA)} for details of what is included as output from the BSTFA function.
 #' @examples
 #' set.seed(240)
 #' ff <- c(
-#'   22, #west
-#'   20, #south
-#'   48, #north
-#'   14 #east
+#'   22, #"west"
+#'   20, #"south"
+#'   48, #"north"
+#'   14 #"east"
 #' )
-#' out.sm <- BSTFA(ymat=out.sm$ymat, 
-#' dates=out.sm$dates, 
-#' coords=out.sm$coords, 
+#' out.sim <- BSTFA(ymat=out.sim$ymat, 
+#' dates=out.sim$dates, 
+#' coords=out.sim$coords, 
 #' iters=500, 
 #' save.missing=F, 
 #' factors.fixed=ff, 
 #' n.temp.bases=22)
-"out.sm"
+"out.sim"
+
+

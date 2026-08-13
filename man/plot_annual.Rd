@@ -36,9 +36,9 @@ A plot of the annual/seasonal process at \code{location}.
 Plot annual/seasonal behavior at a specific location.
 }
 \examples{
-data(out.sm)
-attach(out.sm)
-plot_annual(out.sm, location=1)
+data(out.sim)
+attach(out.sim)
+plot_annual(out.sim, location=1)
 }
 \author{
 Candace Berrett and Adam Simpson

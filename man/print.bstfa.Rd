@@ -23,7 +23,7 @@ A data frame containing the following elements:
 This function prints the names and properties of a 'bstfa' object.
 }
 \examples{
-print(out.sm)
+print(out.sim)
 }
 \author{
 Candace Berrett and Adam Simpson

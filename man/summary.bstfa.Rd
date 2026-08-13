@@ -23,7 +23,7 @@ A data frame containing the following elements:
 This function provides posterior mean, standard deviations, and probabilities of being greater than 0 of interpretable parameters.
 }
 \examples{
-summary(out.sm)
+summary(out.sim)
 }
 \author{
 Candace Berrett and Adam Simpson

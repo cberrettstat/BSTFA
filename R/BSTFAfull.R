@@ -73,9 +73,9 @@
 #' @useDynLib BSTFA, .registration = TRUE
 #' @returns A list containing the following elements (any elements that are the same as in the function input are removed here for brevity):
 #' \describe{
-#'   \item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the values will all be zero.}
-#'   \item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
-#'   \item{tau2.mu}{An mcmc object of size \code{draws} by \code{1} containing the posterior draws for the variance of the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
+#'   \item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the object is \code{NA}.}
+#'   \item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), the object is \code{NA}.}
+#'   \item{tau2.mu}{An mcmc object of size \code{draws} by \code{1} containing the posterior draws for the variance of the mean process.  If \code{mean=FALSE} (default), the object is \code{NA}.}
 #'   \item{beta}{An mcmc object of size \code{draws} by \code{n.locs} containing the posterior draws for the increase/decrease (slope) across time for each location.}
 #'   \item{alpha.beta}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the slope.}
 #'   \item{tau2.beta}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the slopes.}
@@ -109,9 +109,9 @@
 #'   48, #north
 #'   14 #east
 #' )
-#' out <- BSTFAfull(ymat=out.sm$ymat,
-#' dates=out.sm$dates,
-#' coords=out.sm$coords,
+#' out <- BSTFAfull(ymat=out.sim$ymat,
+#' dates=out.sim$dates,
+#' coords=out.sim$coords,
 #' iters=500, 
 #' spatial.style="eigen",
 #' save.missing=F, 
@@ -256,13 +256,17 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     rm(list=c("mu.mean", "mu.var"))
     alpha.mu=rep(0, dim(newS)[2])
     tau2.mu = 1
+    mu.save <- matrix(0, nrow=n.locs, ncol=floor((iters-burn)/thin))
+    alpha.mu.save <- matrix(0, nrow=dim(newS)[2], ncol=floor((iters-burn)/thin))
+    tau2.mu.save <- matrix(0,nrow=1,ncol=floor((iters-burn)/thin))
   } else {
     mu <- rep(0, n.locs)
     Jfullmu.long <- rep(0, n.times*n.locs)
+    mu.save <- NULL
+    alpha.mu.save <- NULL
+    tau2.mu.save <- NULL
   }
-  mu.save <- matrix(0, nrow=n.locs, ncol=floor((iters-burn)/thin))
-  alpha.mu.save <- matrix(0, nrow=dim(newS)[2], ncol=floor((iters-burn)/thin))
-  tau2.mu.save <- matrix(0,nrow=1,ncol=floor((iters-burn)/thin))
+  
 
   ### Set up linear component
   if (linear == TRUE) {
@@ -279,16 +283,20 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
       rm(list=c("beta.mean", "beta.var"))
     }
     Tfullbeta.long <- as.numeric(Tfull%*%beta)
-    model.matrices$linear.Tsub <- Tsub
+    model.matrices$linear.Tsub <- as.matrix(Tsub, ncol=1)
     alpha.beta <- rep(0, dim(newS)[2])
     tau2.beta <- 1
+    beta.save <- matrix(0, nrow=n.locs, ncol=floor((iters-burn)/thin))
+    alpha.beta.save <- matrix(0, nrow=dim(newS)[2], ncol=floor((iters-burn)/thin))
+    tau2.beta.save <- matrix(0,nrow=1,ncol=floor((iters-burn)/thin))
   } else {
     beta <- rep(0, n.locs)
     Tfullbeta.long <- rep(0, n.times*n.locs)
+    beta.save <- NULL
+    alpha.beta.save <- NULL
+    tau2.beta.save <- NULL
   }
-  beta.save <- matrix(0, nrow=n.locs, ncol=floor((iters-burn)/thin))
-  alpha.beta.save <- matrix(0, nrow=dim(newS)[2], ncol=floor((iters-burn)/thin))
-  tau2.beta.save <- matrix(0,nrow=1,ncol=floor((iters-burn)/thin))
+  
 
 
   ### Set up seasonal component
@@ -309,13 +317,17 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     model.matrices$seasonal.bs.basis <- bs.basis
     alpha.xi <- rep(0, dim(newS.xi)[2])
     tau2.xi <- 1
+    xi.save <- matrix(0, nrow=n.locs*n.seasn.knots, ncol=floor((iters-burn)/thin))
+    alpha.xi.save <- matrix(0, nrow=n.seasn.knots*dim(newS)[2], ncol=floor((iters-burn)/thin))
+    tau2.xi.save <- matrix(0, nrow=1, ncol=floor((iters-burn)/thin))
   } else {
     xi <- rep(0, n.locs*n.seasn.knots)
     Bfullxi.long <- rep(0, n.locs*n.times)
+    xi.save <- NULL
+    alpha.xi.save <- NULL
+    tau2.xi.save <- NULL
   }
-  xi.save <- matrix(0, nrow=n.locs*n.seasn.knots, ncol=floor((iters-burn)/thin))
-  alpha.xi.save <- matrix(0, nrow=n.seasn.knots*dim(newS)[2], ncol=floor((iters-burn)/thin))
-  tau2.xi.save <- matrix(0, nrow=1, ncol=floor((iters-burn)/thin))
+  
 
 
   ### Deal with confounding
@@ -381,14 +393,25 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
   delayFA = min(floor(burn/2), 500)
 
-  PFmat.save <- matrix(0, nrow=n.factors*n.times, ncol=floor((iters-burn)/thin))
-  Omega.save <- matrix(0, nrow=n.factors*n.factors, ncol=floor((iters-burn)/thin))
-  Sigma.F.inv.save <- matrix(0, nrow=n.factors*n.factors, ncol=floor((iters-burn)/thin))
-  Lambda.save <- matrix(0, nrow=n.factors*n.locs, ncol=floor((iters-burn)/thin))
-  tau2.lambda.save <- matrix(0, nrow=n.factors, ncol=floor((iters-burn)/thin))
-  phi.lambda.save <- matrix(0, nrow=n.factors, ncol=floor((iters-burn)/thin))
-  phi.lambda.accept <- rep(0, n.factors)
-  Omega.accept <- matrix(0, n.factors, n.factors)
+  if(factors){
+    PFmat.save <- matrix(0, nrow=n.factors*n.times, ncol=floor((iters-burn)/thin))
+    Omega.save <- matrix(0, nrow=n.factors*n.factors, ncol=floor((iters-burn)/thin))
+    Sigma.F.inv.save <- matrix(0, nrow=n.factors*n.factors, ncol=floor((iters-burn)/thin))
+    Lambda.save <- matrix(0, nrow=n.factors*n.locs, ncol=floor((iters-burn)/thin))
+    tau2.lambda.save <- matrix(0, nrow=n.factors, ncol=floor((iters-burn)/thin))
+    phi.lambda.save <- matrix(0, nrow=n.factors, ncol=floor((iters-burn)/thin))
+    phi.lambda.accept <- rep(0, n.factors)
+    Omega.accept <- matrix(0, n.factors, n.factors)
+  }else{
+    PFmat.save <- NULL
+    Omega.save <- NULL
+    Sigma.F.inv.save <- NULL
+    Lambda.save <- NULL
+    tau2.lambda.save <- NULL
+    phi.lambda.save <- NULL
+    phi.lambda.accept <- NULL
+    Omega.accept <- NULL
+  }
   FLambda.long = rep(0, n.times*n.locs)
 
   if(is.null(sig2)){
@@ -721,23 +744,23 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
   if (verbose) cat('Finished MCMC Sampling. \n')
 
-  output = list("mu" = as.mcmc(t(mu.save)),
-                "alpha.mu" = as.mcmc(t(alpha.mu.save)),
-                "tau2.mu" = as.mcmc(t(tau2.mu.save)),
-                "beta" = as.mcmc(t(beta.save)),
-                "alpha.beta" = as.mcmc(t(alpha.beta.save)),
-                "tau2.beta" = as.mcmc(t(tau2.beta.save)),
-                "xi" = as.mcmc(t(xi.save)),
-                "alpha.xi" = as.mcmc(t(alpha.xi.save)),
-                "tau2.xi" = as.mcmc(t(tau2.xi.save)),
-                "F.tilde" = as.mcmc(t(PFmat.save)),
-                "Omega" = as.mcmc(t(Omega.save)),
-                "Omega.accept" = Omega.accept,
-                "Sigma.F.inv" = as.mcmc(t(Sigma.F.inv.save)),
-                "Lambda.tilde" = as.mcmc(t(Lambda.save)),
-                "tau2.lambda" = as.mcmc(t(tau2.lambda.save)),
-                "phi.lambda" = as.mcmc(t(phi.lambda.save)),
-                "phi.lambda.accept" = phi.lambda.accept,
+  output = list("mu" = if(mean){as.mcmc(t(mu.save))}else{NA},
+                "alpha.mu" = if(mean){as.mcmc(t(alpha.mu.save))}else{NA},
+                "tau2.mu" = if(mean){as.mcmc(t(tau2.mu.save))}else{NA},
+                "beta" = if(linear){as.mcmc(t(beta.save))}else{NA},
+                "alpha.beta" = if(linear){as.mcmc(t(alpha.beta.save))}else{NA},
+                "tau2.beta" = if(linear){as.mcmc(t(tau2.beta.save))}else{NA},
+                "xi" = if(seasonal){as.mcmc(t(xi.save))}else{NA},
+                "alpha.xi" = if(seasonal){as.mcmc(t(alpha.xi.save))}else{NA},
+                "tau2.xi" = if(seasonal){as.mcmc(t(tau2.xi.save))}else{NA},
+                "F.tilde" = if(factors){as.mcmc(t(PFmat.save))}else{NA},
+                "Omega" = if(factors){as.mcmc(t(Omega.save))}else{NA},
+                "Omega.accept" = if(factors){Omega.accept}else{NA},
+                "Sigma.F.inv" = if(factors){as.mcmc(t(Sigma.F.inv.save))}else{NA},
+                "Lambda.tilde" = ifelse(factors, as.mcmc(t(Lambda.save)), NA),
+                "tau2.lambda" = ifelse(factors, as.mcmc(t(tau2.lambda.save)), NA),
+                "phi.lambda" = ifelse(factors, as.mcmc(t(phi.lambda.save)), NA),
+                "phi.lambda.accept" = ifelse(factors, phi.lambda.accept, NA),
                 "sig2" = as.mcmc(t(sig2.save)),
                 "y.missing" = y.save,
                 "time.data" = time.data,

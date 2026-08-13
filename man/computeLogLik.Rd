@@ -20,9 +20,9 @@ A matrix of size \code{n.times*n.locs} by \code{draws} log-likelihood values for
 Compute log-likelihood
 }
 \examples{
-data(out.sm)
-attach(out.sm)
-loglik <- computeLogLik(out.sm, addthin=2)
+data(out.sim)
+attach(out.sim)
+loglik <- computeLogLik(out.sim, addthin=2)
 }
 \author{
 Adam Simpson and Candace Berrett

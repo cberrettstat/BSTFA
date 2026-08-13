@@ -36,7 +36,7 @@ A plot of the selected parameter or variable.
 This function calls appropriate plotting functions for different bstfa parameters. For more control over specific plotting features, use \code{plot_spatial_param}, \code{plot_factor}, \code{plot_annual}, \code{plot_location}, and \code{map_spatial_param}.
 }
 \examples{
-plot(out.sm)
+plot(out.sim)
 }
 \author{
 Candace Berrett and Adam Simpson

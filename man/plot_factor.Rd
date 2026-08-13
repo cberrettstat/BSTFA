@@ -39,9 +39,9 @@ A plot of spatially-dependent parameter values for a grid of interpolated locati
 Plot the temporally-dependent factors.
 }
 \examples{
-data(out.sm)
-attach(out.sm)
-plot_factor(out.sm, factor=1:4, together=TRUE)
+data(out.sim)
+attach(out.sim)
+plot_factor(out.sim, factor=1:4, together=TRUE)
 }
 \author{
 Candace Berrett and Adam Simpson

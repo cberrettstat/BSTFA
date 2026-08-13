@@ -9,9 +9,9 @@
 #' @returns A plot containing the trace plot (and density plot when \code{density=TRUE}) of the listed parameters.
 #' @author Adam Simpson
 #' @examples
-#' data(out.sm)
-#' attach(out.sm)
-#' plot_trace(out.sm, parameter='beta', param.range=1)
+#' data(out.sim)
+#' attach(out.sim)
+#' plot_trace(out.sim, parameter='beta', param.range=1)
 #' @export plot_trace
 plot_trace = function(out, parameter, param.range=NULL,
                       par.mfrow=c(1,1), density=TRUE) {
@@ -70,55 +70,100 @@ compute_summary = function(out) {
 #' Check effective sample size and geweke diagnostic
 #' @param out Output from BSTFA or BSTFAfull.
 #' @param type Character specifying which diagnostic to compute.  Options are \code{ess} and \code{geweke}.
-#' @param cutoff Numeric scalar indicating the cutoff value to flag parameters that haven't converged.
+#' @param onlyfail Logical scalar indicating whether to save only those parameters that fail to meet the designated \code{cutoff} value. Default \code{TRUE}.
+#' @param cutoff Numeric scalar indicating the cutoff value to flag parameters that haven't converged. Used when \code{onlyfail=TRUE}, ignored otherwise.
 #' @returns A list containing the parameters not meeting the convergence cutoff criteria.
-#' @author Adam Simpson
+#' @author Adam Simpson and Candace Berrett
 #' @examples
-#' data(out.sm)
-#' attach(out.sm)
-#' convergence_diag(out.sm)
+#' data(out.sim)
+#' attach(out.sim)
+#' convergence_diag(out.sim)
 #' @importFrom coda effectiveSize
 #' @importFrom coda geweke.diag
 #' @export convergence_diag
-convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,1.96)) {
-
+convergence_diag = function(out, type='eSS', onlyfail=TRUE, cutoff=ifelse(type=='eSS',100,1.96)) {
+  
   mcmcVals = list()
-  if (type=='eSS') {
-    if (sum(out$mu)!=0) mcmcVals$mu = effectiveSize(out$mu)[which(effectiveSize(out$mu)<cutoff)]
-    if (sum(out$alpha.mu)!=0) mcmcVals$alpha.mu = effectiveSize(out$alpha.mu)[which(effectiveSize(out$alpha.mu)<cutoff)]
-    if (sum(out$tau2.mu)!=0) mcmcVals$tau2.mu = effectiveSize(out$tau2.mu)[which(effectiveSize(out$tau2.mu)<cutoff)]
-    if (sum(out$beta)!=0) mcmcVals$beta = effectiveSize(out$beta)[which(effectiveSize(out$beta)<cutoff)]
-    if (sum(out$alpha.beta)!=0) mcmcVals$alpha.beta = effectiveSize(out$alpha.beta)[which(effectiveSize(out$alpha.beta)<cutoff)]
-    if (sum(out$tau2.beta)!=0) mcmcVals$tau2.beta = effectiveSize(out$tau2.beta)[which(effectiveSize(out$tau2.beta)<cutoff)]
-    if (sum(out$xi)!=0) mcmcVals$xi = effectiveSize(out$xi)[which(effectiveSize(out$xi)<cutoff)]
-    if (sum(out$alpha.xi)!=0) mcmcVals$alpha.xi = effectiveSize(out$alpha.xi)[which(effectiveSize(out$alpha.xi)<cutoff)]
-    if (sum(out$tau2.xi)!=0) mcmcVals$tau2.xi = effectiveSize(out$tau2.xi)[which(effectiveSize(out$tau2.xi)<cutoff)]
-    if (sum(out$alphaT)!=0) mcmcVals$alphaT = effectiveSize(out$alphaT)[which(effectiveSize(out$alphaT)<cutoff)]
-    if (sum(out$PFmat)!=0) mcmcVals$PFmat = effectiveSize(out$PFmat)[which(effectiveSize(out$PFmat)<cutoff)]
-    if (sum(out$Lambda)!=0) mcmcVals$Lambda = effectiveSize(out$Lambda)[which(effectiveSize(out$Lambda)<cutoff)]
-    if (sum(out$alphaS)!=0) mcmcVals$alphaS = effectiveSize(out$alphaS)[which(effectiveSize(out$alphaS)<cutoff)]
-    if (sum(out$tau2.lambda)!=0) mcmcVals$tau2.lambda = effectiveSize(out$tau2.lambda)[which(effectiveSize(out$tau2.lambda)<cutoff)]
-    if (sum(out$sig2)!=0) mcmcVals$sig2 = effectiveSize(out$sig2)[which(effectiveSize(out$sig2)<cutoff)]
-  }
+  
+  if(onlyfail){
 
-  if (type=='geweke') {
-    if (sum(out$mu)!=0) mcmcVals$mu = geweke.diag(out$mu)[[1]][which(geweke.diag(out$mu)[[1]]>cutoff | geweke.diag(out$mu)[[1]]< -cutoff)]
-    if (sum(out$alpha.mu)!=0) mcmcVals$alpha.mu = geweke.diag(out$alpha.mu)[[1]][which(geweke.diag(out$alpha.mu)[[1]]>cutoff | geweke.diag(out$alpha.mu)[[1]]< -cutoff)]
-    if (sum(out$tau2.mu)!=0) mcmcVals$tau2.mu = geweke.diag(out$tau2.mu)[[1]][which(geweke.diag(out$tau2.mu)[[1]]>cutoff | geweke.diag(out$tau2.mu)[[1]]< -cutoff)]
-    if (sum(out$beta)!=0) mcmcVals$beta = geweke.diag(out$beta)[[1]][which(geweke.diag(out$beta)[[1]]>cutoff | geweke.diag(out$beta)[[1]]< -cutoff)]
-    if (sum(out$alpha.beta)!=0) mcmcVals$alpha.beta = geweke.diag(out$alpha.beta)[[1]][which(geweke.diag(out$alpha.beta)[[1]]>cutoff | geweke.diag(out$alpha.beta)[[1]]< -cutoff)]
-    if (sum(out$tau2.beta)!=0) mcmcVals$tau2.beta = geweke.diag(out$tau2.beta)[[1]][which(geweke.diag(out$tau2.beta)[[1]]>cutoff | geweke.diag(out$tau2.beta)[[1]]< -cutoff)]
-    if (sum(out$xi)!=0) mcmcVals$xi = geweke.diag(out$xi)[[1]][which(geweke.diag(out$xi)[[1]]>cutoff | geweke.diag(out$xi)[[1]]< -cutoff)]
-    if (sum(out$alpha.xi)!=0) mcmcVals$alpha.xi = geweke.diag(out$alpha.xi)[[1]][which(geweke.diag(out$alpha.xi)[[1]]>cutoff | geweke.diag(out$alpha.xi)[[1]]< -cutoff)]
-    if (sum(out$tau2.xi)!=0) mcmcVals$tau2.xi = geweke.diag(out$tau2.xi)[[1]][which(geweke.diag(out$tau2.xi)[[1]]>cutoff | geweke.diag(out$tau2.xi)[[1]]< -cutoff)]
-    if (sum(out$alphaT)!=0) mcmcVals$alphaT = geweke.diag(out$alphaT)[[1]][which(geweke.diag(out$alphaT)[[1]]>cutoff | geweke.diag(out$alphaT)[[1]]< -cutoff)]
-    if (sum(out$PFmat)!=0) mcmcVals$PFmat = geweke.diag(out$PFmat)[[1]][which(geweke.diag(out$PFmat)[[1]]>cutoff | geweke.diag(out$PFmat)[[1]]< -cutoff)]
-    if (sum(out$Lambda)!=0) mcmcVals$Lambda = geweke.diag(out$Lambda)[[1]][which(geweke.diag(out$Lambda)[[1]]>cutoff | geweke.diag(out$Lambda)[[1]]< -cutoff)]
-    if (sum(out$alphaS)!=0) mcmcVals$alphaS = geweke.diag(out$alphaS)[[1]][which(geweke.diag(out$alphaS)[[1]]>cutoff | geweke.diag(out$alphaS)[[1]]< -cutoff)]
-    if (sum(out$tau2.lambda)!=0) mcmcVals$tau2.lambda = geweke.diag(out$tau2.lambda)[[1]][which(geweke.diag(out$tau2.lambda)[[1]]>cutoff | geweke.diag(out$tau2.lambda)[[1]]< -cutoff)]
-    if (sum(out$sig2)!=0) mcmcVals$sig2 = geweke.diag(out$sig2)[[1]][which(geweke.diag(out$sig2)[[1]]>cutoff | geweke.diag(out$sig2)[[1]]< -cutoff)]
-  }
+    if (type=='eSS') {
+      if (!is.na(out$mu[1])) mcmcVals$mu = effectiveSize(out$mu)[which(effectiveSize(out$mu)<cutoff)]
+      if (!is.na(out$alpha.mu[1])) mcmcVals$alpha.mu = effectiveSize(out$alpha.mu)[which(effectiveSize(out$alpha.mu)<cutoff)]
+      if (!is.na(out$tau2.mu[1])) mcmcVals$tau2.mu = effectiveSize(out$tau2.mu)[which(effectiveSize(out$tau2.mu)<cutoff)]
+      if (!is.na(out$beta[1])) mcmcVals$beta = effectiveSize(out$beta)[which(effectiveSize(out$beta)<cutoff)]
+      if (!is.na(out$alpha.beta[1])) mcmcVals$alpha.beta = effectiveSize(out$alpha.beta)[which(effectiveSize(out$alpha.beta)<cutoff)]
+      if (!is.na(out$tau2.beta[1])) mcmcVals$tau2.beta = effectiveSize(out$tau2.beta)[which(effectiveSize(out$tau2.beta)<cutoff)]
+      if (!is.na(out$xi[1])) mcmcVals$xi = effectiveSize(out$xi)[which(effectiveSize(out$xi)<cutoff)]
+      if (!is.na(out$alpha.xi[1])) mcmcVals$alpha.xi = effectiveSize(out$alpha.xi)[which(effectiveSize(out$alpha.xi)<cutoff)]
+      if (!is.na(out$tau2.xi[1])) mcmcVals$tau2.xi = effectiveSize(out$tau2.xi)[which(effectiveSize(out$tau2.xi)<cutoff)]
+      if (!is.na(out$alphaT[1])) mcmcVals$alphaT = effectiveSize(out$alphaT)[which(effectiveSize(out$alphaT)<cutoff)]
+      if (!is.na(out$F.tilde[1])) mcmcVals$F.tilde = effectiveSize(out$F.tilde)[which(effectiveSize(out$F.tilde)<cutoff)]
+      if (!is.na(out$Lambda[1])) mcmcVals$Lambda = effectiveSize(out$Lambda)[which(effectiveSize(out$Lambda)<cutoff)]
+      if (!is.na(out$alphaS[1])) mcmcVals$alphaS = effectiveSize(out$alphaS)[which(effectiveSize(out$alphaS)<cutoff)]
+      if (!is.na(out$tau2.lambda[1])) mcmcVals$tau2.lambda = effectiveSize(out$tau2.lambda)[which(effectiveSize(out$tau2.lambda)<cutoff)]
+      if (!is.na(out$sig2[1])) mcmcVals$sig2 = effectiveSize(out$sig2)[which(effectiveSize(out$sig2)<cutoff)]
+    }
 
+    if (type=='geweke') {
+      if (!is.na(out$mu[1])) mcmcVals$mu = geweke.diag(out$mu)[[1]][which(geweke.diag(out$mu)[[1]]>cutoff | geweke.diag(out$mu)[[1]]< -cutoff)]
+      if (!is.na(out$alpha.mu[1])) mcmcVals$alpha.mu = geweke.diag(out$alpha.mu)[[1]][which(geweke.diag(out$alpha.mu)[[1]]>cutoff | geweke.diag(out$alpha.mu)[[1]]< -cutoff)]
+      if (!is.na(out$tau2.mu[1])) mcmcVals$tau2.mu = geweke.diag(out$tau2.mu)[[1]][which(geweke.diag(out$tau2.mu)[[1]]>cutoff | geweke.diag(out$tau2.mu)[[1]]< -cutoff)]
+      if (!is.na(out$beta[1])) mcmcVals$beta = geweke.diag(out$beta)[[1]][which(geweke.diag(out$beta)[[1]]>cutoff | geweke.diag(out$beta)[[1]]< -cutoff)]
+      if (!is.na(out$alpha.beta[1])) mcmcVals$alpha.beta = geweke.diag(out$alpha.beta)[[1]][which(geweke.diag(out$alpha.beta)[[1]]>cutoff | geweke.diag(out$alpha.beta)[[1]]< -cutoff)]
+      if (!is.na(out$tau2.beta[1])) mcmcVals$tau2.beta = geweke.diag(out$tau2.beta)[[1]][which(geweke.diag(out$tau2.beta)[[1]]>cutoff | geweke.diag(out$tau2.beta)[[1]]< -cutoff)]
+      if (!is.na(out$xi[1])) mcmcVals$xi = geweke.diag(out$xi)[[1]][which(geweke.diag(out$xi)[[1]]>cutoff | geweke.diag(out$xi)[[1]]< -cutoff)]
+      if (!is.na(out$alpha.xi[1])) mcmcVals$alpha.xi = geweke.diag(out$alpha.xi)[[1]][which(geweke.diag(out$alpha.xi)[[1]]>cutoff | geweke.diag(out$alpha.xi)[[1]]< -cutoff)]
+      if (!is.na(out$tau2.xi[1])) mcmcVals$tau2.xi = geweke.diag(out$tau2.xi)[[1]][which(geweke.diag(out$tau2.xi)[[1]]>cutoff | geweke.diag(out$tau2.xi)[[1]]< -cutoff)]
+      if (!is.na(out$alphaT[1])) mcmcVals$alphaT = geweke.diag(out$alphaT)[[1]][which(geweke.diag(out$alphaT)[[1]]>cutoff | geweke.diag(out$alphaT)[[1]]< -cutoff)]
+      if (!is.na(out$F.tilde[1])) mcmcVals$PFmat = geweke.diag(out$F.tilde)[[1]][which(geweke.diag(out$F.tilde)[[1]]>cutoff | geweke.diag(out$F.tilde)[[1]]< -cutoff)]
+      if (!is.na(out$Lambda[1])) mcmcVals$Lambda = geweke.diag(out$Lambda)[[1]][which(geweke.diag(out$Lambda)[[1]]>cutoff | geweke.diag(out$Lambda)[[1]]< -cutoff)]
+      if (!is.na(out$alphaS[1])) mcmcVals$alphaS = geweke.diag(out$alphaS)[[1]][which(geweke.diag(out$alphaS)[[1]]>cutoff | geweke.diag(out$alphaS)[[1]]< -cutoff)]
+      if (!is.na(out$tau2.lambda[1])) mcmcVals$tau2.lambda = geweke.diag(out$tau2.lambda)[[1]][which(geweke.diag(out$tau2.lambda)[[1]]>cutoff | geweke.diag(out$tau2.lambda)[[1]]< -cutoff)]
+      if (!is.na(out$sig2[1])) mcmcVals$sig2 = geweke.diag(out$sig2)[[1]][which(geweke.diag(out$sig2)[[1]]>cutoff | geweke.diag(out$sig2)[[1]]< -cutoff)]
+    }
+    
+    if(length(mcmcVals)==0){
+      mcmcVals <- "All parameters have met the cutoff criteria."
+    }
+  }else{
+    
+    if (type=='eSS') {
+      if (!is.na(out$mu[1])) mcmcVals$mu = effectiveSize(out$mu)
+      if (!is.na(out$alpha.mu[1])) mcmcVals$alpha.mu = effectiveSize(out$alpha.mu)
+      if (!is.na(out$tau2.mu[1])) mcmcVals$tau2.mu = effectiveSize(out$tau2.mu)
+      if (!is.na(out$beta[1])) mcmcVals$beta = effectiveSize(out$beta)
+      if (!is.na(out$alpha.beta[1])) mcmcVals$alpha.beta = effectiveSize(out$alpha.beta)
+      if (!is.na(out$tau2.beta[1])) mcmcVals$tau2.beta = effectiveSize(out$tau2.beta)
+      if (!is.na(out$xi[1])) mcmcVals$xi = effectiveSize(out$xi)
+      if (!is.na(out$alpha.xi[1])) mcmcVals$alpha.xi = effectiveSize(out$alpha.xi)
+      if (!is.na(out$tau2.xi[1])) mcmcVals$tau2.xi = effectiveSize(out$tau2.xi)
+      if (!is.na(out$alphaT[1])) mcmcVals$alphaT = effectiveSize(out$alphaT)
+      if (!is.na(out$F.tilde[1])) mcmcVals$F.tilde = effectiveSize(out$F.tilde)
+      if (!is.na(out$Lambda[1])) mcmcVals$Lambda = effectiveSize(out$Lambda)
+      if (!is.na(out$alphaS[1])) mcmcVals$alphaS = effectiveSize(out$alphaS)
+      if (!is.na(out$tau2.lambda[1])) mcmcVals$tau2.lambda = effectiveSize(out$tau2.lambda)
+      if (!is.na(out$sig2[1])) mcmcVals$sig2 = effectiveSize(out$sig2)
+    }
+    
+    if (type=='geweke') {
+      if (!is.na(out$mu[1])) mcmcVals$mu = geweke.diag(out$mu)[[1]]
+      if (!is.na(out$alpha.mu[1])) mcmcVals$alpha.mu = geweke.diag(out$alpha.mu)[[1]]
+      if (!is.na(out$tau2.mu[1])) mcmcVals$tau2.mu = geweke.diag(out$tau2.mu)[[1]]
+      if (!is.na(out$beta[1])) mcmcVals$beta = geweke.diag(out$beta)[[1]]
+      if (!is.na(out$alpha.beta[1])) mcmcVals$alpha.beta = geweke.diag(out$alpha.beta)[[1]]
+      if (!is.na(out$tau2.beta[1])) mcmcVals$tau2.beta = geweke.diag(out$tau2.beta)[[1]]
+      if (!is.na(out$xi[1])) mcmcVals$xi = geweke.diag(out$xi)[[1]]
+      if (!is.na(out$alpha.xi[1])) mcmcVals$alpha.xi = geweke.diag(out$alpha.xi)[[1]]
+      if (!is.na(out$tau2.xi[1])) mcmcVals$tau2.xi = geweke.diag(out$tau2.xi)[[1]]
+      if (!is.na(out$alphaT[1])) mcmcVals$alphaT = geweke.diag(out$alphaT)[[1]]
+      if (!is.na(out$F.tilde[1])) mcmcVals$F.tilde = geweke.diag(out$F.tilde)[[1]]
+      if (!is.na(out$Lambda[1])) mcmcVals$Lambda = geweke.diag(out$Lambda)[[1]]
+      if (!is.na(out$alphaS[1])) mcmcVals$alphaS = geweke.diag(out$alphaS)[[1]]
+      if (!is.na(out$tau2.lambda[1])) mcmcVals$tau2.lambda = geweke.diag(out$tau2.lambda)[[1]]
+      if (!is.na(out$sig2[1])) mcmcVals$sig2 = geweke.diag(out$sig2)[[1]]
+    }
+  }
   mcmcVals
 
 }
@@ -130,9 +175,9 @@ convergence_diag = function(out, type='eSS', cutoff=ifelse(type=='eSS',100,1.96)
 #' @returns A matrix of size \code{n.times*n.locs} by \code{draws} log-likelihood values for each observation and each posterior draw.
 #' @author Adam Simpson and Candace Berrett
 #' @examples
-#' data(out.sm)
-#' attach(out.sm)
-#' loglik <- computeLogLik(out.sm, addthin=2)
+#' data(out.sim)
+#' attach(out.sim)
+#' loglik <- computeLogLik(out.sim, addthin=2)
 #' @export computeLogLik
 computeLogLik <- function(out, verbose=FALSE, addthin=1) {
   y = out$y

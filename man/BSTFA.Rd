@@ -144,22 +144,22 @@ BSTFA(
 \value{
 A bstfa object containing the following elements (any elements that are the same as in the function input are removed here for brevity):
 \describe{
-\item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the values will all be zero.}
-\item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
-\item{tau2.mu}{An mcmc object of size \code{draws} by \code{1} containing the posterior draws for the variance of the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
-\item{beta}{An mcmc object of size \code{draws} by \code{n.locs} containing the posterior draws for the increase/decrease (slope) across time for each location.}
-\item{alpha.beta}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the slope.}
-\item{tau2.beta}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the slopes.}
-\item{xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots*n.locs} containing posterior draws for the coefficients of the seasonal process.}
-\item{alpha.xi}{An mcmc object of size \code{draws} by \code{(n.spatial.bases + p)*n.seasn.knots} containing posterior draws for the coefficients modeling each coefficient of the seasonal process.}
-\item{tau2.xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots} containing posterior draws of the variance of the coefficients of the seasonal process.}
-\item{F.tilde}{An mcmc object of size \code{draws} by \code{n.times*n.factors} containing posterior draws of the residual factors.}
-\item{alphaT}{An mcmc object of size \code{draws} by \code{n.factors*n.temp.bases} containing posterior draws of the coefficients for the factor temporally-dependent process.}
-\item{Lambda.tilde}{An mcmc object of size \code{draws} by \code{n.factors*n.locs} containing posterior draws of the loadings for each location.}
-\item{alphaS}{An mcmc object of size \code{draws} by \code{n.factors*n.load.bases} containing posterior draws of the coefficients for the loadings spatial process.}
-\item{tau2.lambda}{An mcmc object of size \code{draws} by \code{1} indicating the residual variance of the loadings spatial process.}
+\item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), then it is \code{NA}.}
+\item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), then it is \code{NA}.}
+\item{tau2.mu}{An mcmc object of size \code{draws} by \code{1} containing the posterior draws for the variance of the mean process.  If \code{mean=FALSE} (default), then it is \code{NA}.}
+\item{beta}{An mcmc object of size \code{draws} by \code{n.locs} containing the posterior draws for the increase/decrease (slope) across time for each location. If \code{linear=FALSE}, then it is \code{NA}.}
+\item{alpha.beta}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the slope. If \code{linear=FALSE}, then it is \code{NA}.}
+\item{tau2.beta}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the slopes. If \code{linear=FALSE}, then it is \code{NAL}.}
+\item{xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots*n.locs} containing posterior draws for the coefficients of the seasonal process. If \code{seasonal=FALSE}, then it is \code{NA}.}
+\item{alpha.xi}{An mcmc object of size \code{draws} by \code{(n.spatial.bases + p)*n.seasn.knots} containing posterior draws for the coefficients modeling each coefficient of the seasonal process. If \code{seasonal=FALSE}, then it is \code{NA}.}
+\item{tau2.xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots} containing posterior draws of the variance of the coefficients of the seasonal process. If \code{seasonal=FALSE}, then it is \code{NA}.}
+\item{F.tilde}{An mcmc object of size \code{draws} by \code{n.times*n.factors} containing posterior draws of the residual factors. If \code{factors=FALSE}, then it is \code{NA}.}
+\item{alphaT}{An mcmc object of size \code{draws} by \code{n.factors*n.temp.bases} containing posterior draws of the coefficients for the factor temporally-dependent process. If \code{factors=FALSE}, then it is \code{NA}.}
+\item{Lambda.tilde}{An mcmc object of size \code{draws} by \code{n.factors*n.locs} containing posterior draws of the loadings for each location. If \code{factors=FALSE}, then it is \code{NA}.}
+\item{alphaS}{An mcmc object of size \code{draws} by \code{n.factors*n.load.bases} containing posterior draws of the coefficients for the loadings spatial process. If \code{factors=FALSE}, then it is \code{NA}.}
+\item{tau2.lambda}{An mcmc object of size \code{draws} by \code{1} indicating the residual variance of the loadings spatial process. If \code{factors=FALSE}, then it is \code{NA}.}
 \item{sig2}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the residual variance of the data.}
-\item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NULL}. }
+\item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NA}. }
 \item{time.data}{A data frame of size \code{iters} by \code{6} containing the time it took to sample each parameter for every iteration.}
 \item{setup.time}{An object containing the time the model setup took.}
 \item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the Fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
@@ -184,9 +184,9 @@ ff <- c(
   48, #north
   14 #east
 )
-out <- BSTFA(ymat=out.sm$ymat,
-  dates=out.sm$dates,
-  coords=out.sm$coords,
+out <- BSTFA(ymat=out.sim$ymat,
+  dates=out.sim$dates,
+  coords=out.sim$coords,
   iters=500, 
   save.missing=F, 
   factors.fixed=ff, 

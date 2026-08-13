@@ -4,14 +4,21 @@
 \alias{convergence_diag}
 \title{Check effective sample size and geweke diagnostic}
 \usage{
-convergence_diag(out, type = "eSS", cutoff = ifelse(type == "eSS", 100, 1.96))
+convergence_diag(
+  out,
+  type = "eSS",
+  onlyfail = TRUE,
+  cutoff = ifelse(type == "eSS", 100, 1.96)
+)
 }
 \arguments{
 \item{out}{Output from BSTFA or BSTFAfull.}
 
 \item{type}{Character specifying which diagnostic to compute.  Options are \code{ess} and \code{geweke}.}
 
-\item{cutoff}{Numeric scalar indicating the cutoff value to flag parameters that haven't converged.}
+\item{onlyfail}{Logical scalar indicating whether to save only those parameters that fail to meet the designated \code{cutoff} value. Default \code{TRUE}.}
+
+\item{cutoff}{Numeric scalar indicating the cutoff value to flag parameters that haven't converged. Used when \code{onlyfail=TRUE}, ignored otherwise.}
 }
 \value{
 A list containing the parameters not meeting the convergence cutoff criteria.
@@ -20,10 +27,10 @@ A list containing the parameters not meeting the convergence cutoff criteria.
 Check effective sample size and geweke diagnostic
 }
 \examples{
-data(out.sm)
-attach(out.sm)
-convergence_diag(out.sm)
+data(out.sim)
+attach(out.sim)
+convergence_diag(out.sim)
 }
 \author{
-Adam Simpson
+Adam Simpson and Candace Berrett
 }

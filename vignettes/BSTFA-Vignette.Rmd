@@ -99,46 +99,39 @@ kable(
   column_spec(2, width = "4.5in")
 ```
 
-The `BSTFA` and `BSTFAfull` functions are demonstrated below. Additional Markov-chain Monte Carlo (MCMC) arguments such as `iters`, `thin`, and `burn` have default values, but they can be specified as in any Bayesian model to control the number of posterior draws. Although the `BSTFA` function is much faster than the fully-parameterized `BSTFAfull` function, it is still an MCMC with many parameters and will need many draws to fully represent the posterior distributions.  Except for the model comparison figures (where plots were created outside the vignette), for the sake of keeping the vignette's compile time short, we use a data set in the package called `out.sm` which is an object fit using the code below.  
+The `BSTFA` and `BSTFAfull` functions are demonstrated below. Additional Markov-chain Monte Carlo (MCMC) arguments such as `iters`, `thin`, and `burn` have default values, but they can be specified as in any Bayesian model to control the number of posterior draws. Although the `BSTFA` function is much faster than the fully-parameterized `BSTFAfull` function, it is still an MCMC with many parameters and will need many draws to fully represent the posterior distributions.  Except for the model comparison figures (where plots were created outside the vignette), for the sake of keeping the vignette's compile time short, we use a data set in the package called `out.sim` which is output from the `BSTFA` function on a simulated data set and is included in the package. 
 
 ```{r bstfaoutput, eval=F}
-#Code used to create the "out.sm" data object in the BSTFA package. 
+#Code used to create the "out.sim" data object in the BSTFA package. 
 #Note: Not run within this vignette.
 
-#Load the full temperature data set
-data(UtahDataList)
-attach(UtahDataList)
+#Load the data
+data(out.sim)
+attach(out.sim)
 
-#Load the data and select a subset
-dates.ind <- 1151:1251
-locs.use <- c(3, 8, 11, 16, 17,
-               		 	20, 23, 29, 30, 46,
-               		 	47, 49, 60, 62, 66, 73,
-               		 	75, 76, 77, 78, 85, 89, 94,
-               		 	96, 98, 100, 109, 112,
-              		 	115, 121, 124, 128, 133, 144)
-temps.sm <- TemperatureVals[dates.ind, locs.use]
-coords.sm <- Coords[locs.use,]
-dates.sm <- Dates[dates.ind]
-locsm.names <- Locations[locs.use]
+#Set seed and fixed locations for the loadings
+set.seed(173)
+ff <- c(
+33, #west
+31, #south
+7, #north
+49 #east
+)
 
-#Fit the model
-set.seed(466)
-out.sm <- BSTFA(ymat=temps.sm, 
-                 	dates=dates.sm, 
-                 	coords=coords.sm, 
-                 	iters=5000, 
-                 	burn=1000,
-                 	thin=40, 
-                 	factors.fixed=c(14, 22, 15, 20), 
-                 	n.temp.bases=45, 
-                  save.missing=FALSE)
+coordsmat <- coordsmat[,1:2]
+out.sim <- BSTFA(ymat=ymat, 
+             dates=dates, 
+             coords=coordsmat, 
+             iters=1000, 
+             thin=2,
+             save.missing=F, 
+             factors.fixed=ff,
+             verbose=FALSE)
 ```
 
 The `verbose` argument controls whether or not the function prints status updates during sampling. Although the default value for this is `TRUE`, for the sake of this vignette, `verbose` will always be set to `FALSE`. 
 
 The `utahDataList` list object in the `BSTFA` package contains the observed temperature data (`TemperatureVals`), the corresponding dates (`Dates`), the coordinates (`Coords`), and the weather station names (`Locations`).
-
 
 ```{r reducedmod, eval=FALSE, cache=FALSE}
 out = BSTFA(ymat=utahDataList$TemperatureVals,
@@ -156,8 +149,8 @@ full.out = BSTFAfull(ymat=utahDataList$TemperatureVals,
 
 ```{r sampleout, eval=TRUE}
 #Load small pre-fit model output
-data(out.sm)
-attach(out.sm)
+data(out.sim)
+attach(out.sim)
 ```
 
 ### Understanding Output {#subsubsec-output}
@@ -191,7 +184,7 @@ The code below provides posterior predictive draws of temperatures at an observe
 
 ```{r predall, eval=F}
 loc = 1
-preds = predictBSTFA(out.sm, 
+preds = predictBSTFA(out.sim, 
                      location = loc,
                      type='all',
                      pred.int=TRUE,
@@ -202,7 +195,7 @@ The code below sets `type == "mean"` and returns a $T \times 1$ vector containin
 
 ```{r plotpredobs, eval=F}
 loc = 1
-preds = predictBSTFA(out.sm, 
+preds = predictBSTFA(out.sim, 
                      location = loc,
                      type='mean')
 ```
@@ -211,7 +204,7 @@ The code below provides posterior predictive draws for temperatures at an $\text
 
 ```{r plotpred, eval=F}
 loc = matrix(c(0.89, 0.21), nrow=1, ncol=2) #Coordinates close to Location 1
-preds_new = predictBSTFA(out.sm, 
+preds_new = predictBSTFA(out.sim, 
                          location = loc,
                          type='all',
                          pred.int=TRUE,
@@ -220,11 +213,11 @@ preds_new = predictBSTFA(out.sm,
 
 The `predictBSTFA` function is also called within the `plot_location` function, which takes similar arguments as `predictBSTFA` with the addition of a few extra plotting arguments. `xrange` defines the time points $\{t: t \in \mathcal{T}\}$ at which the posterior estimates are plotted, with default value `NULL` indicating to plot on all of $\mathcal{T}$. `truth` (default value `FALSE`) will plot the observed data along with the estimates if `location` comes from the data set. `uncertainty` (default value `TRUE`) indicates whether to include a posterior predictive interval (`pred.int==TRUE`) or a credible interval (`pred.int==FALSE`).
 
-Below is an example of code used to plot the posterior mean temperature values (black line) at an observed location, Loa, Utah, with 95\% posterior credible bounds (gray bands), and observed measurements (gray circles). Figure \@ref(fig:fig-location) provides the plot.  Notice that the posterior mean (black line) closely follows the pattern of the observed data, but, as expected due to basis smoothing, is more smooth than the observed data. Increasing the number of bases will decrease the smoothness (but increase computation time).
+Below is an example of code used to plot the posterior mean temperature values (black line) at an observed location (Location 1) with 95\% posterior credible bounds (gray bands), and observed measurements (gray circles). Figure \@ref(fig:fig-location) provides the plot.  Notice that the posterior mean (black line) closely follows the pattern of the observed data, but, as expected due to basis smoothing, is more smooth than the observed data. Increasing the number of bases will decrease the smoothness (but increase computation time).
 
-```{r fig-location, fig.cap="Posterior mean temperature values (black line) at an in-sample location, Loa, Utah, with 95% posterior predictive bounds (gray bands), and observed temperature measurements (gray circles).", fig.align="center", fig.height=3.5, fig.width=6}
+```{r fig-location, fig.cap="Posterior mean temperature values (black line) at an in-sample location (Location 1) with 95% posterior predictive bounds (gray bands), and observed temperature measurements (gray circles).", fig.align="center", fig.height=3.5, fig.width=6}
 loc = 1
-plot_location(out.sm,
+plot_location(out.sim,
               location=loc,
               type='mean',
               uncertainty=TRUE,
@@ -232,11 +225,11 @@ plot_location(out.sm,
               truth=TRUE)
 ```
 
-Below is an example of code used to plot the estimated posterior mean temperature values at an $\textit{unobserved}$ location, "Torrey, Utah," a location near Loa. Figure \@ref(fig:fig-prediction) provides the plot where again, the black line represents the posterior mean and the gray bands represent the 95\% posterior predictive intervals.  
+Below is an example of code used to plot the estimated posterior mean temperature values at an $\textit{unobserved}$ location near Location 1. Figure \@ref(fig:fig-prediction) provides the plot where again, the black line represents the posterior mean and the gray bands represent the 95\% posterior predictive intervals.  
 
-```{r fig-prediction, fig.cap="Posterior mean temperature values (black line) at an out-of-sample location, Torrey, Utah, with 95% posterior predictive bounds (gray bands).", fig.align="center",fig.height=3.5, fig.width=6}
-loc = matrix(c(0.89, 0.21), nrow=1, ncol=2) #Coordinates close to Location 1
-plot_location(out.sm,
+```{r fig-prediction, fig.cap="Posterior mean temperature values (black line) at an out-of-sample location with 95% posterior predictive bounds (gray bands).", fig.align="center",fig.height=3.5, fig.width=6}
+loc = matrix(c(0.89, 0.74), nrow=1, ncol=2) #Coordinates close to Location 1
+plot_location(out.sim,
               location=loc,
               type='mean',
               uncertainty=TRUE,
@@ -248,7 +241,6 @@ plot_location(out.sm,
 ## Visualization {#subsec-plots}
 
 The `BSTFA` package contains multiple functions for plotting and visualizing the model output. Of course, all of these can be implemented on your own (the output from the `BSTFA` or `BSTFAfull` functions contain all posterior draws and basis function matrices), but these functions exist for quick plotting and visualization of posterior distributions. Some functions use base R for plotting while others use the `ggplot2` package [@wickham2016]. Table \@ref(tab:tab-plotting) below displays a table with each plotting function and a basic description. 
-
 
 ```{r tab-plotting, results='asis', label="tab-plotting", echo=FALSE}
 kable(
@@ -273,37 +265,37 @@ kable(
   column_spec(2, width = "4.5in")
 ```
 
-For instance, `plot_annual` can plot the estimated annual seasonal behavior at any (observed or unobserved) location. The code for doing this for an observed location, Loa, Utah, is provided below.  Figure \@ref(fig:fig-season) provides the corresponding plot, where the black line is the posterior mean, the gray band is the 95\% credible interval, and the gray dots are the observations plotted on their day of year. This shows the expected seasonal behavior -- that the temperatures tend to increase in the spring/summer months and decrease in the fall/winter months. 
+For instance, `plot_annual` can plot the estimated annual seasonal behavior at any observed or unobserved location. The code for doing this for an observed location (Location 1) is provided below.  Figure \@ref(fig:fig-season) provides the corresponding plot, where the black line is the posterior mean, the gray band is the 95\% credible interval, and the gray dots are the observations plotted on their day of year. This shows the expected seasonal behavior -- that the temperatures tend to increase in the spring/summer months and decrease in the fall/winter months. 
 
 ```{r fig-season, fig.cap="Posterior mean annual seasonal behavior (black line) with 95% credible interval (gray band), and observed data (open gray circles) plotted by day of year.", fig.align="center",fig.height=3.5, fig.width=5}
-plot_annual(out.sm,
+plot_annual(out.sim,
             location=1,
             years='one')
 ```
 
-The `plot_spatial_param` function can plot the posterior mean of the linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year." If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. Figure \@ref(fig:fig-obsslope) provides the corresponding plot, where the color represents the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Notice that most locations show an average increase in temperature of between 0 and approximately 0.3 degrees Celcius per year over the 2007 to 2015 time period.
+The `plot_spatial_param` function can plot the posterior mean of the linear slope or factor loadings at all observed locations. The `type` argument (default is `"mean"`, with other options `"median"`, `"ub"`, or `"lb"`) indicates which summary to show. The `parameter` argument can be set either to `"slope"` or `"loading"`. If set to `"slope"`, the argument `yearscale` (default is `TRUE`) controls whether the slope estimates are "per year." If set to `"loading"`, the `loadings` argument indicates which loading to plot. First, we provide an example to plot the estimated linear change in temperature (increase or decrease) across time. Figure \@ref(fig:fig-obsslope) provides the corresponding plot, where the color represents the long-term increasing (positive and red) or decreasing (negative and blue) behavior over the observed time period for the observed locations. Notice that most locations show an average increase in the response variable of between 0 and approximately 0.1 units per year over the simulation time period.
 
 ```{r fig-obsslope, fig.align="center", fig.cap="Posterior mean linear change in time (slope) of temperatures at observed locations.", fig.width=3.5, fig.height=3.5}
-plot_spatial_param(out.sm,
+plot_spatial_param(out.sim,
           type='mean',
           parameter='slope',
           yearscale=TRUE)
 ```
 
-Next, we provide example code for plotting a particular loading, in this case, the posterior mean loading for the first factor. Figure \@ref(fig:fig-obsloading1) provides the corresponding plot showing the posterior mean loading values that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The circled dot shows the location of the fixed factor; in this case, the first factor is fixed at Ibapah, Utah.  This means that the loading corresponding to factor 1 for that location was fixed at a value of 1 (and fixed to be 0 for factors 2, 3, and 4) and the loadings for other locations are estimated given that value. The model accounts for spatial dependence in the loadings so that locations near to Ibapah are modeled to have posterior mean loadings closer to one.
+Next, we provide example code for plotting a particular loading, in this case, the posterior mean loading for the first factor. Figure \@ref(fig:fig-obsloading1) provides the corresponding plot showing the posterior mean loading values that each location places on the first factor, with the color indicating the strength of the weight (darker colors indicate a stronger weight). The circled dot shows the location of the fixed factor; in this case, the first factor is fixed at Location 22, a point in the western part of the region.  This means that the loading corresponding to factor 1 for that location was fixed at a value of 1 (and fixed to be 0 for factors 2, 3, and 4) and the loadings for other locations are estimated given that value. The model accounts for spatial dependence in the loadings so that locations near Location 22 are modeled to have posterior mean loading values closer to one.
 
 ```{r fig-obsloading1, fig.cap="Posterior mean estimates of loadings for factor 1 at observed locations.  The circled red dot shows the location of the fixed factor loading.", fig.align="center", fig.width=4, fig.height=3.5}
-plot_spatial_param(out.sm,
+plot_spatial_param(out.sim,
           type='mean',
           parameter='loading',
           loadings=1)
 ```
 
 
-The `plot_factor` function plots the estimated temporally-dependent factors either together (setting `together=TRUE`) or separate (setting `together=FALSE` and `factor` to the factor number you want to plot). The example code below plots the first factor, corresponding to the loadings shown in the previous example. Figure \@ref(fig:fig-factorexample2) shows the posterior mean (black line) and 95\% credible intervals (gray band) of the first factor across the 2007-2015 time period. Notice how this first factor around 2013 tends to have lower values (values < 0).  This means that after accounting for the constant increase/decrease in temperature across time and the seasonal cycle, locations whose loadings weight positively on this factor saw lower-than-typical temperatures during this time period.  
+The `plot_factor` function plots the estimated temporally-dependent factors either together (setting `together=TRUE`) or separate (setting `together=FALSE` and `factor` to the factor numbers you want to plot). The example code below plots the first factor, the factor that corresponds to the loadings shown in the previous example. Figure \@ref(fig:fig-factorexample2) shows the posterior mean (black line) and 95\% credible intervals (gray band) of the first factor across the simulation time period. Notice how this first factor during the middle of the time series tends to have higher values (values > 0).  This means that after accounting for the constant increase/decrease in temperature across time and the seasonal cycle, locations whose loadings weight positively on this factor saw higher-than-expected response variables during this time period.  
 
 ```{r fig-factorexample2, fig.cap="Posterior mean (black line) and 95% credible interval (gray band) of the first factor across the observed time period.", fig.align="center", fig.height=3.5, fig.width=6}
-plot_factor(out.sm,
+plot_factor(out.sim,
             together=FALSE,
             include.legend=FALSE,
             factor=1,
@@ -313,7 +305,7 @@ plot_factor(out.sm,
 To plot the factors together, set `together==TRUE`, as in the example code below (not run). We can think of the factors as "unknown" environmental behaviors.  Thus, the factors capture common behaviors of the temperature measurements across time that weren't explicitly modeled (in contrast to the increasing/decreasing temperature and seasonal behaviors that were explicitly modeled).    
 
 ```{r fig-factorexample1, fig.cap="Posterior mean (solid lines) and 95% credible intervals (light colored bands) for the four estimated factors across the observed time period.", fig.align="center", fig.height=3.75, fig.width=6, eval=F}
-plot_factor(out.sm,
+plot_factor(out.sim,
             together=TRUE,
             include.legend=TRUE,
             type='mean')
@@ -321,10 +313,10 @@ plot_factor(out.sm,
 
 
 
-The `map_spatial_param` function is similar to `plot_spatial_param`, but the parameter is plotted on a grid of unobserved locations. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=25` creates a $25 \times 25$ grid of locations to estimate the parameter values.  This function is demonstrated below for the estimated linear increase/decrease of temperatures across Utah (once again, setting `yearscale=TRUE` to provide "per year" estimates). Figure \@ref(fig:fig-mapexample1) shows the model estimates that temperatures tend to be increasing across the state by between $\approx$ 0 and 0.3$^{\circ}$ C each year.
+The `map_spatial_param` function is similar to `plot_spatial_param`, but the parameter is plotted on a grid across the region of interest. If `map` is set to `FALSE`, the estimates will appear on a square grid. Setting, `map=TRUE`, `state=TRUE` and `location='utah'` uses the `sf` package [@sfpackage] to import a map of Utah. The `fine` argument indicates the size of the grid; for instance, setting `fine=25` creates a $25 \times 25$ grid of locations to estimate the parameter values.  This function is demonstrated below for the estimated linear increase/decrease of the simulated response variable (once again, setting `yearscale=TRUE` to provide "per year" estimates). Figure \@ref(fig:fig-mapexample1) shows the model estimates that the variables tend to be increasing across the region by between $\approx$ 0 and 0.05 units each year.
 
 ```{r fig-mapexample1, cache=FALSE, warning=FALSE, fig.cap="Posterior mean linear change in temperatures across time for locations across the observed space.", fig.align="center", fig.width=3.5}
-map_spatial_param(out.sm,
+map_spatial_param(out.sim,
          parameter='slope',
          yearscale=TRUE,
          type='mean',
@@ -677,11 +669,15 @@ Factor analysis allows for interpretability of the factors and/or loadings. Sinc
 
 It's important that the fixed factor locations have a low proportion of missing data. If fixed factor locations are not given, they will be smartly chosen by the function according to distance and proportion of missing data.
 
-```{r dataplotsetup, echo=FALSE, warning=FALSE, include=FALSE, fig.width=3, eval=FALSE}
+```{r dataplotsetup, echo=FALSE, warning=FALSE, include=FALSE, fig.width=3, eval=TRUE}
 map_data_loc <- ggplot2::map_data('state')[ggplot2::map_data('state')$region == 'utah',]
 full_map <- ggplot2::map_data('state')
 sf_polygon <- sf::st_sfc(sf::st_polygon(list(as.matrix(map_data_loc[,c(1,2)]))), crs=4326)
-fixed_locations <- out.sm$coords[out.sm$factors.fixed,] 
+
+data("utahDataList")
+attach(utahDataList)
+
+fixed_locations <- utahDataList$Coords[c(62, 89, 66, 78),] 
 
 m = ggplot() +
   ## First layer: worldwide map
@@ -694,9 +690,9 @@ m = ggplot() +
                color = 'black', fill='#f3f3f3') +
   coord_map() +
   coord_fixed(1.3,
-              xlim = c(min(out.sm$coords[,1])-0.5, max(out.sm$coords[,1])+0.5),
-              ylim = c(min(out.sm$coords[,2])-0.5, max(out.sm$coords[,2])+0.5)) + 
-  geom_point(data=out.sm$coords,
+              xlim = c(min(utahDataList$Coords[,1])-0.5, max(utahDataList$Coords[,1])+0.5),
+              ylim = c(min(utahDataList$Coords[,2])-0.5, max(utahDataList$Coords[,2])+0.5)) + 
+  geom_point(data=utahDataList$Coords,
              aes(x=Longitude,y=Latitude),
              color='black', cex=1) +
   geom_point(data=fixed_locations,
@@ -713,7 +709,7 @@ m
 ```
 
 
-Because Ibapah is the first fixed loading location (western-most red dot in Figure \@ref(fig:fig-dataplot)), the map of estimates for the first loading indicate the strength of the relationship of each location's temperatures to Ibapah's temperatures, after accounting for linear and seasonal behavior. Higher loading values indicate greater similarity. We can use the `map_spatial_param` to plot the estimated loadings across a grid over the observed locations by using `parameter='loading'` and `loading=1` (for the first loading). 
+Because Ibapah, Utah is the first fixed loading location (western-most red dot in Figure \@ref(fig:fig-dataplot)), the map of estimates for the first loading indicate the strength of the relationship of each location's temperatures to Ibapah's temperatures, after accounting for linear and seasonal behavior. Higher loading values indicate greater similarity. We can use the `map_spatial_param` to plot the estimated loadings across a grid over the observed locations by using `parameter='loading'` and `loading=1` (for the first loading). 
 
 ## Basis Function Details
 
@@ -804,10 +800,11 @@ bstfaTPS <- BSTFA(ymat=utahDataList$TemperatureVals,
 There are few ways to decide which spatial basis functions to use for your data. First, diagnostics such as the Watanabe-Akaike Information Criterion (WAIC) and Leave-One-Out Cross-Validation (LOO-CV) can help the user compare model fits [@loopackage]. These can be computed using the `waic` and `loo` functions from the `loo` package. These functions require a matrix of log-likelihood values, which can be generated using the function `computeLogLik` from the `BSTFA` package, supplying as argument the output from `BSTFA` or `BSTFAfull`.
 
 ```{r, eval=FALSE}
-loglik = computeLogLik(out.sm,
+loglik = computeLogLik(out.sim,
                        verbose=FALSE)
+reff <- loo::relative_eff(exp(t(loglik)), chain_id=rep(1, out.sim$draws))
 loo::waic(t(loglik))
-loo::loo(t(loglik))
+loo::loo(t(loglik), r_eff=reff)
 ```
 
 Table \@ref(tab:tab-waic) compares the WAIC and LOO-CV for 12 different models fit to the full Utah temperature data. In each instance, the number of spatial bases is the same for both the linear/seasonal components and the factor analysis component -- that is, `n.spatial.bases` = `n.load.bases`. The number of temporal bases is the `n.temp.bases` argument; 126 is the default for the Utah data (10\% of $T$). 
@@ -845,7 +842,7 @@ knitr::include_graphics("basis_comparison3.png")
 The `BSTFA` package has built-in helper functions for assessing convergence. These functions use the fact that all matrices of parameter draws are MCMC objects from the `coda` package. To look at trace plots, you can use the `plot_trace` function. This function takes as input your `BSTFA` or `BSTFAfull` object, a string value `parameter` indicating which parameter to view (corresponds directly to what the parameter is called in the `BSTFA` list output), and `param.range` which accepts a numeric vector indicating which of these parameters you want to view.
 
 ```{r, eval=F}
-plot_trace(out.sm,
+plot_trace(out.sim,
            parameter='beta',
            param.range=c(27),
            density=FALSE)
@@ -854,9 +851,9 @@ plot_trace(out.sm,
 The other available helper function is `convergence_diag`. This function takes as input the `BSTFA` or `BSTFAfull` function output and returns the effective sample size or Geweke diagnostic (indicated by `type='eSS'` or `type='geweke'`) for all parameters above a given cutoff (indicated by `cutoff`). For instance, the function below will return all parameters with an effective sample size below 100.
 
 ```{r, eval=FALSE}
-convergence_diag(out.sm,
+convergence_diag(out.sim,
                   type='geweke',
-                  cutoff = 2)
+                  cutoff = 2, onlyfail=FALSE)
 ```
 
 We encourage the user to read additional resources on MCMC and convergence, such as @johnson2022bayes for introductory readers or @gelman2013bayesian for more advanced readers.

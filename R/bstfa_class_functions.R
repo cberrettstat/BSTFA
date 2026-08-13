@@ -13,7 +13,7 @@
 #' }
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' summary(out.sm)
+#' summary(out.sim)
 #' @export 
 summary.bstfa <- function(object, ...){
   
@@ -73,7 +73,7 @@ summary.bstfa <- function(object, ...){
 #' @returns A plot of the selected parameter or variable.  
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' plot(out.sm)
+#' plot(out.sim)
 #' @export 
 plot.bstfa <- function(x, ..., plot.param='beta', type='map', location=1, loadings=NULL, factor=1){
   
@@ -123,7 +123,7 @@ plot.bstfa <- function(x, ..., plot.param='beta', type='map', location=1, loadin
 #' }
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' print(out.sm)
+#' print(out.sim)
 #' @export
 print.bstfa <- function(x, ...){
   
@@ -182,7 +182,7 @@ print.bstfa <- function(x, ...){
 #' @returns A numeric vector for BSTFA model coefficients.  Names of the values are labeled using the station name then the parameter.
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' coef(out.sm)
+#' coef(out.sim)
 #' @export 
 coef.bstfa <- function(object, ...){
   

@@ -61,22 +61,22 @@
 #' @import graphics
 #' @returns A bstfa object containing the following elements (any elements that are the same as in the function input are removed here for brevity):
 #' \describe{
-#'   \item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), the values will all be zero.}
-#'   \item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
-#'   \item{tau2.mu}{An mcmc object of size \code{draws} by \code{1} containing the posterior draws for the variance of the mean process.  If \code{mean=FALSE} (default), the values will all be zero.}
-#'   \item{beta}{An mcmc object of size \code{draws} by \code{n.locs} containing the posterior draws for the increase/decrease (slope) across time for each location.}
-#'   \item{alpha.beta}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the slope.}
-#'   \item{tau2.beta}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the slopes.}
-#'   \item{xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots*n.locs} containing posterior draws for the coefficients of the seasonal process.}
-#'   \item{alpha.xi}{An mcmc object of size \code{draws} by \code{(n.spatial.bases + p)*n.seasn.knots} containing posterior draws for the coefficients modeling each coefficient of the seasonal process.}
-#'   \item{tau2.xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots} containing posterior draws of the variance of the coefficients of the seasonal process.}
-#'   \item{F.tilde}{An mcmc object of size \code{draws} by \code{n.times*n.factors} containing posterior draws of the residual factors.}
-#'   \item{alphaT}{An mcmc object of size \code{draws} by \code{n.factors*n.temp.bases} containing posterior draws of the coefficients for the factor temporally-dependent process.}
-#'   \item{Lambda.tilde}{An mcmc object of size \code{draws} by \code{n.factors*n.locs} containing posterior draws of the loadings for each location.}
-#'   \item{alphaS}{An mcmc object of size \code{draws} by \code{n.factors*n.load.bases} containing posterior draws of the coefficients for the loadings spatial process.}
-#'   \item{tau2.lambda}{An mcmc object of size \code{draws} by \code{1} indicating the residual variance of the loadings spatial process.}
+#'   \item{mu}{An mcmc object of size \code{draws} by \code{n.locs} containing posterior draws for the mean of each location.  If \code{mean=FALSE} (default), then it is \code{NA}.}
+#'   \item{alpha.mu}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the mean process.  If \code{mean=FALSE} (default), then it is \code{NA}.}
+#'   \item{tau2.mu}{An mcmc object of size \code{draws} by \code{1} containing the posterior draws for the variance of the mean process.  If \code{mean=FALSE} (default), then it is \code{NA}.}
+#'   \item{beta}{An mcmc object of size \code{draws} by \code{n.locs} containing the posterior draws for the increase/decrease (slope) across time for each location. If \code{linear=FALSE}, then it is \code{NA}.}
+#'   \item{alpha.beta}{An mcmc object of size \code{draws} by \code{n.spatial.bases + p} containing posterior draws for the coefficients modeling the slope. If \code{linear=FALSE}, then it is \code{NA}.}
+#'   \item{tau2.beta}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the variance of the slopes. If \code{linear=FALSE}, then it is \code{NAL}.}
+#'   \item{xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots*n.locs} containing posterior draws for the coefficients of the seasonal process. If \code{seasonal=FALSE}, then it is \code{NA}.}
+#'   \item{alpha.xi}{An mcmc object of size \code{draws} by \code{(n.spatial.bases + p)*n.seasn.knots} containing posterior draws for the coefficients modeling each coefficient of the seasonal process. If \code{seasonal=FALSE}, then it is \code{NA}.}
+#'   \item{tau2.xi}{An mcmc object of size \code{draws} by \code{n.seasn.knots} containing posterior draws of the variance of the coefficients of the seasonal process. If \code{seasonal=FALSE}, then it is \code{NA}.}
+#'   \item{F.tilde}{An mcmc object of size \code{draws} by \code{n.times*n.factors} containing posterior draws of the residual factors. If \code{factors=FALSE}, then it is \code{NA}.}
+#'   \item{alphaT}{An mcmc object of size \code{draws} by \code{n.factors*n.temp.bases} containing posterior draws of the coefficients for the factor temporally-dependent process. If \code{factors=FALSE}, then it is \code{NA}.}
+#'   \item{Lambda.tilde}{An mcmc object of size \code{draws} by \code{n.factors*n.locs} containing posterior draws of the loadings for each location. If \code{factors=FALSE}, then it is \code{NA}.}
+#'   \item{alphaS}{An mcmc object of size \code{draws} by \code{n.factors*n.load.bases} containing posterior draws of the coefficients for the loadings spatial process. If \code{factors=FALSE}, then it is \code{NA}.}
+#'   \item{tau2.lambda}{An mcmc object of size \code{draws} by \code{1} indicating the residual variance of the loadings spatial process. If \code{factors=FALSE}, then it is \code{NA}.}
 #'   \item{sig2}{An mcmc object of size \code{draws} by \code{1} containing posterior draws of the residual variance of the data.}
-#'   \item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NULL}. }
+#'   \item{y.missing}{If \code{save.missing=TRUE}, a matrix of size \code{sum(missing)} by \code{draws} containing posterior draws of the missing observations.  Otherwise, the object is \code{NA}. }
 #'   \item{time.data}{A data frame of size \code{iters} by \code{6} containing the time it took to sample each parameter for every iteration.}
 #'   \item{setup.time}{An object containing the time the model setup took.}
 #'   \item{model.matrices}{A list containing the matrices used for each modeling process. \code{newS} is the matrix of spatial basis coefficients for the mean, linear, and seasonal process coefficients.  \code{linear.Tsub} is the matrix used to enforce a linear increase/increase (slope) across time. \code{seasonal.bs.basis} is the matrix containing the circular b-splines of the seasonal process.  \code{confoundingPmat.prime} is the matrix that enforces orthogonality of the factors from the mean, linear, and seasonal processes.  \code{QT} contains the Fourier bases used to model the temporal factors.  \code{QS} contains the bases used to model the spatial loadings.}
@@ -98,9 +98,9 @@
 #'   48, #north
 #'   14 #east
 #' )
-#' out <- BSTFA(ymat=out.sm$ymat,
-#'   dates=out.sm$dates,
-#'   coords=out.sm$coords,
+#' out <- BSTFA(ymat=out.sim$ymat,
+#'   dates=out.sim$dates,
+#'   coords=out.sim$coords,
 #'   iters=500, 
 #'   save.missing=F, 
 #'   factors.fixed=ff, 
@@ -144,13 +144,13 @@ BSTFA <- function(ymat, dates, coords,
   prop.missing = apply(ymat, 2, function(x) sum(is.na(x)) / n.times)
   missind <- which(missing)
   notmissind <- which(!missing)
-  y[missing] = 0
+  y[missind] = 0
   if (is.null(sig2)) sig2 = var(y)/10
 
   if(save.missing==T & sum(missing)!=0){
     y.save <- matrix(0, nrow=sum(missing), ncol=floor((iters-burn)/thin))
   }else{
-    y.save <- NULL
+    y.save <- NA
   }
 
   ### Create doy
@@ -278,13 +278,17 @@ BSTFA <- function(ymat, dates, coords,
     rm(list=c("mu.mean", "mu.var"))
     alpha.mu=rep(0, dim(newS)[2])
     tau2.mu = as.numeric(var(mu))
+    mu.save <- matrix(0, nrow=n.locs, ncol=floor((iters-burn)/thin))
+    alpha.mu.save <- matrix(0, nrow=dim(newS)[2], ncol=floor((iters-burn)/thin))
+    tau2.mu.save <- matrix(0,nrow=1,ncol=floor((iters-burn)/thin))
   } else {
     mu <- rep(0, n.locs)
     Jfullmu.long <- rep(0, n.times*n.locs)
+    mu.save <- NULL
+    alpha.mu.save <- NULL
+    tau2.mu.save <- NULL
   }
-  mu.save <- matrix(0, nrow=n.locs, ncol=floor((iters-burn)/thin))
-  alpha.mu.save <- matrix(0, nrow=dim(newS)[2], ncol=floor((iters-burn)/thin))
-  tau2.mu.save <- matrix(0,nrow=1,ncol=floor((iters-burn)/thin))
+  
 
 
   ### Set up linear component
@@ -308,13 +312,17 @@ BSTFA <- function(ymat, dates, coords,
     model.matrices$linear.Tsub <- Tsub
     alpha.beta <- rep(0, dim(newS)[2])
     tau2.beta <- as.numeric(var(beta))
+    beta.save <- matrix(0, nrow=n.locs, ncol=floor((iters-burn)/thin))
+    alpha.beta.save <- matrix(0, nrow=dim(newS)[2], ncol=floor((iters-burn)/thin))
+    tau2.beta.save <- matrix(0,nrow=1,ncol=floor((iters-burn)/thin))
  } else {
     beta <- rep(0, n.locs)
     Tfullbeta.long <- rep(0, n.times*n.locs)
+    beta.save <- NULL
+    alpha.beta.save <- NULL
+    tau2.beta.save <- NULL
   }
-  beta.save <- matrix(0, nrow=n.locs, ncol=floor((iters-burn)/thin))
-  alpha.beta.save <- matrix(0, nrow=dim(newS)[2], ncol=floor((iters-burn)/thin))
-  tau2.beta.save <- matrix(0,nrow=1,ncol=floor((iters-burn)/thin))
+  
 
   ######### If eigen style, can use variog and variofit to estimate phi get a "better" newS?
   
@@ -342,14 +350,17 @@ BSTFA <- function(ymat, dates, coords,
     model.matrices$seasonal.bs.basis <- bs.basis
     alpha.xi <- rep(0, dim(newS.xi)[2])
     tau2.xi <- apply(matrix(xi, nrow=n.seasn.knots, ncol=n.locs, byrow=F), 1, var)/sqrt(n.locs) #rep(0.01, n.seasn.knots) #as.numeric(var(xi))
+    xi.save <- matrix(0, nrow=n.locs*n.seasn.knots, ncol=floor((iters-burn)/thin))
+    alpha.xi.save <- matrix(0, nrow=n.seasn.knots*dim(newS)[2], ncol=floor((iters-burn)/thin))
+    tau2.xi.save <- matrix(0, nrow=n.seasn.knots, ncol=floor((iters-burn)/thin))
   } else {
     xi <- rep(0, n.locs*n.seasn.knots)
     Bfullxi.long <- rep(0, n.locs*n.times)
+    xi.save <- NULL
+    alpha.xi.save <- NULL
+    tau2.xi.save <- NULL
   }
-  xi.save <- matrix(0, nrow=n.locs*n.seasn.knots, ncol=floor((iters-burn)/thin))
-  alpha.xi.save <- matrix(0, nrow=n.seasn.knots*dim(newS)[2], ncol=floor((iters-burn)/thin))
-  tau2.xi.save <- matrix(0, nrow=n.seasn.knots, ncol=floor((iters-burn)/thin))
-
+  
 
   ### Deal with confounding
   if (mean | linear | seasonal) {
@@ -542,11 +553,19 @@ BSTFA <- function(ymat, dates, coords,
 
   delayFA = min(floor(burn/2), 500)
 
-  alphaT.save <- matrix(0, nrow=n.factors*n.temp.bases, ncol=floor((iters-burn)/thin))
-  F.tilde.save <- matrix(0, nrow=n.factors*n.times, ncol=floor((iters-burn)/thin))
-  Lambda.tilde.save <- matrix(0, nrow=n.factors*n.locs, ncol=floor((iters-burn)/thin))
-  alphaS.save <- matrix(0, nrow=n.factors*n.load.bases, ncol=floor((iters-burn)/thin))
-  tau2.lambda.save <- matrix(0, nrow=1, ncol=floor((iters-burn)/thin))
+  if(factors){
+    alphaT.save <- matrix(0, nrow=n.factors*n.temp.bases, ncol=floor((iters-burn)/thin))
+    F.tilde.save <- matrix(0, nrow=n.factors*n.times, ncol=floor((iters-burn)/thin))
+    Lambda.tilde.save <- matrix(0, nrow=n.factors*n.locs, ncol=floor((iters-burn)/thin))
+    alphaS.save <- matrix(0, nrow=n.factors*n.load.bases, ncol=floor((iters-burn)/thin))
+    tau2.lambda.save <- matrix(0, nrow=1, ncol=floor((iters-burn)/thin))
+  }else{
+    alphaT.save <- NULL
+    F.tilde.save <- NULL
+    Lambda.tilde.save <- NULL
+    alphaS.save <- NULL
+    tau2.lambda.save <- NULL
+  }
   alphaT <- rep(0, n.factors*n.temp.bases)
   alphaS <- rep(0, n.factors*n.load.bases)
   FLambda.long <- c(Fmat%*%t(Lambda))
@@ -827,12 +846,14 @@ BSTFA <- function(ymat, dates, coords,
 
 
     ### Fill in missing data
-    y[missind] = Jfullmu.long[missind] + Tfullbeta.long[missind] +
-      Bfullxi.long[missind] + FLambda.long[missind] + rnorm(sum(missing), 0, sqrt(sig2))
+    if(sum(missing)!=0){
+      y[missind] = Jfullmu.long[missind] + Tfullbeta.long[missind] +
+       Bfullxi.long[missind] + FLambda.long[missind] + rnorm(sum(missing), 0, sqrt(sig2))
 
-    if(save.missing==T){
-      if((i-burn)%%thin == 0 & i > burn){
-        y.save[,(i-burn)/thin] <- y[missind]
+      if(save.missing==T){
+        if((i-burn)%%thin == 0 & i > burn){
+          y.save[,(i-burn)/thin] <- y[missind]
+        }
       }
     }
 
@@ -856,20 +877,20 @@ BSTFA <- function(ymat, dates, coords,
 
   if (verbose) cat('Finished MCMC Sampling. \n')
 
-  output = list("mu" = coda::as.mcmc(t(mu.save)),
-                "alpha.mu" = coda::as.mcmc(t(alpha.mu.save)),
-                "tau2.mu" = coda::as.mcmc(t(tau2.mu.save)),
-                "beta" = coda::as.mcmc(t(beta.save)),
-                "alpha.beta" = coda::as.mcmc(t(alpha.beta.save)),
-                "tau2.beta" = coda::as.mcmc(t(tau2.beta.save)),
-                "xi" = coda::as.mcmc(t(xi.save)),
-                "alpha.xi" = coda::as.mcmc(t(alpha.xi.save)),
-                "tau2.xi" = coda::as.mcmc(t(tau2.xi.save)),
-                "F.tilde" = coda::as.mcmc(t(F.tilde.save)),
-                "alphaT" = coda::as.mcmc(t(alphaT.save)),
-                "Lambda.tilde" = coda::as.mcmc(t(Lambda.tilde.save)),
-                "alphaS" = coda::as.mcmc(t(alphaS.save)),
-                "tau2.lambda" = coda::as.mcmc(t(tau2.lambda.save)),
+  output = list("mu" = if(mean){coda::as.mcmc(t(mu.save))}else{NA},
+                "alpha.mu" = if(mean){coda::as.mcmc(t(alpha.mu.save))}else{NA},
+                "tau2.mu" = if(mean){coda::as.mcmc(t(tau2.mu.save))}else{NA},
+                "beta" = if(linear){coda::as.mcmc(t(beta.save))}else{NA},
+                "alpha.beta" = if(linear){coda::as.mcmc(t(alpha.beta.save))}else{NA},
+                "tau2.beta" = if(linear){coda::as.mcmc(t(tau2.beta.save))}else{NA},
+                "xi" = if(seasonal){coda::as.mcmc(t(xi.save))}else{NA},
+                "alpha.xi" = if(seasonal){coda::as.mcmc(t(alpha.xi.save))}else{NA},
+                "tau2.xi" = if(seasonal){coda::as.mcmc(t(tau2.xi.save))}else{NA},
+                "F.tilde" = if(factors){coda::as.mcmc(t(F.tilde.save))}else{NA},
+                "alphaT" = if(factors){coda::as.mcmc(t(alphaT.save))}else{NA},
+                "Lambda.tilde" = if(factors){coda::as.mcmc(t(Lambda.tilde.save))}else{NA},
+                "alphaS" = if(factors){coda::as.mcmc(t(alphaS.save))}else{NA},
+                "tau2.lambda" = if(factors){coda::as.mcmc(t(tau2.lambda.save))}else{NA},
                 "sig2" = coda::as.mcmc(t(sig2.save)),
                 "y.missing" = y.save,
                 "time.data" = time.data,
