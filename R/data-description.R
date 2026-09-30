@@ -19,20 +19,8 @@
 #'
 #' @format See \code{help(BSTFA)} for details of what is included as output from the BSTFA function.
 #' @examples
-#' set.seed(240)
-#' ff <- c(
-#'   22, #"west"
-#'   20, #"south"
-#'   48, #"north"
-#'   14 #"east"
-#' )
-#' out.sim <- BSTFA(ymat=out.sim$ymat, 
-#' dates=out.sim$dates, 
-#' coords=out.sim$coords, 
-#' iters=500, 
-#' save.missing=F, 
-#' factors.fixed=ff, 
-#' n.temp.bases=22)
+#' data(out.sim)
+#' dim(out.sim$ymat)
 "out.sim"
 
 

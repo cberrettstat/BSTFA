@@ -92,19 +92,12 @@
 #' @author Adam Simpson and Candace Berrett
 #' @examples
 #' set.seed(240)
-#' ff <- c(
-#'   22, #west
-#'   20, #south
-#'   48, #north
-#'   14 #east
-#' )
-#' out <- BSTFA(ymat=out.sim$ymat,
-#'   dates=out.sim$dates,
-#'   coords=out.sim$coords,
-#'   iters=500, 
-#'   save.missing=F, 
-#'   factors.fixed=ff, 
-#'   n.temp.bases=22)
+#' out <- BSTFA(ymat=out.sim$ymat[1:30,1:10],
+#'   dates=out.sim$dates[1:30],
+#'   coords=out.sim$coords[1:10,],
+#'   iters=250, 
+#'   save.missing=FALSE, 
+#'  n.factors=2)
 #' @export BSTFA
 BSTFA <- function(ymat, dates, coords,
                  iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
@@ -147,7 +140,7 @@ BSTFA <- function(ymat, dates, coords,
   y[missind] = 0
   if (is.null(sig2)) sig2 = var(y)/10
 
-  if(save.missing==T & sum(missing)!=0){
+  if(save.missing & sum(missing)!=0){
     y.save <- matrix(0, nrow=sum(missing), ncol=floor((iters-burn)/thin))
   }else{
     y.save <- NA
@@ -850,7 +843,7 @@ BSTFA <- function(ymat, dates, coords,
       y[missind] = Jfullmu.long[missind] + Tfullbeta.long[missind] +
        Bfullxi.long[missind] + FLambda.long[missind] + rnorm(sum(missing), 0, sqrt(sig2))
 
-      if(save.missing==T){
+      if(save.missing){
         if((i-burn)%%thin == 0 & i > burn){
           y.save[,(i-burn)/thin] <- y[missind]
         }

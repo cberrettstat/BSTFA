@@ -21,7 +21,7 @@ map_spatial_param(
   location = NULL,
   addthin = 1,
   collims = NULL,
-  printmap = TRUE
+  printmap = FALSE
 )
 }
 \arguments{
@@ -55,7 +55,7 @@ map_spatial_param(
 
 \item{collims}{Numeric vector of length 2 providing the lower and upper limits for the color scale. If \code{NULL} (default), the limits are set to be symmetric around zero based on the maximum absolute value of the parameter being plotted.}
 
-\item{printmap}{Logical scalar indicating whether to plot the resulting image.  Default is \code{TRUE}.}
+\item{printmap}{Logical scalar indicating whether to plot the resulting image.  Default is \code{FALSE}.}
 }
 \value{
 A plot of spatially-dependent parameter values for a grid of interpolated locations.

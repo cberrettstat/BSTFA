@@ -7,3 +7,5 @@ inst/doc
 
 *.Rproj
 .positai
+id_ed25519_github*
+AGENTS.md

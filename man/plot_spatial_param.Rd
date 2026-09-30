@@ -14,7 +14,7 @@ plot_spatial_param(
   color.gradient = (grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, name =
     "RdBu"))))(50),
   collims = NULL,
-  plotmap = TRUE
+  printmap = FALSE
 )
 }
 \arguments{
@@ -34,7 +34,7 @@ plot_spatial_param(
 
 \item{collims}{Numeric vector of length 2 providing the lower and upper limits for the color scale. If \code{NULL} (default), the limits are set to be symmetric around zero based on the maximum absolute value of the parameter being plotted.}
 
-\item{plotmap}{Logical scalar indicating whether to plot the resulting map or not.  Default is \code{TRUE}.}
+\item{printmap}{Logical scalar indicating whether to plot the resulting map or not.  Default is \code{TRUE}.}
 }
 \value{
 A plot of spatially-dependent parameter values for the observed locations.

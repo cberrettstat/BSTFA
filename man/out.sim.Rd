@@ -14,19 +14,7 @@ out.sim
 'bstfa' object named \code{out.sim} containing the output from running the BSTFA function on a small simulated data set.
 }
 \examples{
-set.seed(240)
-ff <- c(
-  22, #"west"
-  20, #"south"
-  48, #"north"
-  14 #"east"
-)
-out.sim <- BSTFA(ymat=out.sim$ymat, 
-dates=out.sim$dates, 
-coords=out.sim$coords, 
-iters=500, 
-save.missing=F, 
-factors.fixed=ff, 
-n.temp.bases=22)
+data(out.sim)
+dim(out.sim$ymat)
 }
 \keyword{datasets}

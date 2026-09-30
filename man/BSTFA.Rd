@@ -178,19 +178,12 @@ This function uses MCMC to draw from posterior distributions of a Bayesian spati
 }
 \examples{
 set.seed(240)
-ff <- c(
-  22, #west
-  20, #south
-  48, #north
-  14 #east
-)
-out <- BSTFA(ymat=out.sim$ymat,
-  dates=out.sim$dates,
-  coords=out.sim$coords,
-  iters=500, 
-  save.missing=F, 
-  factors.fixed=ff, 
-  n.temp.bases=22)
+out <- BSTFA(ymat=out.sim$ymat[1:30,1:10],
+  dates=out.sim$dates[1:30],
+  coords=out.sim$coords[1:10,],
+  iters=250, 
+  save.missing=FALSE, 
+ n.factors=2)
 }
 \author{
 Adam Simpson and Candace Berrett

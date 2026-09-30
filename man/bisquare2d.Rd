@@ -10,6 +10,8 @@ bisquare2d(locs, knots, latlon = FALSE)
 \item{locs}{Matrix of 2-dimensional coordinates for locations of interest.}
 
 \item{knots}{A matrix of 2-dimensional knot coordinates for a given resolution.}
+
+\item{latlon}{Logical scalar indicating whether to use euclidean distance (\code{FALSE}; default) or great circle distance (\code{TRUE}).#' @importFrom stats dist}
 }
 \value{
 A matrix containing the bisquare bases for a given resolution evaluated at the input locations.

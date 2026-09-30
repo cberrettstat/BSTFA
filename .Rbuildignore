@@ -7,3 +7,5 @@
 ^CONTRIBUTING\.md$
 ^\.positai$
 ^\.claude$
+^AGENTS\.md$
+^id_ed25519_github(\.pub)?$

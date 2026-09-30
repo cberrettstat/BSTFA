@@ -103,19 +103,13 @@
 #' @author Candace Berrett and Adam Simpson
 #' @examples
 #' set.seed(240)
-#' ff <- c(
-#'   22, #west
-#'   20, #south
-#'   48, #north
-#'   14 #east
-#' )
-#' out <- BSTFAfull(ymat=out.sim$ymat,
-#' dates=out.sim$dates,
-#' coords=out.sim$coords,
-#' iters=500, 
+#' out <- BSTFAfull(ymat=out.sim$ymat[1:30,1:10],
+#' dates=out.sim$dates[1:30],
+#' coords=out.sim$coords[1:10,],
+#' iters=100, 
 #' spatial.style="eigen",
-#' save.missing=F, 
-#' factors.fixed=ff)
+#' save.missing=FALSE, 
+#' n.factors=2)
 #' @export BSTFAfull
 BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.locs=ncol(ymat), x=NULL,
                      mean=FALSE, linear=TRUE, seasonal=TRUE, factors=TRUE,
@@ -153,7 +147,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
   prop.missing <- apply(ymat, 2, function(x) sum(is.na(x)) / n.times)
   y[whichmis] <- 0
 
-  if(save.missing==T & sum(missing)!=0){
+  if(save.missing & sum(missing)!=0){
     y.save <- matrix(0, nrow=sum(missing), ncol=floor((iters-burn)/thin))
   }else{
     y.save <- NULL
@@ -274,7 +268,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     Tfull <- Matrix::kronecker(Matrix::Diagonal(n=n.locs), Tsub)
     ItTT <- methods::as(base::kronecker(diag(1,n.locs), t(Tsub)%*%Tsub), "sparseMatrix")
     ItT <- methods::as(base::kronecker(diag(1,n.locs), t(Tsub)), "sparseMatrix")
-    if(is.null(beta)==T){
+    if(is.null(beta)==TRUE){
       beta.var <- solve(ItTT)
       beta.mean <- beta.var%*%ItT%*%y #starting values for beta
       beta <- my_mvrnorm(beta.mean, beta.var)
@@ -676,7 +670,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     y[whichmis] = Jfullmu.long[whichmis] + Tfullbeta.long[whichmis] +
       Bfullxi.long[whichmis] + FLambda.long[whichmis] + rnorm(sum(missing), 0, sqrt(sig2))
 
-    if(save.missing==T){
+    if(save.missing){
       if((i-burn)%%thin == 0 & i > burn){
         y.save[,(i-burn)/thin] <- y[whichmis]
       }
@@ -684,7 +678,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
 
     ### Adapt to help Metropolis sampling schemes
     if(adapt.epsilon>0 & i > burn){
-      if(factors==T){
+      if(factors){
         if(i==adapt.iter){
           if(n.factors>1){
             g.omega <- apply(Omega.save[,1:floor((i-burn)/thin)], 1, var)
@@ -705,7 +699,7 @@ BSTFAfull <- function(ymat, dates, coords, iters=10000, n.times=nrow(ymat), n.lo
     }#end if adapt.epsilon>0
 
     if(adapt.epsilon>0 & i > burn){
-      if(factors==T){
+      if(factors){
         if(i==adapt.iter){
           if(n.factors>1){
             g.phi.lambda <- apply(phi.lambda.save[,1:floor((i-burn)/thin)], 1, var)
