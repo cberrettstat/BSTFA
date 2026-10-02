@@ -18,5 +18,5 @@ LazyData: true
 LazyDataCompression: xz
 Imports: 
     MASS, RColorBrewer, ggplot2, ggpubr, mgcv, MCMCpack, coda, npreg, matrixcalc, scatterplot3d, sf, Rcpp, lubridate, Matrix, stats, methods, RcppArmadillo, geosphere
-Suggests: knitr, rmarkdown, utils, devtools, kableExtra, bookdown, magick, maps, loo
+Suggests: knitr, rmarkdown, devtools, kableExtra, bookdown, magick, maps, loo
 Config/roxygen2/version: 8.0.0
