@@ -73,7 +73,7 @@ summary.bstfa <- function(object, ...){
 #' @returns A plot of the selected parameter or variable.  
 #' @author Candace Berrett and Adam Simpson
 #' @examples
-#' plot(out.sim)
+#' plot(out.sim, fine=25)
 #' @export 
 plot.bstfa <- function(x, ..., plot.param='beta', type='map', location=1, loadings=NULL, factor=1){
   
@@ -85,7 +85,7 @@ plot.bstfa <- function(x, ..., plot.param='beta', type='map', location=1, loadin
   
   if(type=="map"){
     if(!plot.param %in% c("beta", "mu", "lambda")){stop("This type of plot requires a plot.param to be one of 'beta', 'mu', or 'lambda'.")}
-     m <- map_spatial_param(out, parameter=var.to.plot, loadings=loadings, type='mean')
+     m <- map_spatial_param(out, parameter=var.to.plot, loadings=loadings, type='mean', ...)
   }
   
   
